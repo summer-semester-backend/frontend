@@ -1,0 +1,23 @@
+{
+	"extends": "@vue/tsconfig/tsconfig.web.json",
+	"strict": false,
+	"include": [
+		"src/**/*",
+		"src/**/*.vue",
+		"vite.config.*",
+		".env-config.ts",
+		"components.d.ts"
+	],
+	"exclude": [
+		"/dist/**",
+		"node_modules"
+	],
+	"compilerOptions": {
+		"baseUrl": ".",
+		"paths": {
+			"@/*": ["./src/*"],
+			"~/*": ["./*"]
+		},
+		"types": ["node","naive-ui/volar"]
+	}
+}
