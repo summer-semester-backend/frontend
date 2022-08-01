@@ -1,5 +1,5 @@
 <template>
-  <n-config-provider :locale="zhCN" :date-locale="dateZhCN" class="h-full">
+  <n-config-provider :locale="zhCN" :date-locale="dateZhCN" :theme-overrides="colorConfig">
     <naive-provider>
       <app />
     </naive-provider>
@@ -9,6 +9,7 @@
 <script setup lang="ts">
 import { zhCN, dateZhCN } from 'naive-ui';
 import App from './App.vue';
+import { colorConfig } from './config/color';
 </script>
 
 <style scoped></style>
