@@ -1,1 +1,4 @@
-<template>project</template>
+<template>
+  <work-space />
+</template>
+<script setup lang="ts"></script>
