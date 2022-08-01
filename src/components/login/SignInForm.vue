@@ -4,10 +4,10 @@
       <n-input v-model:value="model.email" placeholder="请输入邮箱" />
     </n-form-item>
     <n-form-item path="passwd">
-      <n-input v-model:value="model.passwd" type="password" show-password-on="click" placeholder="请输入密码" />
+      <n-input v-model:value="model.password" type="password" show-password-on="click" placeholder="请输入密码" />
     </n-form-item>
     <n-space :vertical="true" :size="24">
-      <n-button :text="true" @click="">忘记密码？</n-button>
+      <n-button :text="true" @click="emits('forget')">忘记密码？</n-button>
       <n-button type="primary" size="large" :block="true" :round="true" @click="handleLogin"> 确定 </n-button>
     </n-space>
   </n-form>
@@ -16,20 +16,21 @@
 <script setup lang="ts">
 import { login } from '@/api/auth';
 import { useAuthStore } from '@/store/auth';
-import { reactive } from 'vue';
+import { reactive, defineEmits } from 'vue';
 import { useRouter } from 'vue-router';
 
+const emits = defineEmits(['forget']);
 const { signIn } = useAuthStore();
 const router = useRouter();
 
 const model = reactive({
   email: '',
-  passwd: '',
+  password: '',
 });
 
 const handleLogin = () => {
-  login({ email: model.email, passwd: model.passwd }).then((res) => {
-    if (res.data.status == 0) {
+  login({ email: model.email, password: model.password }).then((res) => {
+    if (res.data.result == 0) {
       localStorage.setItem('token', res.data.data.token);
       signIn(res.data.data.token);
       window.$message.info('登录成功');

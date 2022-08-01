@@ -1,4 +1,5 @@
 <template>
-  <work-space />
+  <!-- <work-space /> -->
+  <draggable-area />
 </template>
 <script setup lang="ts"></script>

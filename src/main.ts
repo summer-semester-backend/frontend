@@ -3,6 +3,7 @@ import { setupNaiveUI, setupAssets } from './plugins';
 import AppProvider from './AppProvider.vue';
 import router from './router';
 import VueKonva from 'vue-konva';
+import Vue3DraggableResizable from 'vue3-draggable-resizable';
 import { createPinia } from 'pinia';
 
 async function setupApp() {
@@ -12,7 +13,7 @@ async function setupApp() {
   // 按需引入naiveUI
   setupNaiveUI(app);
   // 路由准备就绪后挂载 App
-  app.use(router).use(createPinia()).use(VueKonva, { prefix: 'Konva' }).mount('#app');
+  app.use(router).use(createPinia()).use(VueKonva, { prefix: 'Konva' }).use(Vue3DraggableResizable).mount('#app');
 }
 
 setupApp();
