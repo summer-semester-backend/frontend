@@ -1,20 +1,18 @@
 <template>
-  <n-layout has-sider position="absolute">
-    <n-layout-sider collapsed collapse-mode="width" bordered>
-      <n-layout-header position="absolute">
-        <n-menu collapsed :options="topMenuOptions" :value="topValue" @update-value="handleTopUpdate" />
-      </n-layout-header>
-      <n-layout-footer position="absolute">
-        <n-menu
-          collapsed
-          :options="bottomMenuOptions"
-          class="bottom-menu"
-          :value="bottomValue"
-          @update-value="handleBottomUpdate"
-        />
-      </n-layout-footer>
-    </n-layout-sider>
-  </n-layout>
+  <n-layout-sider collapsed collapse-mode="width" bordered>
+    <n-layout-header position="absolute">
+      <n-menu collapsed :options="topMenuOptions" :value="topValue" @update-value="handleTopUpdate" />
+    </n-layout-header>
+    <n-layout-footer position="absolute">
+      <n-menu
+        collapsed
+        :options="bottomMenuOptions"
+        class="bottom-menu"
+        :value="bottomValue"
+        @update-value="handleBottomUpdate"
+      />
+    </n-layout-footer>
+  </n-layout-sider>
 </template>
 
 <script setup lang="tsx">
@@ -39,7 +37,7 @@ const topMenuOptions = createMenuOptions([
 ]);
 
 const bottomMenuOptions = createMenuOptions([
-  { path: '/user', name: '个人', icon: PersonCircleOutline },
+  { path: '/login', name: '个人', icon: PersonCircleOutline },
   { path: '/setting', name: '设置', icon: SettingsOutline },
 ]);
 </script>

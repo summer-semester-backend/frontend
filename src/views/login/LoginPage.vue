@@ -2,7 +2,7 @@
   <div class="flex flex-col h-screen my-auto items-center bg-login-pattern bg-cover">
     <div class="relative flex-center wh-full">
       <n-card :bordered="false" size="large" class="w-100 rounded-10px shadow-sm">
-        <n-gradient-text type="primary" :size="28">待定</n-gradient-text>
+        <n-gradient-text type="primary" class="m-auto" :size="28">项目管理平台</n-gradient-text>
         <main class="pt-24px">
           <n-tabs
             class="card-tabs"
