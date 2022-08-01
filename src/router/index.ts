@@ -26,6 +26,11 @@ const routes: RouteRecordRaw[] = [
     name: 'login',
     component: () => import('../views/login/LoginPage.vue'),
   },
+  {
+    path: '/document/editor',
+    name: 'editor',
+    component: () => import('../views/document/DocumentEditor.vue'),
+  },
 ];
 
 const router = createRouter({
