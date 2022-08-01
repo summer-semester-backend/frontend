@@ -71,6 +71,11 @@ import {
   NSlider,
   NResult,
   NDynamicTags,
+  NLayout,
+  NLayoutContent,
+  NLayoutSider,
+  NLayoutFooter,
+  NLayoutHeader,
 } from 'naive-ui';
 
 /** 按需引入naiveUI */
@@ -114,6 +119,11 @@ export default function setupNaiveUI(app: App) {
       NList,
       NListItem,
       NLoadingBarProvider,
+      NLayout,
+      NLayoutContent,
+      NLayoutSider,
+      NLayoutFooter,
+      NLayoutHeader,
       NModal,
       NMenu,
       NMessageProvider,
