@@ -1,8 +1,15 @@
 <template>
   <div ref="area">
     <Vue3DraggableResizable
+      :initW="110"
+      :initH="120"
+      v-model:x="x"
+      v-model:y="y"
+      v-model:w="w"
+      v-model:h="h"
+      v-model:active="active"
       :draggable="true"
-      :resizable="false"
+      :resizable="true"
       @activated="print('activated')"
       @deactivated="print('deactivated')"
       @drag-start="print('drag-start')"
@@ -12,7 +19,7 @@
       @drag-end="print('drag-end')"
       @resize-end="print('resize-end')"
     >
-      <n-button>hello</n-button>
+      <n-button class="h-full w-full">hello</n-button>
     </Vue3DraggableResizable>
     <Vue3DraggableResizable
       :draggable="true"
@@ -26,7 +33,7 @@
       @drag-end="print('drag-end')"
       @resize-end="print('resize-end')"
     >
-      <n-button>hello2</n-button>
+      <n-button class="h-full w-full">hello2</n-button>
     </Vue3DraggableResizable>
   </div>
 </template>

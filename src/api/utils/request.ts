@@ -1,7 +1,7 @@
 import axios from 'axios';
 import qs from 'qs';
 const mockUrl = 'http://127.0.0.1:4523/m1/1374970-0-default';
-const url = 'http://kurino.top/api';
+const url = 'http://43.138.77.8:8080/api/';
 const backend = axios.create({
   baseURL: url,
 });
