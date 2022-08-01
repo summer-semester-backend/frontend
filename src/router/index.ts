@@ -7,9 +7,19 @@ const routes: RouteRecordRaw[] = [
     redirect: 'login',
   },
   {
-    path: '/homepage',
-    name: 'homepage',
-    component: () => import('../views/homepage/HomePage.vue'),
+    path: '/project',
+    name: 'project',
+    component: () => import('../views/project/ProjectOverview.vue'),
+  },
+  {
+    path: '/team',
+    name: 'team',
+    component: () => import('../views/team/TeamOverview.vue'),
+  },
+  {
+    path: '/user',
+    name: 'user',
+    component: () => import('../views/user/UserOverview.vue'),
   },
   {
     path: '/login',

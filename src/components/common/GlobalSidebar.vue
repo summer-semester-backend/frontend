@@ -2,13 +2,7 @@
   <n-layout has-sider position="absolute">
     <n-layout-sider collapsed collapse-mode="width" bordered>
       <n-layout-header position="absolute">
-        <n-menu
-          collapsed
-          :options="topMenuOptions"
-          class="top-menu"
-          :value="topValue"
-          @update-value="handleTopUpdate"
-        />
+        <n-menu collapsed :options="topMenuOptions" :value="topValue" @update-value="handleTopUpdate" />
       </n-layout-header>
       <n-layout-footer position="absolute">
         <n-menu
@@ -45,7 +39,7 @@ const topMenuOptions = createMenuOptions([
 ]);
 
 const bottomMenuOptions = createMenuOptions([
-  { path: '/login', name: '个人', icon: PersonCircleOutline },
+  { path: '/user', name: '个人', icon: PersonCircleOutline },
   { path: '/setting', name: '设置', icon: SettingsOutline },
 ]);
 </script>
