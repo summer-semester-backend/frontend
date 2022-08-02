@@ -1,8 +1,5 @@
 <template>
   <n-form ref="formRef" :model="model" size="large" :show-label="false">
-    <n-form-item path="name">
-      <n-input v-model:value="model.username" placeholder="昵称" />
-    </n-form-item>
     <n-form-item path="email">
       <n-input v-model:value="model.email" placeholder="邮箱地址" />
     </n-form-item>
@@ -29,24 +26,23 @@
       </div>
     </n-form-item>
     <n-form-item path="passwd">
-      <n-input v-model:value="model.passwd" type="password" show-password-on="click" placeholder="密码" />
+      <n-input v-model:value="model.passwd" type="password" show-password-on="click" placeholder="新密码" />
     </n-form-item>
     <n-form-item path="confirmpasswd">
-      <n-input v-model:value="model.confirmpasswd" type="password" show-password-on="click" placeholder="确认密码" />
+      <n-input v-model:value="model.confirmpasswd" type="password" show-password-on="click" placeholder="确认新密码" />
     </n-form-item>
-    <n-button type="primary" size="large" :block="true" :round="true" @click="handleSubmit">确定</n-button>
+    <n-button type="primary" size="large" :block="true" :round="true" @click="handleSubmit">确定修改密码</n-button>
   </n-form>
 </template>
 
 <script setup lang="ts">
-import { applyRegisterCode, register } from '@/api/auth';
+import { applyForgetCode, forgetPassword } from '@/api/auth';
 import { reactive, ref } from 'vue';
 import type { CountdownProps } from 'naive-ui';
-import { isValid } from 'date-fns';
-const emits = defineEmits(['finish-register']);
+import { ArrowBack } from '@vicons/ionicons5';
+const emits = defineEmits(['finish-forget']);
 const valid = ref(true);
 const model = reactive({
-  username: '',
   email: '',
   code: '',
   passwd: '',
@@ -58,10 +54,9 @@ const handleRegisterCode = () => {
     window.$message.warning('输入邮箱不能为空');
     return;
   }
-  applyRegisterCode({ email: model.email });
+  applyForgetCode({ email: model.email });
   valid.value = false;
 };
-
 const renderCountdown: CountdownProps['render'] = ({ hours, minutes, seconds }) => {
   return `(${String(seconds).padStart(2, '0')})`;
 };
@@ -75,10 +70,10 @@ const handleSubmit = () => {
     window.$message.warning('两次输入密码不同！');
     return;
   }
-  register({ email: model.email, password: model.passwd, code: model.code }).then((res) => {
+  forgetPassword({ email: model.email, password: model.passwd, code: model.code }).then((res) => {
     if (res.data.result == 0) {
       window.$message.info('注册成功');
-      emits('finish-register');
+      emits('finish-forget');
     }
   });
 };

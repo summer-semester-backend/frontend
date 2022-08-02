@@ -1,8 +1,8 @@
 export const colorConfig = {
   common: {
-    primaryColor: '#fac03dFF',
-    primaryColorHover: '#FAD43DF7',
-    primaryColorPressed: '#db9b34FF',
-    primaryColorSuppl: 'rgba(148, 127, 42, 1)',
+    primaryColorSuppl: 'rgba(42, 111, 148, 1)',
+    primaryColorHover: '#7FE0E7FF',
+    primaryColor: '#63D7E2FF',
+    primaryColorPressed: '#5AB7CEFF',
   },
 };

@@ -1,13 +1,25 @@
 import { backend } from './utils/request';
 
-export function login(data: { email: string; passwd: string }) {
+export function login(data: { email: string; password: string }) {
   return backend.post('auth/login', data);
 }
 
-export function getCaptcha(data: { email: string }) {
-  return backend.post('auth/captcha', data);
+export function applyRegisterCode(data: { email: string }) {
+  return backend.post('auth/emailRegister', data);
 }
 
-export function register(data: { email: string; passwd: string; code: string }) {
+export function register(data: { email: string; password: string; code: string }) {
   return backend.post('auth/register', data);
+}
+
+export function applyForgetCode(data: { email: string }) {
+  return backend.post('auth/emailForget', data);
+}
+
+export function forgetPassword(data: { email: string; password: string; code: string }) {
+  return backend.post('auth/forgetPassword', data);
+}
+
+export function changePassword(data: { password: string; newPassword: string }) {
+  return backend.put('auth/changePassword', data);
 }
