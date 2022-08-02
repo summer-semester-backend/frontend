@@ -9,8 +9,10 @@ declare module 'vue' {
     GlobalContent: typeof import('./src/components/common/GlobalContent.vue')['default']
     GlobalSidebar: typeof import('./src/components/common/GlobalSidebar.vue')['default']
     NaiveProvider: typeof import('./src/components/common/NaiveProvider.vue')['default']
+    PersonInfo: typeof import('./src/components/user/PersonInfo.vue')['default']
     SignInForm: typeof import('./src/components/login/SignInForm.vue')['default']
     SignUpForm: typeof import('./src/components/login/SignUpForm.vue')['default']
+    UserBar: typeof import('./src/components/user/UserBar.vue')['default']
     WorkSpace: typeof import('./src/components/prototype/WorkSpace.vue')['default']
   }
 }
