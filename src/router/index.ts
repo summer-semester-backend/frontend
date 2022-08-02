@@ -7,6 +7,11 @@ const routes: RouteRecordRaw[] = [
     redirect: 'login',
   },
   {
+    path: '/project/desktop',
+    name: 'ProjectDesktop',
+    component: () => import('../views/project/ProjectDesktop.vue'),
+  },
+  {
     path: '/project',
     name: 'project',
     component: () => import('../views/project/ProjectOverview.vue'),
