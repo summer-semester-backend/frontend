@@ -6,14 +6,7 @@
           <n-icon size="18" color="rgb(100,100,100)"><search /></n-icon>
         </template>
       </n-button>
-      <n-input
-        v-model:value="input"
-        v-else
-        round
-        placeholder="搜索名称"
-        @blur="hideInput"
-        :style="{ width: inputWidth }"
-      >
+      <n-input v-model:value="input" v-else round placeholder="搜索名称" @blur="hideInput" style="width: 200px">
         <template #suffix>
           <n-icon size="18" :component="Search" />
         </template>
@@ -122,7 +115,6 @@ const {
 }>();
 
 const isEmbedded = ref(true); //卡片是否灰色
-const inputWidth = ref('0');
 const isInputShow = ref(false); //是否显示搜索框
 const page = ref(1); //当前页
 const pageSize = ref(10); //每页元素数
@@ -142,12 +134,10 @@ const options = ref([
 //显示搜索
 const showInput = () => {
   isInputShow.value = true;
-  inputWidth.value = '200px';
 };
 //隐藏搜索
 const hideInput = () => {
   isInputShow.value = false;
-  inputWidth.value = '0';
 };
 
 //选择操作
@@ -199,12 +189,6 @@ const title = computed(() => {
       .n-card:hover {
         cursor: pointer;
       }
-    }
-  }
-
-  #toolbar {
-    .n-input {
-      transition: width 1s;
     }
   }
 }
