@@ -13,6 +13,9 @@
       />
     </n-layout-footer>
   </n-layout-sider>
+          <n-button strong secondary type="info" @click="showUserBar()">
+        Info
+        </n-button>
 </template>
 
 <script setup lang="tsx">
@@ -20,8 +23,21 @@ import { ref } from 'vue';
 import { createMenuOptions } from './GlobalUtils.js';
 import { People, SettingsOutline, PersonCircleOutline } from '@vicons/ionicons5';
 import { ProjectOutlined } from '@vicons/antd';
+import { barState } from '../../store/auth';
+
 const topValue = ref<string | null>(null);
 const bottomValue = ref<string | null>(null);
+
+const barstate = barState();
+const showUserBar = () => {
+    barstate.openUserBar();
+}
+const showProjectBar = () => {
+    barstate.openProjectBar();
+}
+const showTeamBar = () => {
+    barstate.openTeamBar();
+}
 
 function handleTopUpdate(key: string) {
   bottomValue.value = null;
@@ -37,7 +53,7 @@ const topMenuOptions = createMenuOptions([
 ]);
 
 const bottomMenuOptions = createMenuOptions([
-  { path: '/login', name: '个人', icon: PersonCircleOutline },
+  { path: '/user', name: '个人', icon: PersonCircleOutline },
   { path: '/setting', name: '设置', icon: SettingsOutline },
 ]);
 </script>
