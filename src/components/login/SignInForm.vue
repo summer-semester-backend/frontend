@@ -31,10 +31,11 @@ const model = reactive({
 const handleLogin = () => {
   login({ email: model.email, password: model.password }).then((res) => {
     if (res.data.result == 0) {
-      localStorage.setItem('token', res.data.data.token);
-      signIn(res.data.data.token);
+      localStorage.setItem('token', res.data.token);
+      localStorage.setItem('userID', res.data.userID);
+      signIn(res.data.token);
       window.$message.info('登录成功');
-      router.push({ name: 'homepage' });
+      router.push({ name: 'project' });
     }
   });
 };
