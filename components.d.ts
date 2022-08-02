@@ -9,6 +9,7 @@ declare module 'vue' {
     NaiveProvider: typeof import('./src/components/common/NaiveProvider.vue')['default']
     SignInForm: typeof import('./src/components/login/SignInForm.vue')['default']
     SignUpForm: typeof import('./src/components/login/SignUpForm.vue')['default']
+    Vditor: typeof import('./src/components/document/Vditor.vue')['default']
   }
 }
 
