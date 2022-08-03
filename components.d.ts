@@ -18,6 +18,7 @@ declare module 'vue' {
     SidebarButton: typeof import('./src/components/common/SidebarButton.vue')['default']
     SignInForm: typeof import('./src/components/login/SignInForm.vue')['default']
     SignUpForm: typeof import('./src/components/login/SignUpForm.vue')['default']
+    TeamBar: typeof import('./src/components/team/TeamBar.vue')['default']
     UserBar: typeof import('./src/components/user/UserBar.vue')['default']
     Vditor: typeof import('./src/components/document/Vditor.vue')['default']
   }
