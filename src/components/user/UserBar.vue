@@ -49,18 +49,18 @@ const router = useRouter();
 const placement = ref("left");
 
 const barstate = barState();
-const active = computed(() => barstate.userBar);
+const active = computed(() => barstate.userBar);///////////////
 let backState = ref(false);
 
 const closeBar = () => {
-    barstate.closeUserBar();
+    barstate.closeUserBar();////////////////
 }
 
 const openBar = () => {
-    barstate.openUserBar();
+    barstate.openUserBar();///////////////
 }
 
-const itemList = ref([
+const itemList = ref([///////////////////
     {
         id:0,
         imgSrc: new URL("../../../public/resource/image/Bar/black/Info.svg", import.meta.url).href,
