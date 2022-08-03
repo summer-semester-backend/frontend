@@ -37,7 +37,7 @@
     </div>
 </template>
 
-<script setup>
+<script setup lang="js">
 import { ref , computed ,watch, onUpdated} from "vue";
 import { MenuOpenRound } from '@vicons/material';
 import { barState } from '../../store/auth';
@@ -174,8 +174,6 @@ onUpdated(()=>{
             flex-direction: row;
             justify-content: space-between;
             align-items: center;
-            padding: 0px;
-            gap: 122px;
 
             width: 200px;
             height: 35px;

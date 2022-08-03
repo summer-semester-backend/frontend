@@ -1,8 +1,7 @@
 <template>
     <div class="barBox" v-show="backState">
-
         <n-drawer
-        v-model:show="active"
+        :show="active"
         :width="270"
         :height="200"
         :placement="placement"
@@ -26,10 +25,6 @@
                     </div>
                 </div>
             </template>
-
-            <!-- <template #footer>
-            <n-button>Footer</n-button>
-            </template> -->
 
             </n-drawer-content>
 
@@ -131,7 +126,6 @@ const clickItem = (e,item) => {
 
 onUpdated(()=>{
     var list = document.querySelectorAll(".pointBox");
-    // alert(list.length);
     for(let i = 0; i < list.length; ++i)
     {
         // console.log(itemList.value[list[i].getAttribute("pos")].route , router.currentRoute.value.name)
@@ -162,15 +156,12 @@ onUpdated(()=>{
 
         background: #FFFFFF;
         border: 1px solid #D9D9D9;
-
         .head
         {
             display: flex;
             flex-direction: row;
             justify-content: space-between;
             align-items: center;
-            padding: 0px;
-            gap: 122px;
 
             width: 200px;
             height: 35px;
@@ -183,11 +174,18 @@ onUpdated(()=>{
             border-bottom: 2px solid #D9D9D9;
             .titleBox
             {
+                width: 48px;
+                height: 29px;
+
                 font-family: 'Inter';
                 font-style: normal;
                 font-weight: 700;
                 font-size: 24px;
                 line-height: 29px;
+
+                flex: none;
+                order: 0;
+                flex-grow: 0;
             }
             .icon
             {

@@ -48,7 +48,7 @@ export const barState = defineStore("bar",{
         },
 
         openTeamBar(){
-            this.userBar = true;
+            this.userBar = false;
             this.projectBar = false;
             this.teamBar = true;
         },

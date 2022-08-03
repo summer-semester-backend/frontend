@@ -2,7 +2,7 @@
     <div class="barBox" v-show="backState">
 
         <n-drawer
-        v-model:show="active"
+        :show="active"
         :width="270"
         :height="200"
         :placement="placement"
@@ -14,7 +14,7 @@
 
             <template #default>
                 <div class="head">
-                    <div class="titleBox">我的</div>
+                    <div class="titleBox">软工小学期</div>
                     <n-icon size="30" class="icon" @click="closeBar()">
                         <MenuOpenRound />
                     </n-icon>
@@ -26,10 +26,6 @@
                     </div>
                 </div>
             </template>
-
-            <!-- <template #footer>
-            <n-button>Footer</n-button>
-            </template> -->
 
             </n-drawer-content>
 
@@ -43,7 +39,7 @@ import { ref , computed ,watch, onUpdated} from "vue";
 import { MenuOpenRound } from '@vicons/material';
 import { barState } from '../../store/auth';
 import { pxfy } from "seemly";
-import {useRouter} from 'vue-router';
+import { useRouter } from 'vue-router';
 
 const router = useRouter();
 const placement = ref("left");
@@ -126,22 +122,22 @@ const coverColor = (target,item) => {
 
 const clickItem = (e,item) => {
     coverColor(e.currentTarget,item);
-    router.push({name:item.routeName});
+    // router.push({name:item.routeName});
 }
 
-onUpdated(()=>{
-    var list = document.querySelectorAll(".pointBox");
-    // alert(list.length);
-    for(let i = 0; i < list.length; ++i)
-    {
-        // console.log(itemList.value[list[i].getAttribute("pos")].route , router.currentRoute.value.name)
-        if(itemList.value[list[i].getAttribute("pos")].routeName == router.currentRoute.value.name)
-        {
-            coverColor(list[i],itemList.value[list[i].getAttribute("pos")]);
-            return;
-        }
-    }
-})
+// onUpdated(()=>{
+//     var list = document.querySelectorAll(".pointBox");
+//     // alert(list.length);
+//     for(let i = 0; i < list.length; ++i)
+//     {
+//         // console.log(itemList.value[list[i].getAttribute("pos")].route , router.currentRoute.value.name)
+//         if(itemList.value[list[i].getAttribute("pos")].routeName == router.currentRoute.value.name)
+//         {
+//             coverColor(list[i],itemList.value[list[i].getAttribute("pos")]);
+//             return;
+//         }
+//     }
+// })
 
 </script>
 
@@ -169,8 +165,6 @@ onUpdated(()=>{
             flex-direction: row;
             justify-content: space-between;
             align-items: center;
-            padding: 0px;
-            gap: 122px;
 
             width: 200px;
             height: 35px;
@@ -188,6 +182,13 @@ onUpdated(()=>{
                 font-weight: 700;
                 font-size: 24px;
                 line-height: 29px;
+
+                width: 120px;
+                height: 29px;
+
+                flex: none;
+                order: 0;
+                flex-grow: 0;
             }
             .icon
             {
