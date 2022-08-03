@@ -1,25 +1,45 @@
 import { backend } from './utils/request';
 
-export function login(data: { email: string; password: string }) {
-  return backend.post('auth/login', data);
+export function userProjectList() {
+  return backend.post('/project/userProjectList');
 }
 
-export function applyRegisterCode(data: { email: string }) {
-  return backend.post('auth/emailRegister', data);
+export function teamProjectList(data: { teamID: number }) {
+  return backend.post('/project/teamProjectList', data);
 }
 
-export function register(data: { email: string; password: string; code: string }) {
-  return backend.post('auth/register', data);
+export function recentProjectList() {
+  return backend.post('/project/lastVisitProject');
 }
 
-export function applyForgetCode(data: { email: string }) {
-  return backend.post('auth/emailForget', data);
+export function trashProjectList() {
+  return backend.post('/project/projectUserBinList');
 }
 
-export function forgetPassword(data: { email: string; password: string; code: string }) {
-  return backend.post('auth/forgetPassword', data);
+export function createProject(data: { projectName: string; teamID: number | null; projectImage: string }) {
+  return backend.post('/project/createProject', data);
 }
 
-export function changePassword(data: { password: string; newPassword: string }) {
-  return backend.put('auth/changePassword', data);
+export function deleteProject(data: { projectID: number }) {
+  return backend.post('/project/deleteProject', data);
+}
+
+export function recoverProject(data: { projectID: number }) {
+  return backend.post('/project/recoverProject', data);
+}
+
+export function abandonProject(data: { projectID: number }) {
+  return backend.post('/project/abandonProject', data);
+}
+
+export function renameProject(data: { projectID: number; newProjectName: string }) {
+  return backend.post('/project/renameProject', data);
+}
+
+export function projectDetail(data: { projectID: number }) {
+  return backend.post('/project/projectDetail', data);
+}
+
+export function clearBin() {
+  return backend.post('/project/clearBin');
 }

@@ -3,36 +3,52 @@
   <ProjectBar id="projectBar"></ProjectBar>
   <!-- <div class="box" id="projectBar"></div> -->
   <RecentProject />
-  <ProjectList :projects="projects" />
+  <ProjectList :projects="projects" @refresh="getProjectList" />
 </template>
 <script setup lang="ts">
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
+import { userProjectList } from '@/api/project';
 const projects = ref([
   {
-    id: 1,
-    name: 'project1project1project1project1',
-    url: '/resource/image/project1.jpeg',
+    projectID: 1,
+    projectName: 'project1project1project1project1',
+    projectImage: '/resource/image/project1.jpeg',
+    createTime: '2022-01-01',
+    lastVisitTime: '2022-01-01',
   },
   {
-    id: 2,
-    name: '敏捷开发',
-    url: '/resource/image/project1.jpeg',
+    projectID: 2,
+    projectName: '敏捷开发',
+    projectImage: '/resource/image/project1.jpeg',
+    createTime: '2020-01-01',
+    lastVisitTime: '2020-01-01',
   },
 ]);
+const getProjectList = () => {
+  userProjectList()
+    .then((res) => {
+      projects.value = res.data.list;
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+};
+onMounted(() => {
+  getProjectList();
+});
 </script>
 
 <style lang="less" scoped>
-    // #projectBar
-    // {
-    //     float: left;
-    //     height: 100%;
-        
-    // }
+// #projectBar
+// {
+//     float: left;
+//     height: 100%;
 
-    .box
-    {
-      height: 100%;
-      width: 270px;
-      background-color: aqua;
-    }
+// }
+
+.box {
+  height: 100%;
+  width: 270px;
+  background-color: aqua;
+}
 </style>

@@ -46,6 +46,11 @@ const routes: RouteRecordRaw[] = [
     ],
   },
   {
+    path: '/team/project',
+    name: 'TeamProject',
+    component: () => import('../views/team/TeamProject.vue'),
+  },
+  {
     path: '/user',
     name: 'user',
     component: () => import('../views/user/UserOverview.vue'),

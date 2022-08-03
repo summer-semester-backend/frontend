@@ -1,7 +1,7 @@
 <template>
   <div style="position: relative">
     <!--工具栏-->
-    <n-el tag="div" id="toolbar" style="position: absolute; right: 10px; top: 20px; z-index: 2">
+    <n-el tag="div" id="toolbar" style="position: absolute; right: 10px; top: 15px; z-index: 2">
       <slot name="toolbar"></slot>
     </n-el>
     <!--标签页-->
