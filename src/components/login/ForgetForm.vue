@@ -72,7 +72,7 @@ const handleSubmit = () => {
   }
   forgetPassword({ email: model.email, password: model.passwd, code: model.code }).then((res) => {
     if (res.data.result == 0) {
-      window.$message.info('注册成功');
+      window.$message.info('密码修改成功！');
       emits('finish-forget');
     }
   });

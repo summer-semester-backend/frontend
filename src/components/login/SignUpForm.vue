@@ -1,7 +1,7 @@
 <template>
   <n-form ref="formRef" :model="model" size="large" :show-label="false">
     <n-form-item path="name">
-      <n-input v-model:value="model.username" placeholder="昵称" />
+      <n-input v-model:value="model.username" placeholder="用户名" />
     </n-form-item>
     <n-form-item path="email">
       <n-input v-model:value="model.email" placeholder="邮箱地址" />
@@ -75,7 +75,7 @@ const handleSubmit = () => {
     window.$message.warning('两次输入密码不同！');
     return;
   }
-  register({ email: model.email, password: model.passwd, code: model.code }).then((res) => {
+  register({ username: model.username, email: model.email, password: model.passwd, code: model.code }).then((res) => {
     if (res.data.result == 0) {
       window.$message.info('注册成功');
       emits('finish-register');
