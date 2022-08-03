@@ -20,7 +20,7 @@ export function addTeamManager(data: { teamID: string; userID: number }) {
   return backend.post('team/manager/add', data);
 }
 
-export function updateTeamDetail(data: { teamID: string }) {
+export function updateTeamDetail(data: { teamID: string; teamname: string; summary: string }) {
   return backend.post('team/change', data);
 }
 
@@ -38,4 +38,8 @@ export function deleteTeamMember(data: { teamID: string; userID: number }) {
 
 export function deleteTeam(data: { teamID: string }) {
   return backend.post('team/delete', data);
+}
+
+export function leaveTeam(data: { teamID: string }) {
+  return backend.post('team/leave', data);
 }

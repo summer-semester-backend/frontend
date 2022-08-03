@@ -27,7 +27,7 @@ const isReloading = ref(false);
 const emits = defineEmits(['require-reload']);
 const nameColumn = reactive<DataTableBaseColumn>({
   title: '姓名',
-  key: 'name',
+  key: 'username',
   filter: 'default',
   filterOptionValue: null,
   sorter(rowA: any, rowB: any) {
@@ -164,6 +164,7 @@ function reload() {
   });
 }
 defineExpose({ handleFilterSearch, handleInviteUser, reload });
+onMounted(reload);
 </script>
 
 <style scoped></style>
