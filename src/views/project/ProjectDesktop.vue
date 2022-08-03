@@ -3,7 +3,7 @@
   <ProjectBar id="projectBar"></ProjectBar>
   <!-- <div class="box" id="projectBar"></div> -->
   <RecentProject />
-  <ProjectList :projects="projects" @refresh="getProjectList" />
+  <ProjectList :projects="projects" @refresh="getProjectList" :page-size="10" />
 </template>
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';

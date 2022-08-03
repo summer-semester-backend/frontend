@@ -4,7 +4,7 @@
     <div id="recent-box">
       <n-grid x-gap="30" :cols="6">
         <n-gi v-for="(item, index) in projects" :key="index">
-          <n-tooltip :delay="500" placement="bottom-end" @update:show="handleUpdateShow(item.projectID)">
+          <n-tooltip :delay="500" placement="bottom-start" @update:show="handleUpdateShow(item.projectID)">
             <template #trigger>
               <n-card
                 :segmented="{
