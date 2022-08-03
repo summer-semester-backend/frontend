@@ -1,163 +1,108 @@
 <template>
-  <div class="barBox" v-show="backState">
-    <n-drawer
-      :show="active"
-      :width="270"
-      :height="200"
-      :placement="placement"
-      :trap-focus="false"
-      :block-scroll="false"
-      to=".barBox"
-    >
-      <n-drawer-content>
-        <template #default>
-          <div class="head">
-            <div class="titleBox">软工小学期</div>
-            <n-icon size="30" class="icon" @click="closeBar()">
-              <MenuOpenRound />
-            </n-icon>
-          </div>
-          <div class="itemBox">
-            <div v-for="item in itemList" :pos="item.id" class="pointBox" @click="clickItem($event, item)">
-              <img :src="item.imgSrc" alt="" />
-              <div class="title">{{ item.title }}</div>
-            </div>
-          </div>
-        </template>
-      </n-drawer-content>
-    </n-drawer>
+  <div class="barBox">
+    <div class="head">
+      <n-select v-model:value="value" :options="options" style="width: 150px;font-weight: bold;"/>
+      <!-- <div class="titleBox">软工小学期</div> -->
+      <n-icon size="30" class="icon">
+        <MenuOpenRound />
+      </n-icon>
+    </div>
+    
+      <n-space vertical>
+          <!-- <n-switch v-model:value="collapsed" /> -->
+          <n-layout has-sider>
+            <!-- <n-layout-sider
+              bordered
+              collapse-mode="width"
+              :collapsed-width="64"
+              :width="240"
+              :collapsed="collapsed"
+              show-trigger
+              @collapse="collapsed = true"
+              @expand="collapsed = false"
+            > -->
+            <n-layout>
+              <n-menu
+                v-model:value="activeKey"
+                :collapsed="collapsed"
+                :collapsed-width="64"
+                :collapsed-icon-size="22"
+                :options="menuOptions"
+                :icon-size="26"
+                style="width: 250px;font-size: 17px;font-weight:bold;"
+              />
+            </n-layout>
+            <!-- </n-layout-sider> -->
+            <!-- <n-layout>
+              <span>内容</span>
+            </n-layout> -->
+          </n-layout>
+      </n-space>
+    
   </div>
 </template>
 
-<script setup lang="js">
-import { ref, computed, watch, onUpdated } from 'vue';
+<script setup>
+import { defineComponent, h, ref ,computed} from "vue";
 import { MenuOpenRound } from '@vicons/material';
-import { barState } from '../../store/auth';
-import { pxfy } from "seemly";
-import { useRouter } from 'vue-router';
+import { useRouter , RouterLink} from 'vue-router';
+
+import { NIcon } from "naive-ui";
+import { AppstoreAddOutlined ,SettingOutlined} from "@vicons/antd";
+
+function renderIcon(icon) {
+  return () => h(NIcon, null, { default: () => h(icon) });
+}
 
 const router = useRouter();
-const placement = ref('left');
+const activeKey = ref(router.currentRoute.value.name);
+const collapsed = ref(false);
 
-const barstate = barState(); //跨组件通信
-const active = computed(() => barstate.teamBar); //随不同bar变化
-let backState = ref(false);
-
-const closeBar = () => {
-  barstate.closeTeamBar(); //随不同bar变化
-};
-
-const openBar = () => {
-  barstate.openTeamBar(); //随不同bar变化
-};
-
-const itemList = ref([
-  //随不同bar变化
+const value = ref[null];
+const options = [
   {
-    id: 0,
-    imgSrc: new URL('../../../public/resource/image/Bar/black/Info.svg', import.meta.url).href,
-    imgSrcHover: new URL('../../../public/resource/image/Bar/blue/InfoHover.svg', import.meta.url).href,
-    title: '团队项目',
-    routeName: '', //needfill
-  },
-  {
-    id: 1,
-    imgSrc: new URL('../../../public/resource/image/Bar/black/Setting.svg', import.meta.url).href,
-    imgSrcHover: new URL('../../../public/resource/image/Bar/blue/SettingHover.svg', import.meta.url).href,
-    title: '团队信息',
-    routeName: '', //needfill
-  },
-]);
-
-watch(
-  active,
-  (newValue, oldValue) => {
-    if (newValue == true) backState.value = true;
-    else {
-      var item = document.querySelector('.barBox');
-      var originWidth = item.offsetWidth;
-
-      var timer = setInterval(function () {
-        item.style.width = item.offsetWidth - originWidth / 10 + 'px';
-      }, 30);
-
-      setTimeout(function () {
-        clearInterval(timer);
-        backState.value = false;
-        item.style.width = originWidth + 'px';
-      }, 150);
-    }
-  },
-  { immediate: false }
-);
-
-// const enterItem = (e,item) => {
-//     e.target.querySelector("img").src = item.imgSrcHover;
-//     e.target.querySelector(".title").style.color = "#1481FF";
-// }
-
-// const leaveItem = (e,item) => {
-//     e.target.querySelector("img").src = item.imgSrc;
-//     e.target.querySelector(".title").style.color = "#000000";
-// }
-// @mouseenter="enterItem($event,item)"
-// @mouseleave="leaveItem($event,item)"
-
-const coverColor = (target, item) => {
-  var list = document.querySelectorAll('.pointBox');
-  for (let i = 0; i < list.length; ++i) {
-    list[i].style.backgroundColor = '';
-    list[i].querySelector('.title').style.color = '#000000';
-    list[i].querySelector('img').src = itemList.value[list[i].getAttribute('pos')].imgSrc;
+    label: '软工小学期',
+    value: 'ssss'
   }
+];
 
-  target.style.backgroundColor = '#E5F0FF';
-  target.querySelector('.title').style.color = '#1481FF';
-  target.querySelector('img').src = item.imgSrcHover;
-};
 
-const clickItem = (e, item) => {
-  coverColor(e.currentTarget, item);
-  router.push({ name: item.routeName });
-};
+const menuOptions = [
+  {
+    label: () =>
+      h(
+        RouterLink,
+        {
+          to: {
+            name: "TeamProject"
+          }
+        },
+        { default: () => '团队项目' }
+      ),
+    key: "TeamProject",
+    icon: renderIcon(AppstoreAddOutlined)
+  },
+  {
+    label: () =>
+      h(
+        RouterLink,
+        {
+          to: {
+            name: "PasswordChange"
+          }
+        },
+        { default: () => '团队设置' }
+      ),
+    key: "PasswordChange",
+    icon: renderIcon(SettingOutlined),
+  },
+];
 
-onUpdated(() => {
-  var list = document.querySelectorAll('.pointBox');
-  // alert(list.length);
-  for (let i = 0; i < list.length; ++i) {
-    // console.log(itemList.value[list[i].getAttribute("pos")].route , router.currentRoute.value.name)
-    if (itemList.value[list[i].getAttribute('pos')].routeName == router.currentRoute.value.name) {
-      coverColor(list[i], itemList.value[list[i].getAttribute('pos')]);
-      return;
-    }
-
-    target.style.backgroundColor = "#E5F0FF";
-    target.querySelector(".title").style.color = "#1481FF";
-    target.querySelector("img").src = item.imgSrcHover;
-}
-
-const clickItem = (e,item) => {
-    coverColor(e.currentTarget,item);
-    // router.push({name:item.routeName});
-}
-
-// onUpdated(()=>{
-//     var list = document.querySelectorAll(".pointBox");
-//     // alert(list.length);
-//     for(let i = 0; i < list.length; ++i)
-//     {
-//         // console.log(itemList.value[list[i].getAttribute("pos")].route , router.currentRoute.value.name)
-//         if(itemList.value[list[i].getAttribute("pos")].routeName == router.currentRoute.value.name)
-//         {
-//             coverColor(list[i],itemList.value[list[i].getAttribute("pos")]);
-//             return;
-//         }
-//     }
-// })
 </script>
 
 <style lang="less" scoped>
-.barBox {
+.barBox 
+{
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
@@ -173,7 +118,8 @@ const clickItem = (e,item) => {
   background: #ffffff;
   border: 1px solid #d9d9d9;
 
-  .head {
+  .head 
+  {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
@@ -187,90 +133,21 @@ const clickItem = (e,item) => {
     align-self: stretch;
     flex-grow: 0;
 
+    padding-bottom: 10px;
     border-bottom: 2px solid #d9d9d9;
-
-    .titleBox {
+    .titleBox
+    {
       font-family: 'Inter';
       font-style: normal;
       font-weight: 700;
       font-size: 24px;
       line-height: 29px;
-
-      width: 120px;
-      height: 29px;
-
-      flex: none;
-      order: 0;
-      flex-grow: 0;
     }
-    .icon {
+    .icon
+    {
       cursor: pointer;
     }
   }
 
-  .itemBox {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    padding: 0px;
-
-    width: 200px;
-    height: 104px;
-
-    flex: none;
-    order: 1;
-    flex-grow: 0;
-    margin-top: 10px;
-
-    .pointBox {
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      padding: 12px 10px;
-      gap: 10px;
-
-      width: 200px;
-      height: 52px;
-
-      cursor: pointer;
-      border-radius: 8px;
-
-      flex: none;
-      order: 0;
-      flex-grow: 0;
-
-      margin-top: 5px;
-
-      img {
-        width: 28px;
-        height: 28px;
-
-        flex: none;
-        order: 0;
-        flex-grow: 0;
-      }
-
-      .title {
-        width: 142px;
-        height: 19px;
-
-        font-family: 'Inter';
-        font-style: normal;
-        font-weight: 600;
-        font-size: 16px;
-        line-height: 19px;
-
-        color: black;
-
-        flex: none;
-        order: 1;
-        flex-grow: 1;
-      }
-    }
-    .pointBox:hover {
-      background: #f4f4f4;
-      transition: 0.2s;
-    }
-  }
 }
 </style>

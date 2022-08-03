@@ -1,7 +1,5 @@
 <template>
   <!-- <work-space /> -->
-  <ProjectBar id="projectBar"></ProjectBar>
-  <!-- <div class="box" id="projectBar"></div> -->
   <RecentProject />
   <ProjectList :projects="projects" @refresh="getProjectList" />
 </template>
@@ -39,12 +37,6 @@ onMounted(() => {
 </script>
 
 <style lang="less" scoped>
-// #projectBar
-// {
-//     float: left;
-//     height: 100%;
-
-// }
 
 .box {
   height: 100%;
