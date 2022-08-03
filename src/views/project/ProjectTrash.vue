@@ -1,4 +1,6 @@
 <template>
+  <ProjectBar id="projectBar"></ProjectBar>
+
   <div id="content">
     <Header title="回收站">
       <template #toolbar>
@@ -188,6 +190,12 @@ const dataFilter = computed(() => {
 });
 </script>
 <style scope lang="less">
+#projectBar
+{
+    float: left;
+    height: 100%;
+}
+
 #content {
   padding: 40px 60px;
   position: relative;

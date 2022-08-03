@@ -1,5 +1,5 @@
 <template>
-  <TeamBar></TeamBar>
+  <div>2222</div>
 </template>
 
 <script setup>
