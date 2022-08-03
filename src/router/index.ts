@@ -7,6 +7,16 @@ const routes: RouteRecordRaw[] = [
     redirect: 'login',
   },
   {
+    path: '/project/desktop',
+    name: 'ProjectDesktop',
+    component: () => import('../views/project/ProjectDesktop.vue'),
+  },
+  {
+    path: '/project/trash',
+    name: 'ProjectTrash',
+    component: () => import('../views/project/ProjectTrash.vue'),
+  },
+  {
     path: '/project',
     name: 'project',
     component: () => import('../views/project/ProjectOverview.vue'),
@@ -25,6 +35,11 @@ const routes: RouteRecordRaw[] = [
     path: '/login',
     name: 'login',
     component: () => import('../views/login/LoginPage.vue'),
+  },
+  {
+    path: '/document/editor',
+    name: 'editor',
+    component: () => import('../views/document/DocumentEditor.vue'),
   },
 ];
 
