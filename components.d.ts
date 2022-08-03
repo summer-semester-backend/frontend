@@ -8,6 +8,7 @@ declare module 'vue' {
     ForgetForm: typeof import('./src/components/login/ForgetForm.vue')['default']
     GlobalContent: typeof import('./src/components/common/GlobalContent.vue')['default']
     GlobalSidebar: typeof import('./src/components/common/GlobalSidebar.vue')['default']
+    Header: typeof import('./src/components/common/Header.vue')['default']
     NaiveProvider: typeof import('./src/components/common/NaiveProvider.vue')['default']
     ProjectList: typeof import('./src/components/project/ProjectList.vue')['default']
     RecentProject: typeof import('./src/components/project/RecentProject.vue')['default']

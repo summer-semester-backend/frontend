@@ -1,28 +1,28 @@
 <template>
   <div id="content">
-    <n-el tag="div" id="toolbar" style="position: absolute; right: 60px; top: 60px; z-index: 2">
-      <n-button v-if="!isInputShow" @click="showInput" quaternary circle>
-        <template #icon>
-          <n-icon size="18" color="rgb(100,100,100)"><search /></n-icon>
-        </template>
-      </n-button>
-      <n-input v-model:value="input" v-else round placeholder="搜索名称" @blur="hideInput" style="width: 200px">
-        <template #suffix>
-          <n-icon size="18" :component="Search" />
-        </template>
-      </n-input>
-      <n-dropdown :options="options" @select="handleSelect">
-        <n-button quaternary circle
-          ><template #icon>
-            <n-icon size="18" color="rgb(100,100,100)"><ellipsis-horizontal /></n-icon> </template
-        ></n-button>
-      </n-dropdown>
-    </n-el>
-    <n-tabs type="line" animated>
-      <n-tab-pane name="project" tab="回收站">
+    <Header title="回收站">
+      <template #toolbar>
+        <n-button v-if="!isInputShow" @click="showInput" quaternary circle>
+          <template #icon>
+            <n-icon size="18" color="rgb(100,100,100)"><search /></n-icon>
+          </template>
+        </n-button>
+        <n-input v-model:value="input" v-else round placeholder="搜索名称" @blur="hideInput" style="width: 200px">
+          <template #suffix>
+            <n-icon size="18" :component="Search" />
+          </template>
+        </n-input>
+        <n-dropdown :options="options" @select="handleSelect">
+          <n-button quaternary circle
+            ><template #icon>
+              <n-icon size="18" color="rgb(100,100,100)"><ellipsis-horizontal /></n-icon> </template
+          ></n-button>
+        </n-dropdown>
+      </template>
+      <template #content>
         <n-data-table :columns="columns" :data="dataFilter" :pagination="pagination" :bordered="false" />
-      </n-tab-pane>
-    </n-tabs>
+      </template>
+    </Header>
   </div>
 </template>
 <script setup lang="ts">
