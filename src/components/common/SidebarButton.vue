@@ -34,9 +34,11 @@ const route = useRoute();
 const props = defineProps<{ buttonName: string; routeName: string; barName: string }>();
 const handleDirect = () => {
   router.push({ name: props.routeName });
-  if (props.barName == 'user') showUserBar();
-  if (props.barName == 'project') showProjectBar();
-  if (props.barName == 'team') showTeamBar();
+  setTimeout(function () {
+    if (props.barName == 'user') showUserBar();
+    if (props.barName == 'project') showProjectBar();
+    if (props.barName == 'team') showTeamBar();
+  }, 150);
 };
 const isSelect = computed(() => {
   return route.fullPath.split('/')[1] == props.routeName;

@@ -165,8 +165,6 @@ onUpdated(() => {
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    padding: 0px;
-    gap: 122px;
 
     width: 200px;
     height: 35px;

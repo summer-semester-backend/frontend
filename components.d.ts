@@ -22,6 +22,7 @@ declare module 'vue' {
     SignUpForm: typeof import('./src/components/login/SignUpForm.vue')['default']
     TeamAdd: typeof import('./src/components/team/modal/TeamAdd.vue')['default']
     TeamBar: typeof import('./src/components/team/TeamBar.vue')['default']
+    TeamInfo: typeof import('./src/components/team/TeamInfo.vue')['default']
     TeamInvite: typeof import('./src/components/team/modal/TeamInvite.vue')['default']
     TeamSetting: typeof import('./src/components/team/TeamSetting.vue')['default']
     UploadButton: typeof import('./src/components/common/UploadButton.vue')['default']

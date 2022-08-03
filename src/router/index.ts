@@ -55,21 +55,21 @@ const routes: RouteRecordRaw[] = [
     name: 'user',
     component: () => import('../views/user/UserOverview.vue'),
     children: [
-        {
-          path: 'personInfo',
-          name: 'PersonInfo',
-          component: () => import('../components/user/PersonInfo.vue'),
-        },
-        {
-          path: 'passwordChange',
-          name: 'PasswordChange',
-          component: () => import('../components/user/PasswordChange.vue'),
-        },
-        {
-          path: "",
-          redirect: "/user/personInfo",
-        },
-    ]
+      {
+        path: 'personInfo',
+        name: 'PersonInfo',
+        component: () => import('../components/user/PersonInfo.vue'),
+      },
+      {
+        path: 'passwordChange',
+        name: 'PasswordChange',
+        component: () => import('../components/user/PasswordChange.vue'),
+      },
+      {
+        path: '',
+        redirect: '/user/personInfo',
+      },
+    ],
   },
   {
     path: '/login',

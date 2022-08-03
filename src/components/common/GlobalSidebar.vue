@@ -6,10 +6,10 @@
         <sidebar-button button-name="项目" route-name="project" bar-name="project">
           <project-outlined />
         </sidebar-button>
-        <sidebar-button button-name="团队" route-name="team" bar-name="team">
+        <sidebar-button button-name="团队" route-name="TeamInfo" bar-name="team">
           <people />
         </sidebar-button>
-        <sidebar-button button-name="个人" route-name="user" bar-name="user">
+        <sidebar-button button-name="个人" route-name="PersonInfo" bar-name="user">
           <person-circle-outline />
         </sidebar-button>
       </n-space>
@@ -23,6 +23,7 @@
       </n-space>
     </n-layout-footer>
   </n-layout-sider>
+
 </template>
 
 <script setup lang="tsx">
@@ -32,7 +33,7 @@ import { People, SettingsOutline, PersonCircleOutline } from '@vicons/ionicons5'
 import { ProjectOutlined } from '@vicons/antd';
 import {useRouter} from 'vue-router';
 
-const router = useRouter();
+
 const topValue = ref<string | null>(null);
 const bottomValue = ref<string | null>(null);
 

@@ -1,7 +1,7 @@
 <template>
   <div class="barBox" v-show="backState">
     <n-drawer
-      v-model:show="active"
+      :show="active"
       :width="270"
       :height="200"
       :placement="placement"
@@ -134,8 +134,29 @@ onUpdated(() => {
       coverColor(list[i], itemList.value[list[i].getAttribute('pos')]);
       return;
     }
-  }
-});
+
+    target.style.backgroundColor = "#E5F0FF";
+    target.querySelector(".title").style.color = "#1481FF";
+    target.querySelector("img").src = item.imgSrcHover;
+}
+
+const clickItem = (e,item) => {
+    coverColor(e.currentTarget,item);
+    router.push({name:item.routeName});
+}
+
+onUpdated(()=>{
+    var list = document.querySelectorAll(".pointBox");
+    for(let i = 0; i < list.length; ++i)
+    {
+        // console.log(itemList.value[list[i].getAttribute("pos")].route , router.currentRoute.value.name)
+        if(itemList.value[list[i].getAttribute("pos")].routeName == router.currentRoute.value.name)
+        {
+            coverColor(list[i],itemList.value[list[i].getAttribute("pos")]);
+            return;
+        }
+    }
+})
 </script>
 
 <style lang="less" scoped>
@@ -160,8 +181,6 @@ onUpdated(() => {
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    padding: 0px;
-    gap: 122px;
 
     width: 200px;
     height: 35px;
