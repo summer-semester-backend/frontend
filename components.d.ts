@@ -8,6 +8,7 @@ declare module 'vue' {
     ForgetForm: typeof import('./src/components/login/ForgetForm.vue')['default']
     GlobalContent: typeof import('./src/components/common/GlobalContent.vue')['default']
     GlobalSidebar: typeof import('./src/components/common/GlobalSidebar.vue')['default']
+    Header: typeof import('./src/components/common/Header.vue')['default']
     NaiveProvider: typeof import('./src/components/common/NaiveProvider.vue')['default']
     PasswordChange: typeof import('./src/components/user/PasswordChange.vue')['default']
     PersonInfo: typeof import('./src/components/user/PersonInfo.vue')['default']
@@ -20,7 +21,6 @@ declare module 'vue' {
     TeamBar: typeof import('./src/components/team/TeamBar.vue')['default']
     UserBar: typeof import('./src/components/user/UserBar.vue')['default']
     Vditor: typeof import('./src/components/document/Vditor.vue')['default']
-    WorkSpace: typeof import('./src/components/prototype/WorkSpace.vue')['default']
   }
 }
 
