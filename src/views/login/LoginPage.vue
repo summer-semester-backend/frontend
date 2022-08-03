@@ -37,10 +37,13 @@
 </template>
 
 <script setup lang="ts">
+import { backend } from '@/api/utils/request';
+import { useAuthStore } from '@/store/auth';
 import { ref, h } from 'vue';
 import { useRouter } from 'vue-router';
 import Vue3DraggableResizable from 'vue3-draggable-resizable';
 import 'vue3-draggable-resizable/dist/Vue3DraggableResizable.css';
+const { signOut } = useAuthStore();
 const router = useRouter();
 const tabValue = ref('signin');
 const showForgetPassword = ref(false);
@@ -59,6 +62,22 @@ const handleUpdateTab = (value: string) => {
 
 const renderSignInTabPane = () => h('div', { style: 'font-weight: bold;' }, '登录');
 const renderSignUpTabPane = () => h('div', { style: 'font-weight: bold;' }, '注册');
+
+backend.interceptors.response.use(
+  (response) => {
+    if (response.data.result == 10) {
+      window.$message.error('登录认证失败');
+      signOut();
+      router.push({ name: 'login' });
+    } else if (response.data.status != 0) {
+      window.$message.error(response.data.message);
+      return Promise.reject(response);
+    } else return Promise.resolve(response);
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
 </script>
 
 <style scoped>
