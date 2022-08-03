@@ -14,7 +14,7 @@
 
             <template #default>
                 <div class="head">
-                    <div class="titleBox">我的</div>
+                    <div class="titleBox">项目</div>
                     <n-icon size="30" class="icon" @click="closeBar()">
                         <MenuOpenRound />
                     </n-icon>
@@ -34,7 +34,6 @@
             </n-drawer-content>
 
         </n-drawer>
-
     </div>
 </template>
 
@@ -45,19 +44,24 @@ import { barState } from '../../store/auth';
 import { pxfy } from "seemly";
 import {useRouter} from 'vue-router';
 
+
 const router = useRouter();
 const placement = ref("left");
 
 const barstate = barState();//跨组件通信
-const active = computed(() => barstate.userBar);//随不同bar变化
+const active = computed(() => barstate.projectBar);//随不同bar变化
 let backState = ref(false);
 
+const func = () => {
+    console.log(active,backState);
+}
+
 const closeBar = () => {
-    barstate.closeUserBar();//随不同bar变化
+    barstate.closeProjectBar();//随不同bar变化
 }
 
 const openBar = () => {
-    barstate.openUserBar();//随不同bar变化
+    barstate.openProjectBar();//随不同bar变化
 }
 
 const itemList = ref([//随不同bar变化
@@ -65,15 +69,15 @@ const itemList = ref([//随不同bar变化
         id:0,
         imgSrc: new URL("../../../public/resource/image/Bar/black/Info.svg", import.meta.url).href,
         imgSrcHover: new URL("../../../public/resource/image/Bar/blue/InfoHover.svg", import.meta.url).href,
-        title:"基本信息",
-        routeName:"PersonInfo",
+        title:"我的项目",
+        routeName:"ProjectDesktop",
     },
     {
         id:1,
-        imgSrc: new URL("../../../public/resource/image/Bar/black/Key.svg", import.meta.url).href,
-        imgSrcHover: new URL("../../../public/resource/image/Bar/blue/KeyHover.svg", import.meta.url).href,
-        title:"修改密码",
-        routeName:"PasswordChange",
+        imgSrc: new URL("../../../public/resource/image/Bar/black/Delete.svg", import.meta.url).href,
+        imgSrcHover: new URL("../../../public/resource/image/Bar/blue/DeleteHover.svg", import.meta.url).href,
+        title:"回收站",
+        routeName:"ProjectTrash",
     },
 ])
 
@@ -141,6 +145,7 @@ onUpdated(()=>{
             return;
         }
     }
+    console.log("hahaha1");
 })
 
 </script>

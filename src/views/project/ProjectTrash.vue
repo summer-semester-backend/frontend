@@ -1,4 +1,6 @@
 <template>
+  <ProjectBar id="projectBar"></ProjectBar>
+
   <div id="content">
     <n-el tag="div" id="toolbar" style="position: absolute; right: 60px; top: 60px; z-index: 2">
       <n-button v-if="!isInputShow" @click="showInput" quaternary circle>
@@ -134,6 +136,12 @@ const dataFilter = computed(() => {
 });
 </script>
 <style scope lang="less">
+#projectBar
+{
+    float: left;
+    height: 100%;
+}
+
 #content {
   padding: 40px 60px;
   position: relative;

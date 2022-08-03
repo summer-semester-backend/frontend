@@ -13,9 +13,12 @@
       />
     </n-layout-footer>
   </n-layout-sider>
-          <n-button strong secondary type="info" @click="showUserBar()">
-        Info
+        <!-- <n-button strong secondary type="info" @click="showUserBar()" style="position: fixed;top:0px;left:0px;z-index:99999">
+        user
         </n-button>
+        <n-button strong secondary type="info" @click="showProjectBar()" style="position: fixed;top:30px;left:0px;z-index:99999">
+        project
+        </n-button> -->
 </template>
 
 <script setup lang="tsx">
@@ -24,7 +27,9 @@ import { createMenuOptions } from './GlobalUtils.js';
 import { People, SettingsOutline, PersonCircleOutline } from '@vicons/ionicons5';
 import { ProjectOutlined } from '@vicons/antd';
 import { barState } from '../../store/auth';
+import {useRouter} from 'vue-router';
 
+const router = useRouter();
 const topValue = ref<string | null>(null);
 const bottomValue = ref<string | null>(null);
 
