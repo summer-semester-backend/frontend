@@ -24,7 +24,26 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/team',
     name: 'team',
-    component: () => import('../views/team/TeamOverview.vue'),
+    component: () => import('../views/team/Index.vue'),
+    children: [
+      {
+        path: ':teamID',
+        name: 'teamOverview',
+        component: () => import('../views/team/TeamOverview.vue'),
+        children: [
+          {
+            path: '',
+            name: 'teamDetail',
+            component: () => import('../views/team/TeamDetail.vue'),
+          },
+          {
+            path: 'project',
+            name: 'teamProject',
+            component: () => import('../views/team/TeamProject.vue'),
+          },
+        ],
+      },
+    ],
   },
   {
     path: '/user',

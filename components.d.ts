@@ -9,12 +9,17 @@ declare module 'vue' {
     GlobalContent: typeof import('./src/components/common/GlobalContent.vue')['default']
     GlobalSidebar: typeof import('./src/components/common/GlobalSidebar.vue')['default']
     Header: typeof import('./src/components/common/Header.vue')['default']
+    MemberList: typeof import('./src/components/team/MemberList.vue')['default']
     NaiveProvider: typeof import('./src/components/common/NaiveProvider.vue')['default']
     ProjectList: typeof import('./src/components/project/ProjectList.vue')['default']
     RecentProject: typeof import('./src/components/project/RecentProject.vue')['default']
     SidebarButton: typeof import('./src/components/common/SidebarButton.vue')['default']
     SignInForm: typeof import('./src/components/login/SignInForm.vue')['default']
     SignUpForm: typeof import('./src/components/login/SignUpForm.vue')['default']
+    TeamAdd: typeof import('./src/components/team/modal/TeamAdd.vue')['default']
+    TeamInvite: typeof import('./src/components/team/modal/TeamInvite.vue')['default']
+    TeamSetting: typeof import('./src/components/team/TeamSetting.vue')['default']
+    UploadButton: typeof import('./src/components/common/UploadButton.vue')['default']
     Vditor: typeof import('./src/components/document/Vditor.vue')['default']
   }
 }
