@@ -4,7 +4,7 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/',
     name: 'default',
-    redirect: 'login',
+    redirect: 'project',
   },
   {
     path: '/project/desktop',
@@ -24,7 +24,26 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/team',
     name: 'team',
-    component: () => import('../views/team/TeamOverview.vue'),
+    component: () => import('../views/team/Index.vue'),
+    children: [
+      {
+        path: ':teamID',
+        name: 'teamOverview',
+        component: () => import('../views/team/TeamOverview.vue'),
+        children: [
+          {
+            path: '',
+            name: 'teamDetail',
+            component: () => import('../views/team/TeamDetail.vue'),
+          },
+          {
+            path: 'project',
+            name: 'teamProject',
+            component: () => import('../views/team/TeamProject.vue'),
+          },
+        ],
+      },
+    ],
   },
   {
     path: '/team/project',
@@ -36,21 +55,21 @@ const routes: RouteRecordRaw[] = [
     name: 'user',
     component: () => import('../views/user/UserOverview.vue'),
     children: [
-        {
-          path: 'personInfo',
-          name: 'PersonInfo',
-          component: () => import('../components/user/PersonInfo.vue'),
-        },
-        {
-          path: 'passwordChange',
-          name: 'PasswordChange',
-          component: () => import('../components/user/PasswordChange.vue'),
-        },
-        {
-          path: "",
-          redirect: "/user/personInfo",
-        },
-    ]
+      {
+        path: 'personInfo',
+        name: 'PersonInfo',
+        component: () => import('../components/user/PersonInfo.vue'),
+      },
+      {
+        path: 'passwordChange',
+        name: 'PasswordChange',
+        component: () => import('../components/user/PasswordChange.vue'),
+      },
+      {
+        path: '',
+        redirect: '/user/personInfo',
+      },
+    ],
   },
   {
     path: '/login',

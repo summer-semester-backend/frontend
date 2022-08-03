@@ -18,6 +18,7 @@
 			"@/*": ["./src/*"],
 			"~/*": ["./*"]
 		},
-		"types": ["node","naive-ui/volar"]
+		"types": ["node","naive-ui/volar"],
+    "allowJs": true
 	}
 }

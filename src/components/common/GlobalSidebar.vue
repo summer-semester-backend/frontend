@@ -3,13 +3,13 @@
     <n-layout-header class="mt-2" position="absolute">
       <n-space vertical>
         <n-avatar round class="flex m-auto"></n-avatar>
-        <sidebar-button button-name="项目" route-name="project" bar-name="project">
+        <sidebar-button button-name="项目" route-name="project">
           <project-outlined />
         </sidebar-button>
-        <sidebar-button button-name="团队" route-name="team" bar-name="team">
+        <sidebar-button button-name="团队" route-name="team">
           <people />
         </sidebar-button>
-        <sidebar-button button-name="个人" route-name="user" bar-name="user">
+        <sidebar-button button-name="个人" route-name="user">
           <person-circle-outline />
         </sidebar-button>
       </n-space>
@@ -30,12 +30,10 @@ import { ref } from 'vue';
 import { QuestionCircleOutlined } from '@vicons/antd';
 import { People, SettingsOutline, PersonCircleOutline } from '@vicons/ionicons5';
 import { ProjectOutlined } from '@vicons/antd';
-import {useRouter} from 'vue-router';
+import { useRouter } from 'vue-router';
 
-const router = useRouter();
 const topValue = ref<string | null>(null);
 const bottomValue = ref<string | null>(null);
-
 
 function handleTopUpdate(key: string) {
   bottomValue.value = null;
