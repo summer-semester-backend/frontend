@@ -3,29 +3,16 @@
     <n-form style="width: 50%" :model="data">
       <n-grid>
         <n-grid-item span="12">
-          <n-form-item label="团队名称" path="name">
-            <n-input placeholder="请输入团队名称" v-model:value="data.name" />
+          <n-form-item label="团队名称" path="teamname">
+            <n-input placeholder="请输入团队名称" v-model:value="data.teamname" />
           </n-form-item>
           <n-form-item label="团队ID" path="id">
             {{ route.params.teamID }}
           </n-form-item>
         </n-grid-item>
-        <n-grid-item span="12">
-          <div class="avatar-container">
-            <n-avatar round :size="100" :src="data.avatar" style="margin-top: 10px" />
-            <upload-button
-              style="width: 40%; margin-top: 10px"
-              :show-file-list="false"
-              ref="upload"
-              @change="clickUploadAvatar"
-            >
-              上传团队图标
-            </upload-button>
-          </div>
-        </n-grid-item>
         <n-grid-item span="24">
-          <n-form-item label="团队简介" path="profile">
-            <n-input type="textarea" placeholder="请输入团队简介" v-model:value="data.profile" />
+          <n-form-item label="团队简介" path="summary">
+            <n-input type="textarea" placeholder="请输入团队简介" v-model:value="data.summary" />
           </n-form-item>
         </n-grid-item>
       </n-grid>
@@ -61,11 +48,12 @@
 </template>
 
 <script setup lang="ts">
+import { deleteTeam, getTeamDetail, leaveTeam, updateTeamDetail } from '@/api/team';
 import { NButton, NSpace, NModal, NForm, NGrid, NGridItem, NFormItem, NAvatar, NH1, NInput } from 'naive-ui';
 import { onMounted, ref, reactive } from 'vue';
 
 import { useRouter, useRoute } from 'vue-router';
-import UploadButton from '../common/UploadButton.vue';
+import type UploadButton from '../common/UploadButton.vue';
 const router = useRouter();
 const route = useRoute();
 const isAdmin = ref(false);
@@ -73,49 +61,41 @@ const showQuitModal = ref(false);
 const showDeleteModal = ref(false);
 const upload = ref<InstanceType<typeof UploadButton> | null>(null);
 const data = reactive({
-  avatar: 'https://07akioni.oss-cn-beijing.aliyuncs.com/07akioni.jpeg',
-  name: 'Loading...',
-  profile: 'Loading...',
+  teamname: 'Loading...',
+  summary: 'Loading...',
 });
-function clickUploadAvatar() {
-  const formData = new FormData();
-  formData.append('avatar', upload.value?.file as File);
-  // updateOrganization(formData, route.params.id as string).then(() => {
-  //   upload.value?.clearFile()
-  // })
-}
 function reload() {
-  // getOrganization(route.params.id as string).then((res) => {
-  //   if (res.data.success) {
-  //     data.avatar = res.data.avatar
-  //       ? 'https://phoenix.matrix53.top/api/v1/' + res.data.avatar
-  //       : 'https://07akioni.oss-cn-beijing.aliyuncs.com/07akioni.jpeg'
-  //     data.name = res.data.name
-  //     data.profile = res.data.profile
-  //     isAdmin.value = res.data.isAdmin
-  //   }
-  // })
+  getTeamDetail({ teamID: route.params.teamID as string }).then((res) => {
+    if (res.data.result == 0) {
+      data.teamname = res.data.teamname;
+      data.summary = res.data.summary;
+      isAdmin.value = res.data.isAdmin;
+    }
+  });
 }
 function clickConfilmUpdate() {
-  const formData = new FormData();
-  formData.append('name', data.name);
-  formData.append('profile', data.profile);
-  // updateOrganization(formData, route.params.id as string);
+  updateTeamDetail({ teamID: route.params.teamID as string, teamname: data.teamname, summary: data.summary }).then(
+    (res) => {
+      if (res.data.result == 0) {
+        window.$message.info(res.data.message);
+      }
+    }
+  );
 }
 
 function handleQuitClick() {
-  // quitOrganization({ id: route.params.id as string }).then((res) => {
-  //   if (res.data.success) {
-  //     router.push({ path: '/profile' });
-  //   }
-  // });
+  leaveTeam({ teamID: route.params.teamID as string }).then((res) => {
+    if (res.data.result == 0) {
+      router.push({ path: 'project' });
+    }
+  });
 }
 function handleDeleteClick() {
-  // deleteOrganization(route.params.id as string).then((res) => {
-  //   if (res.data.success) {
-  //     router.push({ path: '/team' });
-  //   }
-  // });
+  deleteTeam({ teamID: route.params.teamID as string }).then((res) => {
+    if (res.data.result == 0) {
+      router.push({ name: 'project' });
+    }
+  });
 }
 onMounted(reload);
 </script>

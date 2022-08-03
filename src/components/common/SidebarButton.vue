@@ -3,6 +3,7 @@
     <n-button
       :type="isSelect ? 'info' : 'default'"
       size="large"
+      :bordered="false"
       class="flex rounded-xl mx-2 my-4 h-14"
       @click="handleDirect"
     >

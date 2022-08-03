@@ -4,7 +4,7 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/',
     name: 'default',
-    redirect: 'login',
+    redirect: 'project',
   },
   {
     path: '/project/desktop',
