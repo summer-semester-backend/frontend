@@ -27,12 +27,14 @@
 </template>
 <script setup lang="ts">
 import { NButton, NIcon, NSpace } from 'naive-ui';
-import { h, ref, computed } from 'vue';
+import { h, ref, computed, onMounted } from 'vue';
 import { Refresh, Trash, Search, EllipsisHorizontal } from '@vicons/ionicons5';
+import { trashProjectList, recoverProject, deleteProject, clearBin } from '@/api/project';
 type Project = {
-  id: number;
-  name: string;
-  team: string;
+  projectID: number;
+  projectName: string;
+  teamName: string;
+  abandonTime: string;
 };
 
 const isInputShow = ref(false); //是否显示搜索框
@@ -46,13 +48,18 @@ const options = ref([
 const columns = ref([
   {
     title: '项目名称',
-    key: 'name',
-    sorter: (row1: Project, row2: Project) => (row1.name > row2.name ? 1 : -1),
+    key: 'projectName',
+    sorter: (row1: Project, row2: Project) => (row1.projectName > row2.projectName ? 1 : -1),
   },
   {
     title: '所属团队',
-    key: 'team',
-    sorter: (row1: Project, row2: Project) => (row1.team > row2.team ? 1 : -1),
+    key: 'teamName',
+    sorter: (row1: Project, row2: Project) => (row1.teamName > row2.teamName ? 1 : -1),
+  },
+  {
+    title: '删除时间',
+    key: 'abandonTime',
+    sorter: (row1: Project, row2: Project) => (row1.abandonTime > row2.abandonTime ? 1 : -1),
   },
   {
     title: '操作',
@@ -68,6 +75,16 @@ const columns = ref([
             secondary: true,
             onClick(e) {
               console.log(row);
+              recoverProject({ projectID: row.projectID }).then((res) => {
+                if (res.data.result == 0) {
+                  window.$message.success(res.data.message);
+                  getProjectList();
+                } else if (res.data.result == 1) {
+                  window.$message.warning(res.data.message);
+                } else if (res.data.result == 2) {
+                  window.$message.error(res.data.message);
+                }
+              });
             },
           },
           {
@@ -84,6 +101,16 @@ const columns = ref([
             secondary: true,
             onClick(e) {
               console.log(row);
+              deleteProject({ projectID: row.projectID }).then((res) => {
+                if (res.data.result == 0) {
+                  window.$message.success(res.data.message);
+                  getProjectList();
+                } else if (res.data.result == 1) {
+                  window.$message.warning(res.data.message);
+                } else if (res.data.result == 2) {
+                  window.$message.error(res.data.message);
+                }
+              });
             },
           },
           {
@@ -97,12 +124,16 @@ const columns = ref([
 ]);
 const trashs = ref([
   {
-    name: '123',
-    team: '123',
+    projectID: 1,
+    projectName: '项目1',
+    teamName: '团队1',
+    abandonTime: '2022-8-3',
   },
   {
-    name: '456',
-    team: '456',
+    projectID: 2,
+    projectName: '项目2',
+    teamName: '团队2',
+    abandonTime: '2022-8-2',
   },
 ]);
 const pagination = ref({
@@ -123,13 +154,36 @@ const handleSelect = (key: string | number) => {
   console.log(key);
   if (key === 'delete') {
     console.log('delete');
+    clearBin().then((res) => {
+      if (res.data.result == 0) {
+        window.$message.success(res.data.message);
+        getProjectList();
+      } else if (res.data.result == 1) {
+        window.$message.warning(res.data.message);
+      } else if (res.data.result == 2) {
+        window.$message.error(res.data.message);
+      }
+    });
   }
 };
+
+const getProjectList = () => {
+  trashProjectList()
+    .then((res) => {
+      trashs.value = res.data.list;
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+};
+onMounted(() => {
+  getProjectList();
+});
 
 //搜索
 const dataFilter = computed(() => {
   return trashs.value.filter((data) => {
-    return !input.value || data.name.toLowerCase().includes(input.value.toLowerCase());
+    return !input.value || data.projectName.toLowerCase().includes(input.value.toLowerCase());
   });
 });
 </script>

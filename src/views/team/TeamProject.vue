@@ -1,10 +1,10 @@
 <template>
-  <RecentProject />
-  <ProjectList :projects="projects" @refresh="getProjectList" />
+  <ProjectList :projects="projects" :team-id="teamID" :page-size="20" @refresh="getProjectList" />
 </template>
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
-import { userProjectList } from '@/api/project';
+import { teamProjectList } from '@/api/project';
+const teamID = ref(1);
 const projects = ref([
   {
     projectID: 1,
@@ -22,7 +22,7 @@ const projects = ref([
   },
 ]);
 const getProjectList = () => {
-  userProjectList()
+  teamProjectList({ teamID: 1 })
     .then((res) => {
       projects.value = res.data.list;
     })

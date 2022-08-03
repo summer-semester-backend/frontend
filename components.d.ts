@@ -4,6 +4,7 @@
 
 declare module 'vue' {
   export interface GlobalComponents {
+    CreateModal: typeof import('./src/components/project/CreateModal.vue')['default']
     DraggableArea: typeof import('./src/components/prototype/DraggableArea.vue')['default']
     ForgetForm: typeof import('./src/components/login/ForgetForm.vue')['default']
     GlobalContent: typeof import('./src/components/common/GlobalContent.vue')['default']

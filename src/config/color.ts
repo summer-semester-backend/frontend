@@ -1,9 +1,9 @@
 export const colorConfig = {
   common: {
     primaryColorSuppl: 'rgba(42, 111, 148, 1)',
-    primaryColorHover: '#7FE0E7FF',
+    primaryColorHover: '#E5F0FFFF',
     primaryColor: '#40a9ff',
-    primaryColorPressed: '#5AB7CEFF',
+    primaryColorPressed: '#1481FFFF',
   },
   Tabs: {
     tabTextColorActiveLine: 'rgb(0,0,0)',
