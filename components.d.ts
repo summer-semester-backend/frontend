@@ -8,13 +8,14 @@ declare module 'vue' {
     ForgetForm: typeof import('./src/components/login/ForgetForm.vue')['default']
     GlobalContent: typeof import('./src/components/common/GlobalContent.vue')['default']
     GlobalSidebar: typeof import('./src/components/common/GlobalSidebar.vue')['default']
+    Header: typeof import('./src/components/common/Header.vue')['default']
     NaiveProvider: typeof import('./src/components/common/NaiveProvider.vue')['default']
     ProjectList: typeof import('./src/components/project/ProjectList.vue')['default']
     RecentProject: typeof import('./src/components/project/RecentProject.vue')['default']
+    SidebarButton: typeof import('./src/components/common/SidebarButton.vue')['default']
     SignInForm: typeof import('./src/components/login/SignInForm.vue')['default']
     SignUpForm: typeof import('./src/components/login/SignUpForm.vue')['default']
     Vditor: typeof import('./src/components/document/Vditor.vue')['default']
-    WorkSpace: typeof import('./src/components/prototype/WorkSpace.vue')['default']
   }
 }
 
