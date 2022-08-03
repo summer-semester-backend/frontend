@@ -16,11 +16,27 @@
 <script setup lang="ts">
 import { computed } from '@vue/reactivity';
 import { useRoute, useRouter } from 'vue-router';
+import { barState } from '@/store/bar';
+
+const barstate = barState();
+const showUserBar = () => {
+  barstate.openUserBar();
+};
+const showProjectBar = () => {
+  barstate.openProjectBar();
+};
+const showTeamBar = () => {
+  barstate.openTeamBar();
+};
+
 const router = useRouter();
 const route = useRoute();
-const props = defineProps<{ buttonName: string; routeName: string }>();
+const props = defineProps<{ buttonName: string; routeName: string; barName: string }>();
 const handleDirect = () => {
   router.push({ name: props.routeName });
+  if (props.barName == 'user') showUserBar();
+  if (props.barName == 'project') showProjectBar();
+  if (props.barName == 'team') showTeamBar();
 };
 const isSelect = computed(() => {
   return route.fullPath.split('/')[1] == props.routeName;
