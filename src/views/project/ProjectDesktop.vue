@@ -1,5 +1,7 @@
 <template>
   <!-- <work-space /> -->
+  <ProjectBar id="projectBar"></ProjectBar>
+  <!-- <div class="box" id="projectBar"></div> -->
   <RecentProject />
   <ProjectList :projects="projects" />
 </template>
@@ -18,3 +20,19 @@ const projects = ref([
   },
 ]);
 </script>
+
+<style lang="less" scoped>
+    // #projectBar
+    // {
+    //     float: left;
+    //     height: 100%;
+        
+    // }
+
+    .box
+    {
+      height: 100%;
+      width: 270px;
+      background-color: aqua;
+    }
+</style>
