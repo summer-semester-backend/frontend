@@ -5,4 +5,9 @@ export const colorConfig = {
     primaryColor: '#40a9ff',
     primaryColorPressed: '#5AB7CEFF',
   },
+  Tabs: {
+    tabTextColorActiveLine: 'rgb(0,0,0)',
+    tabFontSizeMedium: '24px',
+    tabFontWeightActive: '700',
+  },
 };
