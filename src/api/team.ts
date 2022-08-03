@@ -32,7 +32,9 @@ export function deleteTeamManager(data: { teamID: string; userID: number }) {
   return backend.post('team/manager/delete', data);
 }
 
-export function deleteTeamMember() {}
+export function deleteTeamMember(data: { teamID: string; userID: number }) {
+  return backend.post('team/user/delete', data);
+}
 
 export function deleteTeam(data: { teamID: string }) {
   return backend.post('team/delete', data);

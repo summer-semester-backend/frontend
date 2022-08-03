@@ -16,12 +16,15 @@ import type { DataTableBaseColumn, DataTableColumns } from 'naive-ui';
 import { onMounted, ref, reactive, unref } from 'vue';
 import TeamInvite from './modal/TeamInvite.vue';
 import { useRoute } from 'vue-router';
+import { addTeamManager, deleteTeamManager, deleteTeamMember, getTeamMember } from '@/api/team';
 
 const userID = parseInt(localStorage.getItem('userID') as string);
-
-const props = defineProps<{ tableData: Array<User.UserTableData>; isReloading: boolean }>();
-const isAdmin = ref(false);
+const route = useRoute();
+const isManager = ref(false);
 const teamInvite = ref<InstanceType<typeof TeamInvite> | null>(null);
+const tableData = ref<Array<any>>([]);
+const isReloading = ref(false);
+const emits = defineEmits(['require-reload']);
 const nameColumn = reactive<DataTableBaseColumn>({
   title: '姓名',
   key: 'name',
@@ -40,7 +43,7 @@ const buttomColumn = reactive<DataTableBaseColumn>({
       <NButtonGroup>
         <NButton
           size="small"
-          disabled={!isAdmin.value || rowData.id === userID}
+          disabled={!isManager.value || rowData.id === userID}
           onClick={() => {
             handleDeleteMember(rowData);
           }}
@@ -49,20 +52,20 @@ const buttomColumn = reactive<DataTableBaseColumn>({
         </NButton>
         <NButton
           size="small"
-          disabled={!isAdmin.value as boolean}
-          type={rowData.isAdmin ? 'primary' : 'tertiary'}
+          disabled={!isManager.value as boolean}
+          type={rowData.isManager ? 'primary' : 'tertiary'}
           onClick={() => {
-            handleUpdateAdmin(rowData);
+            handleUpdateManager(rowData);
           }}
         >
           管理员
         </NButton>
         <NButton
           size={'small'}
-          disabled={!isAdmin.value as boolean}
-          type={rowData.isAdmin ? 'tertiary' : 'primary'}
+          disabled={!isManager.value as boolean}
+          type={rowData.isManager ? 'tertiary' : 'primary'}
           onClick={() => {
-            handleDeleteAdmin(rowData);
+            handleDeleteManager(rowData);
           }}
         >
           组员
@@ -82,12 +85,17 @@ const columns = reactive<DataTableColumns>([
     key: 'identity',
     sorter: 'default',
   },
+  {
+    title: '加入状态',
+    key: 'status',
+    sorter: 'default',
+  },
   buttomColumn,
 ]);
 const pagination = reactive({
   page: 1,
   pageSize: 10,
-  itemCount: unref(props.tableData).length,
+  itemCount: unref(tableData).length,
   onChange: (page: number) => {
     pagination.page = page;
   },
@@ -99,30 +107,63 @@ function handleFilterSearch(value: string) {
 
 function handleInviteUser() {}
 function handleDeleteMember(rowData: any) {
-  // deleteTeamMember(route.params.id as string, rowData.id).finally(reload);
+  deleteTeamMember({ teamID: route.params.teamID as string, userID: rowData.id })
+    .then((res) => {
+      if (res.data.result == 0) {
+        window.$message.info(res.data.message);
+      }
+    })
+    .finally(reload);
 }
-function handleUpdateAdmin(rowData: any) {
-  // if (rowData.isAdmin) return;
-  // updateTeamAdmin({
-  //   userID: rowData.id,
-  //   teamID: route.params.id as string,
-  // }).then((res) => {
-  //   if (res.data.success) {
-  //     tableData.value[rowData.key].identity = '管理员';
-  //     tableData.value[rowData.key].isAdmin = true;
-  //   }
-  // });
+function handleUpdateManager(rowData: any) {
+  if (rowData.isManager) return;
+  addTeamManager({ teamID: route.params.teamID as string, userID: rowData.userID }).then((res) => {
+    if (res.data.result == 0) {
+      tableData.value[rowData.key].identity = '管理员';
+      tableData.value[rowData.key].isManager = true;
+    }
+  });
 }
-function handleDeleteAdmin(rowData: any) {
-  // if (!rowData.isAdmin) return;
-  // deleteTeamAdmin(rowData.id, route.params.id as string).then((res) => {
-  //   if (res.data.success) {
-  //     tableData.value[rowData.key].identity = '组员';
-  //     tableData.value[rowData.key].isAdmin = false;
-  //   }
-  // });
+function handleDeleteManager(rowData: any) {
+  if (!rowData.isManager) return;
+  deleteTeamManager({ teamID: route.params.id as string, userID: rowData.userID }).then((res) => {
+    if (res.data.result) {
+      tableData.value[rowData.key].identity = '组员';
+      tableData.value[rowData.key].isManager = false;
+    }
+  });
 }
-defineExpose({ handleFilterSearch, handleInviteUser });
+
+function reload() {
+  isReloading.value = true;
+  getTeamMember({ teamID: route.params.teamID as string }).then((res) => {
+    if (res.data.result) {
+      tableData.value = res.data.userList.map(
+        (item: { userID: number; username: string; email: string; authority: number }, index: number) => {
+          if (userID == item.userID && item.authority > 0) {
+            isManager.value = true;
+          }
+          return {
+            ...item,
+            key: index,
+            identity: () => {
+              if (item.authority == 2) {
+                return '项目创建人';
+              } else if (item.authority == 1) {
+                return '管理员';
+              } else if (item.authority == 0) {
+                return '普通成员';
+              }
+            },
+            status: item.authority < 0 ? '暂未加入' : '已加入',
+          };
+        }
+      );
+    }
+    isReloading.value = false;
+  });
+}
+defineExpose({ handleFilterSearch, handleInviteUser, reload });
 </script>
 
 <style scoped></style>

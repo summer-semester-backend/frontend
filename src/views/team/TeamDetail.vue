@@ -25,14 +25,14 @@
             <n-icon size="22" color="rgb(100,100,100)"><add /></n-icon>
           </template>
         </n-button>
-        <n-button quaternary circle>
+        <n-button quaternary circle @click="handleReload">
           <template #icon>
-            <n-icon size="18" color="rgb(100,100,100)"><ReloadOutline /></n-icon>
+            <n-icon size="18" color="rgb(100,100,100)"><reload-outline /></n-icon>
           </template>
         </n-button>
       </template>
       <template #content>
-        <MemberList ref="memberListRef" :table-data="tableData" :is-reloading="isReloading" />
+        <MemberList ref="memberListRef" />
       </template>
     </Header>
   </div>
@@ -42,11 +42,9 @@
 import { Search, Add, ReloadOutline } from '@vicons/ionicons5';
 import { ref } from 'vue';
 import MemberList from '@/components/team/MemberList.vue';
-const isReloading = ref(false);
 const memberListRef = ref<InstanceType<typeof MemberList> | null>(null);
 const isInputShow = ref(false); //是否显示搜索框
 const input = ref(''); //搜索关键字
-const tableData = ref<Array<User.UserTableData>>([]);
 //显示搜索
 const showInput = () => {
   isInputShow.value = true;
@@ -65,22 +63,7 @@ const handleInviteUser = () => {
 };
 
 const handleReload = () => {
-  // isReloading.value = true;
-  // getTeamMember(route.params.id as string).then((res) => {
-  //   if (res.data.success) {
-  //     tableData.value = res.data.Members.map((item: any, index: number) => {
-  //       if (userID === item.id && item.isAdmin) {
-  //         isAdmin.value = true;
-  //       }
-  //       return {
-  //         ...item,
-  //         key: index,
-  //         identity: item.isAdmin ? '管理员' : '组员',
-  //       };
-  //     });
-  //   }
-  //   isReloading.value = false;
-  // });
+  memberListRef.value?.reload();
 };
 </script>
 
