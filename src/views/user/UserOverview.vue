@@ -1,12 +1,11 @@
 <template>
-    <div id="userBar"><UserBar></UserBar></div>
-    <div id="personInfo"><PersonInfo></PersonInfo></div>
-  
+    <UserBar id="userBar"></UserBar>
+    <router-view id="view"></router-view> 
 </template>
 
 <script setup>
 import UserBar from "../../components/user/UserBar.vue";
-// import PasswordChange from "../../components/user/PasswordChange.vue";
+import PasswordChange from "../../components/user/PasswordChange.vue";
 import PersonInfo from "../../components/user/PersonInfo.vue";
 </script>
 
@@ -17,7 +16,7 @@ import PersonInfo from "../../components/user/PersonInfo.vue";
         height: 100%;
     }
 
-    #personInfo
+    #view
     {
         width: 100px;
         height: 100px;

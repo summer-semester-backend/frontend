@@ -20,16 +20,16 @@
                     </n-icon>
                 </div>
                 <div class="itemBox">
-                    <div v-for="item in itemList" class="pointBox">
-                        <!-- <img :src="item.imgSrc" alt=""> -->
+                    <div v-for="item in itemList" :pos="item.id" class="pointBox" @click="clickItem($event,item)">
+                        <img :src="item.imgSrc" alt="">
                         <div class="title">{{item.title}}</div>
                     </div>
                 </div>
             </template>
 
-            <template #footer>
+            <!-- <template #footer>
             <n-button>Footer</n-button>
-            </template>
+            </template> -->
 
             </n-drawer-content>
 
@@ -39,11 +39,13 @@
 </template>
 
 <script setup>
-import { ref , computed ,watch} from "vue";
+import { ref , computed ,watch, onUpdated} from "vue";
 import { MenuOpenRound } from '@vicons/material';
 import { barState } from '../../store/auth';
 import { pxfy } from "seemly";
+import {useRouter} from 'vue-router';
 
+const router = useRouter();
 const placement = ref("left");
 
 const barstate = barState();
@@ -59,8 +61,20 @@ const openBar = () => {
 }
 
 const itemList = ref([
-    { title:"基本信息"},
-    {title:"修改密码"},
+    {
+        id:0,
+        imgSrc: new URL("../../../public/resource/image/Bar/black/Info.svg", import.meta.url).href,
+        imgSrcHover: new URL("../../../public/resource/image/Bar/blue/InfoHover.svg", import.meta.url).href,
+        title:"基本信息",
+        route:"PersonInfo",
+    },
+    {
+        id:1,
+        imgSrc: new URL("../../../public/resource/image/Bar/black/Key.svg", import.meta.url).href,
+        imgSrcHover: new URL("../../../public/resource/image/Bar/blue/KeyHover.svg", import.meta.url).href,
+        title:"修改密码",
+        route:"PasswordChange",
+    },
 ])
 
 watch(active,(newValue,oldValue)=>{
@@ -83,6 +97,52 @@ watch(active,(newValue,oldValue)=>{
     }
 
 },{immediate:false})
+
+// const enterItem = (e,item) => {
+//     e.target.querySelector("img").src = item.imgSrcHover;
+//     e.target.querySelector(".title").style.color = "#1481FF";
+// }
+
+// const leaveItem = (e,item) => {
+//     e.target.querySelector("img").src = item.imgSrc;
+//     e.target.querySelector(".title").style.color = "#000000";
+// }
+                    // @mouseenter="enterItem($event,item)"
+                    // @mouseleave="leaveItem($event,item)"
+
+const coverColor = (target,item) => {
+    var list = document.querySelectorAll(".pointBox");
+    for(let i = 0; i < list.length; ++i) 
+    {
+        list[i].style.backgroundColor = "";
+        list[i].querySelector(".title").style.color = "#000000";
+        list[i].querySelector("img").src = itemList.value[list[i].getAttribute("pos")].imgSrc;
+    }
+    
+    target.style.backgroundColor = "#E5F0FF";
+    target.querySelector(".title").style.color = "#1481FF";
+    target.querySelector("img").src = item.imgSrcHover;
+}
+
+const clickItem = (e,item) => {
+    coverColor(e.currentTarget,item);
+    router.push(item.route);
+    // console.log(router.currentRoute.value.name);
+}
+
+onUpdated(()=>{
+    var list = document.querySelectorAll(".pointBox");
+    // alert(list.length);
+    for(let i = 0; i < list.length; ++i)
+    {
+        // console.log(itemList.value[list[i].getAttribute("pos")].route , router.currentRoute.value.name)
+        if(itemList.value[list[i].getAttribute("pos")].route == router.currentRoute.value.name)
+        {
+            coverColor(list[i],itemList.value[list[i].getAttribute("pos")]);
+            return;
+        }
+    }
+})
 
 </script>
 
@@ -163,20 +223,19 @@ watch(active,(newValue,oldValue)=>{
                 width: 200px;
                 height: 52px;
 
-                background: #E5F0FF;
+                cursor: pointer;
                 border-radius: 8px;
 
                 flex: none;
                 order: 0;
                 flex-grow: 0;
 
+                margin-top: 5px;
+
                 img
                 {
                     width: 28px;
                     height: 28px;
-
-
-                    /* Inside auto layout */
 
                     flex: none;
                     order: 0;
@@ -193,16 +252,18 @@ watch(active,(newValue,oldValue)=>{
                     font-weight: 600;
                     font-size: 16px;
                     line-height: 19px;
-
-                    color: #1481FF;
-
-
-                    /* Inside auto layout */
+                    
+                    color: black;
 
                     flex: none;
                     order: 1;
                     flex-grow: 1;
                 }
+            }
+            .pointBox:hover
+            {
+                background: #f4f4f4;
+                transition: 0.2s;
             }
         }
     }
