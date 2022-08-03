@@ -10,19 +10,6 @@
             {{ route.params.teamID }}
           </n-form-item>
         </n-grid-item>
-        <n-grid-item span="12">
-          <div class="avatar-container">
-            <n-avatar round :size="100" :src="data.avatar" style="margin-top: 10px" />
-            <upload-button
-              style="width: 40%; margin-top: 10px"
-              :show-file-list="false"
-              ref="upload"
-              @change="clickUploadAvatar"
-            >
-              上传团队图标
-            </upload-button>
-          </div>
-        </n-grid-item>
         <n-grid-item span="24">
           <n-form-item label="团队简介" path="profile">
             <n-input type="textarea" placeholder="请输入团队简介" v-model:value="data.profile" />
@@ -65,7 +52,7 @@ import { NButton, NSpace, NModal, NForm, NGrid, NGridItem, NFormItem, NAvatar, N
 import { onMounted, ref, reactive } from 'vue';
 
 import { useRouter, useRoute } from 'vue-router';
-import UploadButton from '../common/UploadButton.vue';
+import type UploadButton from '../common/UploadButton.vue';
 const router = useRouter();
 const route = useRoute();
 const isAdmin = ref(false);
