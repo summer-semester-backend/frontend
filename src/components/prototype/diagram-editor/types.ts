@@ -136,6 +136,7 @@ export enum EditorTool {
   WIDGET = 'widget',
   ICON = 'icon',
   CONNECTION = 'connection',
+  TEST = 'test',
 }
 
 export enum ToolBoxGroup {
@@ -174,6 +175,14 @@ export const toolDefinitions: ToolDefinition[] = [
     group: ToolBoxGroup.BASIC,
     icon: 'text_fields',
     itemType: 'Text',
+    iconComponent: Text,
+  },
+  {
+    type: EditorTool.TEST,
+    title: '测试',
+    group: ToolBoxGroup.BASIC,
+    icon: 'text_fields',
+    itemType: 'Test',
     iconComponent: Text,
   },
   {
@@ -246,6 +255,11 @@ export interface LineItem extends Item {
   thick: number;
   style: ConnectionStyle;
 }
+
+// export interface TestItem extends Item {
+//   thick: number;
+//   style: ConnectionStyle;
+// }
 
 export interface ImageItem extends Item {
   url: string;

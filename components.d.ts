@@ -40,11 +40,13 @@ declare module 'vue' {
     SignInForm: typeof import('./src/components/login/SignInForm.vue')['default']
     SignUpForm: typeof import('./src/components/login/SignUpForm.vue')['default']
     Star: typeof import('./src/components/prototype/diagram-editor/blocks/Star.vue')['default']
+    Star1: typeof import('./src/components/prototype/diagram-editor/blocks/Star1.vue')['default'];
     TeamAdd: typeof import('./src/components/team/modal/TeamAdd.vue')['default']
     TeamBar: typeof import('./src/components/team/TeamBar.vue')['default']
     TeamInfo: typeof import('./src/components/team/TeamInfo.vue')['default']
     TeamInvite: typeof import('./src/components/team/modal/TeamInvite.vue')['default']
     TeamSetting: typeof import('./src/components/team/TeamSetting.vue')['default']
+    Test: typeof import('./src/components/prototype/diagram-editor/blocks/Test.vue')['default']
     Text: typeof import('./src/components/prototype/diagram-editor/blocks/Text.vue')['default']
     TextEditor: typeof import('./src/components/prototype/inspector/property-editors/TextEditor.vue')['default']
     ToolBox: typeof import('./src/components/prototype/toolbox/ToolBox.vue')['default']

@@ -17,6 +17,7 @@ import {
   Item,
   ItemConnection,
   LineItem,
+  // TestItem,
   Position,
   TextHAlign,
   TextVAlign,
@@ -247,6 +248,17 @@ export function registerDefaultItemTypes() {
       thick: 3,
     },
     lineModel
+  );
+
+  // ----------------------------------------------------------------------
+  type = 'Test';
+  registerItemType(
+    {
+      ...defaults,
+      component: type,
+      supportsRoundable: true,
+    },
+    shapeModel
   );
 
   // ----------------------------------------------------------------------
