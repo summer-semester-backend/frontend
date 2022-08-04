@@ -1,5 +1,4 @@
 <template>
-
   <div id="content">
     <Header title="回收站">
       <template #toolbar>
@@ -30,7 +29,7 @@
 import { NButton, NIcon, NSpace } from 'naive-ui';
 import { h, ref, computed, onMounted } from 'vue';
 import { Refresh, Trash, Search, EllipsisHorizontal } from '@vicons/ionicons5';
-import { trashProjectList, recoverProject, deleteProject, clearBin } from '@/api/project';
+import { trashProjectList, recoverProject, deleteProject, clearBin } from '@/api/file';
 type Project = {
   projectID: number;
   projectName: string;
@@ -194,4 +193,5 @@ const dataFilter = computed(() => {
   padding: 40px 60px;
   position: relative;
 }
+
 </style>

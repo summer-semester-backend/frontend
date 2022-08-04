@@ -1,4 +1,6 @@
 <template>
+  <!-- <n-layout-sider :width="80" bordered>
+    <n-layout-header class="mt-2" position="absolute"> -->
   <div class="barBox">
     <div class="head">
       <div class="titleBox">项目</div>
@@ -47,10 +49,12 @@
       </n-space>
     
   </div>
+  <!-- </n-layout-header>
+  </n-layout-sider> -->
 </template>
 
 <script setup>
-import { defineComponent, h, ref ,computed} from "vue";
+import { defineComponent, h, ref ,computed, watch} from "vue";
 import { MenuOpenRound } from '@vicons/material';
 import { FlashOutline } from "@vicons/ionicons5";
 import { AppstoreAddOutlined ,DeleteOutlined} from "@vicons/antd";
@@ -98,6 +102,12 @@ const menuOptions = [
   },
 ];
 
+watch(
+  ()=>router.currentRoute.value.name,
+  (newValue, oldValue) => {
+    activeKey.value = newValue;
+  },{ immediate: true }
+)
 </script>
 
 <style lang="less" scoped>

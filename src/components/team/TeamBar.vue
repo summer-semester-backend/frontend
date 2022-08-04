@@ -43,7 +43,7 @@
 </template>
 
 <script setup>
-import { defineComponent, h, ref ,computed} from "vue";
+import { defineComponent, h, ref ,computed, watch} from "vue";
 import { MenuOpenRound } from '@vicons/material';
 import { useRouter , RouterLink} from 'vue-router';
 
@@ -88,15 +88,22 @@ const menuOptions = [
         RouterLink,
         {
           to: {
-            name: "PasswordChange"
+            name: "teamDetail"
           }
         },
         { default: () => '团队设置' }
       ),
-    key: "PasswordChange",
+    key: "teamDetail",
     icon: renderIcon(SettingOutlined),
   },
 ];
+
+watch(
+  ()=>router.currentRoute.value.name,
+  (newValue, oldValue) => {
+    activeKey.value = newValue;
+  },{ immediate: true }
+)
 
 </script>
 

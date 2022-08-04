@@ -42,4 +42,5 @@ onMounted(() => {
   width: 270px;
   background-color: aqua;
 }
+
 </style>
