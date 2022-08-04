@@ -1,45 +1,49 @@
 import { backend } from './utils/request';
 
-export function userProjectList() {
-  return backend.post('/project/userProjectList');
+export function readFile(data: { fileID: number | null; teamID: number | null }) {
+  return backend.post('/file/read', data);
 }
 
-export function teamProjectList(data: { teamID: number }) {
-  return backend.post('/project/teamProjectList', data);
+export function readUserFile() {
+  return backend.post('/file/all');
 }
 
 export function recentProjectList() {
   return backend.post('/file/recently');
 }
 
-export function trashProjectList() {
-  return backend.post('/project/projectUserBinList');
+export function binList(data: { fileID: number | null }) {
+  return backend.post('/file/binList');
 }
 
-export function createProject(data: { projectName: string; teamID: number | null; projectImage: string }) {
+export function createFile(data: {
+  teamID: number | null;
+  fileName: string;
+  fileType: number;
+  fileImage: string;
+  fatherID: number;
+}) {
   return backend.post('/file/create', data);
 }
 
-export function deleteProject(data: { projectID: number }) {
-  return backend.post('/project/deleteProject', data);
+export function deleteFile(data: { fileID: number }) {
+  return backend.post('/file/delete', data);
 }
 
-export function recoverProject(data: { projectID: number }) {
-  return backend.post('/project/recoverProject', data);
+export function recoverFile(data: { fileID: number }) {
+  return backend.post('/file/recover', data);
 }
 
-export function abandonProject(data: { projectID: number }) {
-  return backend.post('/project/abandonProject', data);
-}
-
-export function renameProject(data: { projectID: number; newProjectName: string }) {
-  return backend.post('/project/renameProject', data);
-}
-
-export function projectDetail(data: { projectID: number }) {
-  return backend.post('/project/projectDetail', data);
+export function editFile(data: {
+  fileID: number;
+  fileName: string | null;
+  fileImage: string | null;
+  fatherID: number | null;
+  data: string | null;
+}) {
+  return backend.post('/file/write', data);
 }
 
 export function clearBin() {
-  return backend.post('/project/clearBin');
+  return backend.post('/file/clearBin');
 }

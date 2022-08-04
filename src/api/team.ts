@@ -1,8 +1,9 @@
 import { backend } from './utils/request';
 
 export function teamList() {
-  return backend.post('/team/list');
+  return backend.post('team/list');
 }
+
 export function createTeam(data: { teamname: string; summary: string }) {
   return backend.post('team/create', data);
 }

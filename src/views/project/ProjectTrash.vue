@@ -1,5 +1,4 @@
 <template>
-
   <div id="content">
     <Header title="回收站">
       <template #toolbar>
@@ -30,10 +29,10 @@
 import { NButton, NIcon, NSpace } from 'naive-ui';
 import { h, ref, computed, onMounted } from 'vue';
 import { Refresh, Trash, Search, EllipsisHorizontal } from '@vicons/ionicons5';
-import { trashProjectList, recoverProject, deleteProject, clearBin } from '@/api/project';
+import { binList, recoverFile, deleteFile, clearBin } from '@/api/file';
 type Project = {
-  projectID: number;
-  projectName: string;
+  fileID: number;
+  fileName: string;
   teamName: string;
   abandonTime: string;
 };
@@ -49,8 +48,8 @@ const options = ref([
 const columns = ref([
   {
     title: '项目名称',
-    key: 'projectName',
-    sorter: (row1: Project, row2: Project) => (row1.projectName > row2.projectName ? 1 : -1),
+    key: 'fileName',
+    sorter: (row1: Project, row2: Project) => (row1.fileName > row2.fileName ? 1 : -1),
   },
   {
     title: '所属团队',
@@ -76,7 +75,7 @@ const columns = ref([
             secondary: true,
             onClick(e) {
               console.log(row);
-              recoverProject({ projectID: row.projectID }).then((res) => {
+              recoverFile({ fileID: row.fileID }).then((res) => {
                 if (res.data.result == 0) {
                   window.$message.success(res.data.message);
                   getProjectList();
@@ -102,7 +101,7 @@ const columns = ref([
             secondary: true,
             onClick(e) {
               console.log(row);
-              deleteProject({ projectID: row.projectID }).then((res) => {
+              deleteFile({ fileID: row.fileID }).then((res) => {
                 if (res.data.result == 0) {
                   window.$message.success(res.data.message);
                   getProjectList();
@@ -125,16 +124,10 @@ const columns = ref([
 ]);
 const trashs = ref([
   {
-    projectID: 1,
-    projectName: '项目1',
-    teamName: '团队1',
-    abandonTime: '2022-8-3',
-  },
-  {
-    projectID: 2,
-    projectName: '项目2',
-    teamName: '团队2',
-    abandonTime: '2022-8-2',
+    fileID: 1,
+    fileName: '项目名称',
+    teamName: '所属团队',
+    abandonTime: '1970-1-1',
   },
 ]);
 const pagination = ref({
@@ -169,7 +162,7 @@ const handleSelect = (key: string | number) => {
 };
 
 const getProjectList = () => {
-  trashProjectList()
+  binList({ fileID: null })
     .then((res) => {
       trashs.value = res.data.list;
     })
@@ -184,12 +177,11 @@ onMounted(() => {
 //搜索
 const dataFilter = computed(() => {
   return trashs.value.filter((data) => {
-    return !input.value || data.projectName.toLowerCase().includes(input.value.toLowerCase());
+    return !input.value || data.fileName.toLowerCase().includes(input.value.toLowerCase());
   });
 });
 </script>
 <style scope lang="less">
-
 #content {
   padding: 40px 60px;
   position: relative;

@@ -23,7 +23,7 @@
         <div id="my-box">
           <n-grid :x-gap="48" :y-gap="24" :cols="5">
             <n-gi v-for="(item, index) in dataFilter.slice((page - 1) * pageSize, page * pageSize)" :key="index">
-              <n-tooltip :delay="500" placement="bottom-start" @update:show="handleUpdateShow(item.projectID)">
+              <n-tooltip :delay="500" placement="bottom-start" @update:show="handleUpdateShow(item.fileID)">
                 <template #trigger>
                   <n-card
                     :segmented="{
@@ -37,30 +37,30 @@
                     <template #cover>
                       <div v-if="isManage" style="position: absolute; top: 5px; right: 5px">
                         <n-space>
-                          <n-button circle type="error" size="small" @click.stop="handleDelete(item.projectID)">
+                          <n-button circle type="error" size="small" @click.stop="handleDelete(item.fileID)">
                             <n-icon size="20"><trash-outline /></n-icon
                           ></n-button>
-                          <n-button circle type="info" size="small" @click.stop="handleEdit(item.projectID)">
+                          <n-button circle type="info" size="small" @click.stop="handleEdit(item.fileID)">
                             <n-icon size="20"><create-outline /></n-icon
                           ></n-button>
                         </n-space>
                       </div>
                       <n-image
                         style="border-radius: 8px 8px 0 0"
-                        :src="item.projectImage"
+                        :src="item.fileImage"
                         object-fit="cover"
                         preview-disabled
                       ></n-image>
                     </template>
                     <template #footer>
                       <n-ellipsis style="background-color: #fff; font-size: 1rem; font-weight: 500">
-                        {{ item.projectName }}
+                        {{ item.fileName }}
                       </n-ellipsis>
                     </template>
                   </n-card>
                 </template>
                 <template #default style="color: white">
-                  <div>项目名称：{{ currentProject.projectName }}</div>
+                  <div>项目名称：{{ currentProject.fileName }}</div>
                   <div>所属团队：{{ currentProject.teamName }}</div>
                   <div>创建者：{{ currentProject.userName }}</div>
                   <div>创建时间：{{ currentProject.createTime }}</div>
@@ -118,33 +118,33 @@
 <script setup lang="ts">
 import { ref, computed, reactive, defineProps, onMounted, h } from 'vue';
 import { Add, Search, EllipsisHorizontal, TrashOutline, ArchiveOutline, CreateOutline } from '@vicons/ionicons5';
-import { abandonProject, renameProject, projectDetail } from '@/api/file';
+import { deleteFile, editFile, readFile } from '@/api/file';
 import { NIcon, NInput } from 'naive-ui';
 interface Project {
-  projectID: number;
-  projectName: string;
-  projectImage: string;
+  fileID: number;
+  fileName: string;
+  fileImage: string;
   createTime: string;
   lastVisitTime: string;
 }
-//父组件传参
-const {
-  projects = [
+type Props = {
+  projects: Project[];
+  teamId: number | null;
+  pageSize: number;
+};
+const props = withDefaults(defineProps<Props>(), {
+  projects: () => [
     {
-      projectID: 2,
-      projectName: '敏捷开发',
-      projectImage: '/resource/image/project1.jpeg',
+      fileID: 2,
+      fileName: '敏捷开发',
+      fileImage: '/resource/image/project1.jpeg',
       createTime: '2020-01-01',
       lastVisitTime: '2020-01-01',
     },
   ],
-  teamId = null,
-  pageSize = 10,
-} = defineProps<{
-  projects?: Project[];
-  teamId?: number | null;
-  pageSize?: number;
-}>();
+  teamId: null,
+  pageSize: 10,
+});
 
 //传递事件
 const emits = defineEmits(['refresh']);
@@ -156,9 +156,9 @@ const isCreateModalShow = ref(false); //是否显示创建项目弹窗
 const page = ref(1); //当前页
 const isManage = ref(false); //是否进入删除状态
 const input = ref(''); //搜索关键字
-const newProjectName = ref(''); //新命名项目名称
+const newFileName = ref(''); //新命名项目名称
 const currentProject = ref({
-  projectName: '项目名称',
+  fileName: '项目名称',
   teamName: '团队名称',
   userName: '创建者',
   createTime: '1970-1-1',
@@ -214,7 +214,7 @@ const handleSelect = (key: string | number) => {
 };
 
 //删除项目
-const handleDelete = (projectID: number) => {
+const handleDelete = (fileID: number) => {
   window.$dialog.error({
     title: '删除项目',
     content: '是否确定删除该项目，删除后可以从回收站恢复',
@@ -222,9 +222,10 @@ const handleDelete = (projectID: number) => {
     negativeText: '取消',
     maskClosable: false,
     onPositiveClick: () => {
-      abandonProject({ projectID: projectID }).then((res) => {
+      deleteFile({ fileID: fileID }).then((res) => {
         if (res.data.result == 0) {
           window.$message.success('删除成功');
+          emits('refresh');
         } else if (res.data.result == 1) {
           window.$message.warning(res.data.message);
         } else if (res.data.result == 2) {
@@ -237,7 +238,7 @@ const handleDelete = (projectID: number) => {
 };
 
 //修改项目名称
-const handleEdit = (projectID: number) => {
+const handleEdit = (fileID: number) => {
   window.$dialog.info({
     title: '修改项目名称',
     content: () => {
@@ -245,8 +246,8 @@ const handleEdit = (projectID: number) => {
         style: 'width: 100%;',
         placeholder: '请输入项目名称',
         onInput: (e: any) => {
-          newProjectName.value = e;
-          console.log(newProjectName.value);
+          newFileName.value = e;
+          console.log(newFileName.value);
         },
       });
     },
@@ -259,16 +260,19 @@ const handleEdit = (projectID: number) => {
     negativeText: '取消',
     maskClosable: false,
     onPositiveClick: () => {
-      if (newProjectName.value.length > 0) {
-        renameProject({ projectID: projectID, newProjectName: newProjectName.value }).then((res) => {
-          if (res.data.result == 0) {
-            window.$message.success('修改成功');
-          } else if (res.data.result == 1) {
-            window.$message.warning(res.data.message);
-          } else if (res.data.result == 2) {
-            window.$message.error(res.data.message);
+      if (newFileName.value.length > 0) {
+        editFile({ fileID: fileID, fileName: newFileName.value, fileImage: null, fatherID: null, data: null }).then(
+          (res) => {
+            if (res.data.result == 0) {
+              window.$message.success('修改成功');
+              emits('refresh');
+            } else if (res.data.result == 1) {
+              window.$message.warning(res.data.message);
+            } else if (res.data.result == 2) {
+              window.$message.error(res.data.message);
+            }
           }
-        });
+        );
       } else {
         window.$message.warning('请输入项目名称');
       }
@@ -278,17 +282,13 @@ const handleEdit = (projectID: number) => {
 };
 
 //显示项目信息
-const handleUpdateShow = (projectID: number) => {
-  projectDetail({ projectID: projectID }).then((res) => {
+const handleUpdateShow = (fileID: number) => {
+  readFile({ fileID: fileID, teamID: -1 }).then((res) => {
     if (res.data.result == 0) {
-      currentProject.value.projectName = res.data?.projectName;
-      currentProject.value.createTime = res.data?.createTime;
+      currentProject.value.fileName = res.data?.fileName;
+      currentProject.value.createTime = res.data?.createTime.slice(0, 10);
       currentProject.value.teamName = res.data?.teamName;
       currentProject.value.userName = res.data?.userName;
-    } else if (res.data.result == 1) {
-      window.$message.warning(res.data.message);
-    } else if (res.data.result == 2) {
-      window.$message.error(res.data.message);
     }
   });
 };
@@ -300,22 +300,22 @@ const refresh = () => {
 
 //按创建时间排序
 const sortByCreateTime = () => {
-  projects.sort((a, b) => {
+  props.projects.sort((a, b) => {
     return formatDate(b.createTime) > formatDate(a.createTime) ? 1 : -1;
   });
 };
 
 //按访问时间排序
 const sortByVisitTime = () => {
-  projects.sort((a, b) => {
+  props.projects.sort((a, b) => {
     return formatDate(b.lastVisitTime) > formatDate(a.lastVisitTime) ? 1 : -1;
   });
 };
 
 //搜索
 const dataFilter = computed(() => {
-  return projects.filter((data) => {
-    return !input.value || data.projectName.toLowerCase().includes(input.value.toLowerCase());
+  return props.projects.filter((data) => {
+    return !input.value || data.fileName.toLowerCase().includes(input.value.toLowerCase());
   });
 });
 
@@ -325,7 +325,7 @@ const formatDate = (date: string) => {
 };
 
 onMounted(() => {
-  if (teamId != null) {
+  if (props.teamId != null) {
     title.value = '团队项目';
   }
 });
