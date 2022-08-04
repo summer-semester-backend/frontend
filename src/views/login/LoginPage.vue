@@ -69,7 +69,7 @@ backend.interceptors.response.use(
       window.$message.error('登录认证失败');
       signOut();
       router.push({ name: 'login' });
-    } else if (response.data.status != 0) {
+    } else if (response.data.result != 0) {
       window.$message.error(response.data.message);
       return Promise.reject(response);
     } else return Promise.resolve(response);

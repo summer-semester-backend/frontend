@@ -3,28 +3,13 @@
 </template>
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
-import { teamProjectList } from '@/api/file';
+import { readFile } from '@/api/file';
 const teamID = ref(1);
-const projects = ref([
-  {
-    projectID: 1,
-    projectName: 'project1project1project1project1',
-    projectImage: '/resource/image/project1.jpeg',
-    createTime: '2022-01-01',
-    lastVisitTime: '2022-01-01',
-  },
-  {
-    projectID: 2,
-    projectName: '敏捷开发',
-    projectImage: '/resource/image/project1.jpeg',
-    createTime: '2020-01-01',
-    lastVisitTime: '2020-01-01',
-  },
-]);
+const projects = ref([]);
 const getProjectList = () => {
-  teamProjectList({ teamID: 1 })
+  readFile({ fileID: -1, teamID: 1 })
     .then((res) => {
-      projects.value = res.data.list;
+      projects.value = res.data.sonList;
     })
     .catch((err) => {
       console.log(err);
