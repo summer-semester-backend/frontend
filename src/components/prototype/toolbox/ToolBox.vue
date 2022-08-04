@@ -1,37 +1,38 @@
 <template>
   <div class="toolbox">
     <div class="toolbox-title toolbox-title-drag-handle">工具箱</div>
-
-    <n-config-provider :theme="darkTheme">
-      <n-card>
-        <n-collapse>
-          <n-collapse-item title="图形">
-            <n-grid :x-gap="8" :y-gap="8" :cols="4">
-              <n-gi v-for="t in shapes">
-                <ToolBoxItem
-                  :tool-name="t.title"
-                  :icon="t.iconComponent"
-                  draggable="true"
-                  @mousedown="emits('tool-selected', t.type as EditorTool)"
-                ></ToolBoxItem>
-              </n-gi>
-            </n-grid>
-          </n-collapse-item>
-          <n-collapse-item title="基本">
-            <n-grid :x-gap="8" :y-gap="8" :cols="4">
-              <n-gi v-for="t in basic">
-                <ToolBoxItem
-                  :tool-name="t.title"
-                  :icon="t.iconComponent"
-                  draggable="true"
-                  @mousedown="emits('tool-selected', t.type as EditorTool)"
-                ></ToolBoxItem>
-              </n-gi>
-            </n-grid>
-          </n-collapse-item>
-        </n-collapse>
-      </n-card>
-    </n-config-provider>
+    <div class="toolbox-content">
+      <n-config-provider :theme="darkTheme">
+        <n-card>
+          <n-collapse>
+            <n-collapse-item title="图形">
+              <n-grid :x-gap="8" :y-gap="8" :cols="4">
+                <n-gi v-for="t in shapes">
+                  <ToolBoxItem
+                    :tool-name="t.title"
+                    :icon="t.iconComponent"
+                    draggable="true"
+                    @mousedown="emits('tool-selected', t.type as EditorTool)"
+                  ></ToolBoxItem>
+                </n-gi>
+              </n-grid>
+            </n-collapse-item>
+            <n-collapse-item title="基本">
+              <n-grid :x-gap="8" :y-gap="8" :cols="4">
+                <n-gi v-for="t in basic">
+                  <ToolBoxItem
+                    :tool-name="t.title"
+                    :icon="t.iconComponent"
+                    draggable="true"
+                    @mousedown="emits('tool-selected', t.type as EditorTool)"
+                  ></ToolBoxItem>
+                </n-gi>
+              </n-grid>
+            </n-collapse-item>
+          </n-collapse>
+        </n-card>
+      </n-config-provider>
+    </div>
   </div>
 </template>
 
@@ -58,6 +59,9 @@ const basic = computed(() => {
 <style>
 .toolbox-title-drag-handle {
   cursor: move;
+}
+.toolbox-content {
+  cursor: auto;
 }
 </style>
 
