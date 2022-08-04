@@ -28,6 +28,7 @@ declare module 'vue' {
     UploadButton: typeof import('./src/components/common/UploadButton.vue')['default']
     UserBar: typeof import('./src/components/user/UserBar.vue')['default']
     Vditor: typeof import('./src/components/document/Vditor.vue')['default']
+    WorkBar: typeof import('./src/components/workspace/WorkBar.vue')['default']
   }
 }
 

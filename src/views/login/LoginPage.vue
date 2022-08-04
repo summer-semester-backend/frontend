@@ -7,7 +7,7 @@
     <div id="cloud2"></div>
     <div id="saly"></div>
     <div id="sun"></div>
-    <div class="absolute right-1/8 top-1/4">
+    <div id="loginCard">
       <n-card :bordered="false" size="large" class="w-100 rounded-md shadow-md">
         <n-gradient-text type="primary" class="m-auto" :size="28">项目管理平台</n-gradient-text>
         <main class="pt-24px">
@@ -123,5 +123,14 @@ backend.interceptors.response.use(
   top: 50px;
 
   background: url(/resource/Icon.png);
+}
+
+#loginCard {
+  display: flex;
+  align-items: center;
+  justify-self: center;
+  position: absolute;
+  height: 100%;
+  right: 10%;
 }
 </style>
