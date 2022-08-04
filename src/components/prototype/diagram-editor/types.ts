@@ -1,3 +1,5 @@
+import { Component } from 'vue';
+
 export interface Position {
   x: number; // X Coordinate
   y: number; // Y Coordinate
@@ -136,26 +138,94 @@ export enum EditorTool {
   CONNECTION = 'connection',
 }
 
+export enum ToolBoxGroup {
+  TOOL = 'tool',
+  SHAPE = 'shape',
+  ICON = 'icon',
+  CONTAINER = 'container',
+  BASIC = 'basic',
+}
+
 export interface ToolDefinition {
   type: EditorTool | 'separator';
-  title?: string;
+  title: string;
   icon?: string;
-
+  iconComponent?: Component;
+  group: ToolBoxGroup;
   itemType?: string;
 }
 
+import {
+  Text,
+  Image,
+  RemoveOutline,
+  RadioButtonOffOutline,
+  TabletLandscapeOutline,
+  TriangleOutline,
+  StarOutline,
+} from '@vicons/ionicons5';
+
 export const toolDefinitions: ToolDefinition[] = [
-  { type: EditorTool.SELECT, title: 'Select', icon: 'ads_click' },
-  { type: EditorTool.CONNECTION, title: 'Connection', icon: 'share', itemType: 'Connection' },
-  { type: EditorTool.TEXT, title: 'Text', icon: 'text_fields', itemType: 'Text' },
-  { type: EditorTool.IMAGE, title: 'Image', icon: 'image', itemType: 'Image' },
-  { type: EditorTool.LINE, title: 'Line', icon: 'horizontal_rule', itemType: 'Line' },
-  { type: EditorTool.RECTANGLE, title: 'Rectangle', icon: 'rectangle', itemType: 'Rectangle' },
-  { type: EditorTool.ELLIPSE, title: 'Ellipse', icon: 'circle', itemType: 'Ellipse' },
-  { type: EditorTool.TRIANGLE, title: 'Triangle', icon: 'change_history', itemType: 'Triangle' },
-  { type: EditorTool.STAR, title: 'Star', icon: 'grade', itemType: 'Star' },
-  { type: EditorTool.ICON, title: 'Icon', icon: 'portrait', itemType: 'Icon' },
-  { type: EditorTool.WIDGET, title: 'Widgets', icon: 'view_in_ar' },
+  { type: EditorTool.SELECT, title: 'Select', group: ToolBoxGroup.TOOL, icon: 'ads_click' },
+  { type: EditorTool.CONNECTION, title: 'Connection', group: ToolBoxGroup.TOOL, icon: 'share', itemType: 'Connection' },
+  {
+    type: EditorTool.TEXT,
+    title: '文字',
+    group: ToolBoxGroup.BASIC,
+    icon: 'text_fields',
+    itemType: 'Text',
+    iconComponent: Text,
+  },
+  {
+    type: EditorTool.IMAGE,
+    title: '图片',
+    group: ToolBoxGroup.BASIC,
+    icon: 'image',
+    itemType: 'Image',
+    iconComponent: Image,
+  },
+  {
+    type: EditorTool.LINE,
+    title: '线段',
+    group: ToolBoxGroup.SHAPE,
+    icon: 'horizontal_rule',
+    itemType: 'Line',
+    iconComponent: RemoveOutline,
+  },
+  {
+    type: EditorTool.RECTANGLE,
+    title: '矩形',
+    group: ToolBoxGroup.SHAPE,
+    icon: 'rectangle',
+    itemType: 'Rectangle',
+    iconComponent: TabletLandscapeOutline,
+  },
+  {
+    type: EditorTool.ELLIPSE,
+    title: '圆形',
+    group: ToolBoxGroup.SHAPE,
+    icon: 'circle',
+    itemType: 'Ellipse',
+    iconComponent: RadioButtonOffOutline,
+  },
+  {
+    type: EditorTool.TRIANGLE,
+    title: '三角形',
+    group: ToolBoxGroup.SHAPE,
+    icon: 'change_history',
+    itemType: 'Triangle',
+    iconComponent: TriangleOutline,
+  },
+  {
+    type: EditorTool.STAR,
+    title: '五角形',
+    group: ToolBoxGroup.SHAPE,
+    icon: 'grade',
+    itemType: 'Star',
+    iconComponent: StarOutline,
+  },
+  { type: EditorTool.ICON, title: 'Icon', group: ToolBoxGroup.ICON, icon: 'portrait', itemType: 'Icon' },
+  { type: EditorTool.WIDGET, title: 'Widgets', group: ToolBoxGroup.CONTAINER, icon: 'view_in_ar' },
 ];
 
 export function getToolDefinition(toolType: EditorTool): ToolDefinition {

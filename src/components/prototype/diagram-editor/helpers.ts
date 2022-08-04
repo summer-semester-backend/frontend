@@ -96,8 +96,8 @@ export function createItem(item?: DeepPartial<Item>): Item {
     supportsResizable: true,
     supportsClippable: false,
 
-    backgroundColor: '#bbbbbb',
-    textColor: '#000000',
+    backgroundColor: 'white',
+    textColor: 'black',
     fontSize: 14,
 
     textHAlign: TextHAlign.CENTER,
@@ -106,7 +106,7 @@ export function createItem(item?: DeepPartial<Item>): Item {
     border: {
       width: 0,
       style: ConnectionStyle.SOLID,
-      color: '#333333',
+      color: 'black',
     },
 
     shadow: false,
@@ -195,8 +195,8 @@ export function registerDefaultItemTypes() {
     supportsRoundable: false,
     supportsResizable: true,
 
-    backgroundColor: '#00ff00',
-    textColor: '#111111',
+    backgroundColor: 'gray',
+    textColor: 'black',
     fontSize: 14,
 
     locked: false,
@@ -207,7 +207,7 @@ export function registerDefaultItemTypes() {
     border: {
       width: 0,
       style: ConnectionStyle.SOLID,
-      color: '#333333',
+      color: 'gray',
     },
 
     shadow: false,
@@ -230,7 +230,7 @@ export function registerDefaultItemTypes() {
       ...defaults,
       title: 'Hello World',
       backgroundColor: 'transparent',
-      textColor: '#333333',
+      textColor: 'black',
 
       component: type,
     },
@@ -242,13 +242,9 @@ export function registerDefaultItemTypes() {
   registerItemType<LineItem>(
     {
       ...defaults,
-
       component: type,
-
-      backgroundColor: '#111111',
-
       style: ConnectionStyle.SOLID,
-      thick: 2,
+      thick: 3,
     },
     lineModel
   );
@@ -258,7 +254,6 @@ export function registerDefaultItemTypes() {
   registerItemType(
     {
       ...defaults,
-
       component: type,
       supportsRoundable: true,
     },
@@ -271,11 +266,8 @@ export function registerDefaultItemTypes() {
     {
       ...defaults,
       component: type,
-
       w: 90,
       h: 70,
-      backgroundColor: '#324759',
-      textColor: '#FFFFFF',
     },
     shapeWithoutRadiusModel
   );
@@ -289,7 +281,6 @@ export function registerDefaultItemTypes() {
 
       w: 90,
       h: 70,
-      backgroundColor: '#ff0000',
     },
     shapeWithoutRadiusModel
   );
@@ -303,8 +294,6 @@ export function registerDefaultItemTypes() {
 
       w: 70,
       h: 70,
-      backgroundColor: '#ff0000',
-      textColor: '#333333',
     },
     shapeWithoutRadiusModel
   );
@@ -350,7 +339,6 @@ export function registerDefaultItemTypes() {
       supportsRoundable: true,
 
       backgroundColor: 'transparent',
-      textColor: '#333333',
       fontSize: 60,
       w: 60,
       h: 60,

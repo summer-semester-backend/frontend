@@ -42,9 +42,9 @@
       @wheel="onScroll"
       @scroll="onScroll"
       @mousemove="onMouseMove"
-      @dragover="onDragOver"
+      @dragover="onDragOver($event)"
       @click.stop="editable && !shiftPressed && onCanvasClick($event)"
-      @drop="onCanvasClick($event)"
+      @drop.stop="onCanvasClick($event)"
     >
       <div
         ref="viewport"
@@ -339,14 +339,14 @@
       @drag="onDragInspector"
     />
 
-    <div class="object-toolbox-comtainer">
+    <div class="tool-box-container">
       <ToolBox @tool-selected="handleToolBoxSelect"></ToolBox>
     </div>
 
     <Moveable
       v-if="editable && showInspector"
       ref="moveableToolBox"
-      :target="['.object-toolbox-comtainer']"
+      :target="['.tool-box-container']"
       :throttleDrag="1"
       :draggable="true"
       :origin="false"
@@ -530,6 +530,10 @@ const handleToolBoxSelect = (selected: EditorTool) => {
   currentTool.value = selected;
 };
 
+const allowDrop = (e: any) => {
+  e.preventDefault();
+};
+
 function onMouseMove(e: any) {
   if (!viewport.value) return;
   //console.log('onMouseMove', e.srcElement, e.offsetX, e.offsetY, e);
@@ -542,7 +546,7 @@ function onMouseMove(e: any) {
 
 function onDragOver(e: any) {
   if (!viewport.value) return;
-  // console.log('onDragOver', e.srcElement, e.offsetX, e.offsetY, e);
+  console.log('onDragOver', e.srcElement, e.offsetX, e.offsetY, e);
   e.preventDefault();
   // Mouse position
   const rect = viewport.value.getBoundingClientRect();
@@ -887,6 +891,7 @@ function onCanvasClick(e: any): void {
   console.log('creating new item', toolDef, toolDef.itemType, newItem);
   historyManager.value.execute(new AddItemCommand(elements, newItem));
   emit('add-item', newItem);
+  currentTool.value = EditorTool.SELECT;
 }
 
 /** Handle a click on the connection handles */
@@ -1140,6 +1145,16 @@ function onDragToolBox(e: any): void {
   position: absolute;
   top: 80px;
   right: 20px;
+  width: 300px;
+  height: auto;
+  max-height: 90%;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+.tool-box-container {
+  position: absolute;
+  top: 80px;
+  left: 30px;
   width: 300px;
   height: auto;
   max-height: 90%;
