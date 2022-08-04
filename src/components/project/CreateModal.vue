@@ -7,7 +7,14 @@
           <n-input v-model:value="porjModel.projectName" placeholder=""></n-input>
         </n-form-item>
         <n-form-item label="所属团队" path="teamID">
-          <n-select v-model:value="porjModel.teamID" :options="teams" placeholder="请选择" :disabled="isTeamList" />
+          <n-select
+            v-model:value="porjModel.teamID"
+            value-field="teamID"
+            label-field="teamName"
+            :options="teams"
+            placeholder="请选择"
+            :disabled="isTeamList"
+          />
         </n-form-item>
         <n-form-item label="上传封面&nbsp;&nbsp;">
           <n-upload
@@ -41,7 +48,8 @@
 <script setup lang="ts">
 import { ref, computed, reactive, defineProps, onMounted } from 'vue';
 import type { FormInst, FormRules, FormItemRule, UploadFileInfo } from 'naive-ui';
-import { createProject } from '@/api/project';
+import { createProject } from '@/api/file';
+import { teamList } from '@/api/team';
 //传参
 const { teamId = null, isCreateModalShow = false } = defineProps<{
   teamId?: number | null;
@@ -60,12 +68,12 @@ const isTeamList = ref(false);
 //团队列表
 const teams = ref([
   {
-    label: 'team1',
-    value: 1,
+    teamName: 'team1',
+    teamID: 1,
   },
   {
-    label: 'team2',
-    value: 2,
+    teamName: 'team2',
+    teamID: 2,
   },
 ]);
 //表单校验规则
@@ -132,10 +140,30 @@ const handleCancleClick = () => {
   emits('close');
 };
 
+//获取团队列表
+const getTeamList = () => {
+  teamList()
+    .then((res) => {
+      if (res.data.result == 0) {
+        teams.value = res.data.list;
+        isTeamList.value = true;
+      } else if (res.data.result == 1) {
+        window.$message.warning(res.data.message);
+      } else if (res.data.result == 2) {
+        window.$message.error(res.data.message);
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+};
+
 onMounted(() => {
   if (teamId != null) {
     porjModel.value.teamID = teamId;
     isTeamList.value = true;
+  } else {
+    getTeamList();
   }
 });
 </script>

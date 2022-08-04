@@ -23,7 +23,7 @@
         <div id="my-box">
           <n-grid :x-gap="48" :y-gap="24" :cols="5">
             <n-gi v-for="(item, index) in dataFilter.slice((page - 1) * pageSize, page * pageSize)" :key="index">
-              <n-tooltip :delay="500" placement="bottom-end" @update:show="handleUpdateShow(item.projectID)">
+              <n-tooltip :delay="500" placement="bottom-start" @update:show="handleUpdateShow(item.projectID)">
                 <template #trigger>
                   <n-card
                     :segmented="{
@@ -118,7 +118,7 @@
 <script setup lang="ts">
 import { ref, computed, reactive, defineProps, onMounted, h } from 'vue';
 import { Add, Search, EllipsisHorizontal, TrashOutline, ArchiveOutline, CreateOutline } from '@vicons/ionicons5';
-import { abandonProject, renameProject, projectDetail } from '@/api/project';
+import { abandonProject, renameProject, projectDetail } from '@/api/file';
 import { NIcon, NInput } from 'naive-ui';
 interface Project {
   projectID: number;
@@ -193,7 +193,7 @@ const handleSelect = (key: string | number) => {
   if (key === 'manage') {
     console.log('manage');
     isManage.value = true;
-    operates.value[1] = {
+    operates.value[2] = {
       label: '取消管理',
       key: 'cancel',
     };
@@ -206,7 +206,7 @@ const handleSelect = (key: string | number) => {
   } else if (key === 'cancel') {
     console.log('cancel');
     isManage.value = false;
-    operates.value[1] = {
+    operates.value[2] = {
       label: '管理',
       key: 'manage',
     };

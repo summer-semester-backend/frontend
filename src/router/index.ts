@@ -72,6 +72,12 @@ const routes: RouteRecordRaw[] = [
     ],
   },
   {
+    path: '/workspace',
+    name: 'workspace',
+    component: () => import('../views/workspace/WorkSpaceOverview.vue'),
+    children: [],
+  },
+  {
     path: '/login',
     name: 'login',
     component: () => import('../views/login/LoginPage.vue'),
