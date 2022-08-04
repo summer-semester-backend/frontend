@@ -8,7 +8,7 @@ export function applyRegisterCode(data: { email: string }) {
   return backend.post('auth/emailRegister', data);
 }
 
-export function register(data: { email: string; password: string; code: string }) {
+export function register(data: { username: string; email: string; password: string; code: string }) {
   return backend.post('auth/register', data);
 }
 
@@ -21,5 +21,5 @@ export function forgetPassword(data: { email: string; password: string; code: st
 }
 
 export function changePassword(data: { password: string; newPassword: string }) {
-  return backend.put('auth/changePassword', data);
+  return backend.post('auth/changePassword', data);
 }
