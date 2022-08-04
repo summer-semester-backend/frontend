@@ -32,7 +32,7 @@ const routes: RouteRecordRaw[] = [
         component: () => import('../views/team/TeamOverview.vue'),
         children: [
           {
-            path: '',
+            path: 'teamDetail',
             name: 'teamDetail',
             component: () => import('../views/team/TeamDetail.vue'),
           },
@@ -74,8 +74,14 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/workspace',
     name: 'workspace',
-    component: () => import('../views/workspace/WorkSpaceOverview.vue'),
-    children: [],
+    component: () => import('../views/workspace/WorkspaceOverview.vue'),
+    children: [
+      {
+        path: 'doc',
+        name: 'Doc',
+        component: () => import('../components/workspace/Doc.vue'),
+      },
+    ],
   },
   {
     path: '/login',

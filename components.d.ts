@@ -6,6 +6,7 @@ declare module 'vue' {
   export interface GlobalComponents {
     AmEditor: typeof import('./src/components/editor/AmEditor.vue')['default']
     CreateModal: typeof import('./src/components/project/CreateModal.vue')['default']
+    Doc: typeof import('./src/components/workspace/Doc.vue')['default']
     DraggableArea: typeof import('./src/components/prototype/DraggableArea.vue')['default']
     Empty: typeof import('./src/components/editor/Empty.vue')['default']
     ForgetForm: typeof import('./src/components/login/ForgetForm.vue')['default']
