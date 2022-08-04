@@ -118,7 +118,7 @@
 <script setup lang="ts">
 import { ref, computed, reactive, defineProps, onMounted, h } from 'vue';
 import { Add, Search, EllipsisHorizontal, TrashOutline, ArchiveOutline, CreateOutline } from '@vicons/ionicons5';
-import { abandonProject, renameProject, projectDetail } from '@/api/project';
+import { abandonProject, renameProject, projectDetail } from '@/api/file';
 import { NIcon, NInput } from 'naive-ui';
 interface Project {
   projectID: number;

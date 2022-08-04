@@ -9,7 +9,7 @@ export function teamProjectList(data: { teamID: number }) {
 }
 
 export function recentProjectList() {
-  return backend.post('/project/lastVisitProject');
+  return backend.post('/file/recently');
 }
 
 export function trashProjectList() {
@@ -17,7 +17,7 @@ export function trashProjectList() {
 }
 
 export function createProject(data: { projectName: string; teamID: number | null; projectImage: string }) {
-  return backend.post('/project/createProject', data);
+  return backend.post('/file/create', data);
 }
 
 export function deleteProject(data: { projectID: number }) {

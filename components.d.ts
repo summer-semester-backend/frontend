@@ -4,13 +4,17 @@
 
 declare module 'vue' {
   export interface GlobalComponents {
+    AmEditor: typeof import('./src/components/editor/AmEditor.vue')['default']
     CreateModal: typeof import('./src/components/project/CreateModal.vue')['default']
     DraggableArea: typeof import('./src/components/prototype/DraggableArea.vue')['default']
+    Empty: typeof import('./src/components/editor/Empty.vue')['default']
     ForgetForm: typeof import('./src/components/login/ForgetForm.vue')['default']
     GlobalContent: typeof import('./src/components/common/GlobalContent.vue')['default']
     GlobalSidebar: typeof import('./src/components/common/GlobalSidebar.vue')['default']
     Header: typeof import('./src/components/common/Header.vue')['default']
+    Loading: typeof import('./src/components/editor/loading.vue')['default']
     MemberList: typeof import('./src/components/team/MemberList.vue')['default']
+    Mention: typeof import('./src/components/editor/mention.vue')['default']
     NaiveProvider: typeof import('./src/components/common/NaiveProvider.vue')['default']
     PasswordChange: typeof import('./src/components/user/PasswordChange.vue')['default']
     PersonInfo: typeof import('./src/components/user/PersonInfo.vue')['default']
