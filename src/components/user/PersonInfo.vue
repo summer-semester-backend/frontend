@@ -4,12 +4,12 @@
     <n-layout has-sider>
       <n-layout-sider width="600px">
         <n-form ref="formRef" :rules="rules" :model="model" label-placement="left" require-mark-placement="left">
-          <n-form-item label="&emsp;昵称：" path="nikeName">
-            <n-input v-model:value="model.nikeName" placeholder="请输入" clearable style="width: 350px;"/>
+          <n-form-item label="&emsp;昵称：" path="nickname">
+            <n-input v-model:value="model.nickname" placeholder="请输入" clearable style="width: 350px;"/>
           </n-form-item>
 
-          <n-form-item label="&emsp;邮箱：" path="mail">
-            <n-input v-model:value="model.mail"  placeholder="请输入" clearable style="width: 350px;"/>
+          <n-form-item label="&emsp;邮箱：" path="email">
+            <n-input v-model:value="model.email"  placeholder="请输入" clearable style="width: 350px;"/>
           </n-form-item>
 
           <n-form-item label="&emsp;&emsp;性别：" path="sex">
@@ -26,8 +26,8 @@
             <n-input v-model:value="model.phone" type="text" placeholder="请输入" clearable style="width: 350px;"/>
           </n-form-item>
 
-          <n-form-item label="真实姓名：" path="userName">
-            <n-input v-model:value="model.userName" type="text" placeholder="请输入" clearable style="width: 350px;"/>
+          <n-form-item label="真实姓名：" path="username">
+            <n-input v-model:value="model.username" type="text" placeholder="请输入" clearable style="width: 350px;"/>
           </n-form-item>
 
           <n-form-item label="个人简介：" path="summary">
@@ -100,7 +100,7 @@
         </template>
         <template #action>
           <n-space justify="center" :size="50">
-            <n-button type="primary" :disabled="!fileListLength" @click="handleClick">确定</n-button>
+            <n-button type="info"  @click="handleClick">确定</n-button>
             <n-button type="default" @click="closeModel()">取消</n-button>
           </n-space>
         </template>
@@ -122,11 +122,11 @@ const message = useMessage()
 const title = ref('基本信息'); //页面标题
 const formRef = ref(null);
 const model = ref({
-    nikeName:"",
-    mail:"",
-    sex:"",
+    nickname:"",
+    email:"",
+    sex:null,
     phone:"",
-    userName:"",
+    username:"",
     summary:"",
     avatar:"",
 });
@@ -137,6 +137,11 @@ const handleChange = (options) => {
     fileListLength.value = options.fileList.length;
 }
 const handleClick = () => {
+    if(fileListLength.value == 0)
+    {
+      message.warning("未上传图片！")
+      return;
+    }
     uploadFile.value?.submit();
 }
 
@@ -148,14 +153,14 @@ const handleUploadFinish = ({file,event}) => {
 };
 
 const rules = ref({
-  nikeName: [
+  nickname: [
     {
       required: true,
       message: "请输入昵称",
       trigger: ["input", "blur"]
     },
   ],
-  mail: [
+  email: [
     {
       required: true,
       message: "请输入邮箱",
@@ -186,13 +191,17 @@ const sexs = ref([
 
 const getInfo = () => {
     let userID = localStorage.getItem('userID') || '';
-    console.log("userID",userID);
     getUserInfo({userID:userID}).then((res) => {
       if (res.data.result == 0) {
-        window.$message.success('创建成功');
-        console.log("success");
-        console.log(res);
-        console.log(res.data.data);
+        // window.$message.success('创建成功');
+        let ret = res.data.data;
+        model.value.nickname = ret.nickname;
+        model.value.email = ret.email;
+        model.value.sex = ret.sex;
+        model.value.phone = ret.phone;
+        model.value.username = ret.username;
+        model.value.summary = ret.summary;
+        model.value.avatar = ret.avatar;
       } else if (res.data.result == 1) {
         window.$message.warning(res.data.message);
       } else if (res.data.result == 2) {
@@ -213,9 +222,6 @@ const updateAva = () => {
       updateUserAva({avatar:model.value.avatar}).then((res) => {
       if (res.data.result == 0) {
         window.$message.success('更新成功');
-        console.log("success");
-        console.log(res);
-        console.log(res.data.data);
       } else if (res.data.result == 1) {
         window.$message.warning(res.data.message);
       } else if (res.data.result == 2) {
@@ -228,7 +234,7 @@ const updateAva = () => {
 }
 
 const updateInfo = () => {
-      if(checkEmpty(model.value.nikeName) || checkEmpty(model.value.mail))
+      if(checkEmpty(model.value.nickname) || checkEmpty(model.value.email))
       {
           message.warning("必填字段未填写!");
           return;
@@ -236,9 +242,6 @@ const updateInfo = () => {
       updateUserInfo(model.value).then((res) => {
       if (res.data.result == 0) {
         window.$message.success('更新成功');
-        console.log("success");
-        console.log(res);
-        console.log(res.data.data);
       } else if (res.data.result == 1) {
         window.$message.warning(res.data.message);
       } else if (res.data.result == 2) {

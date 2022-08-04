@@ -4,20 +4,20 @@
 
     <n-form ref="formRef" :rules="rules" :model="model" label-placement="left" require-mark-placement="left">
       <n-form-item label="&emsp;旧密码：" path="password">
-        <n-input v-model:value="model.password" placeholder="请输入" type="password" clearable style="width: 300px;"/>
+        <n-input v-model:value="model.password" placeholder="请输入" type="password" show-password-on="click" style="width: 300px;"/>
       </n-form-item>
 
       <n-form-item label="&emsp;新密码：" path="newPassword">
-        <n-input v-model:value="model.newPassword"  placeholder="请输入" type="password" clearable style="width: 300px;"/>
+        <n-input v-model:value="model.newPassword"  placeholder="请输入" type="password" show-password-on="click" style="width: 300px;"/>
       </n-form-item>
 
       <n-form-item label="确认密码：" path="newPasswordCheck">
-        <n-input v-model:value="model.newPasswordCheck"  placeholder="请输入" type="password" clearable style="width: 300px;"/>
+        <n-input v-model:value="model.newPasswordCheck"  placeholder="请输入" type="password" show-password-on="click" style="width: 300px;"/>
       </n-form-item>
 
     </n-form>
 
-    <n-button type="info" @click="change()" color="#409EFF" style="width: 150px;height: 40px;margin-left: 80px;margin-top: 300px;">
+    <n-button type="info" @click="change()" color="#409EFF" style="width: 150px;height: 40px;margin-left: 80px;margin-top: 30px;">
         提交
     </n-button>
 
@@ -81,10 +81,10 @@ const change = () => {
 
     changePassword({ password: model.value.password, newPassword: model.value.newPassword }).then((res) => {
       if (res.data.result == 0) {
-        window.$message.success('创建成功');
-        console.log("success");
-        console.log(res);
-        console.log(res.data.data);
+        window.$message.success('更新成功！');
+        model.value.password="";
+        model.value.newPassword="";
+        model.value.newPasswordCheck="";
       } else if (res.data.result == 1) {
         window.$message.warning(res.data.message);
       } else if (res.data.result == 2) {
