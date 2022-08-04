@@ -48,7 +48,7 @@
 <script setup lang="ts">
 import { ref, computed, reactive, defineProps, onMounted } from 'vue';
 import type { FormInst, FormRules, FormItemRule, UploadFileInfo } from 'naive-ui';
-import { createProject } from '@/api/project';
+import { createProject } from '@/api/file';
 import { teamList } from '@/api/team';
 //传参
 const { teamId = null, isCreateModalShow = false } = defineProps<{

@@ -43,7 +43,7 @@
 </template>
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import { projectDetail, recentProjectList } from '@/api/project';
+import { projectDetail, recentProjectList } from '@/api/file';
 const projects = ref([
   {
     projectID: 1,

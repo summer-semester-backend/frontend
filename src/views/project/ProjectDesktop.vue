@@ -5,7 +5,7 @@
 </template>
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
-import { userProjectList } from '@/api/project';
+import { userProjectList } from '@/api/file';
 const projects = ref([
   {
     projectID: 1,
@@ -37,7 +37,6 @@ onMounted(() => {
 </script>
 
 <style lang="less" scoped>
-
 .box {
   height: 100%;
   width: 270px;

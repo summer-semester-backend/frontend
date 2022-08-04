@@ -3,7 +3,7 @@
 </template>
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
-import { teamProjectList } from '@/api/project';
+import { teamProjectList } from '@/api/file';
 const teamID = ref(1);
 const projects = ref([
   {

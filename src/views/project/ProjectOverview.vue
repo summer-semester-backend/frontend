@@ -1,7 +1,6 @@
 <template>
   <!-- <work-space /> -->
   <ProjectBar id="userBar"></ProjectBar>
-  <draggable-area />
 </template>
 <script setup lang="ts"></script>
 
