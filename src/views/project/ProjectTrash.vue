@@ -186,4 +186,5 @@ const dataFilter = computed(() => {
   padding: 40px 60px;
   position: relative;
 }
+
 </style>

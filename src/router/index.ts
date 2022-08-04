@@ -7,19 +7,21 @@ const routes: RouteRecordRaw[] = [
     redirect: 'project',
   },
   {
-    path: '/project/desktop',
-    name: 'ProjectDesktop',
-    component: () => import('../views/project/ProjectDesktop.vue'),
-  },
-  {
-    path: '/project/trash',
-    name: 'ProjectTrash',
-    component: () => import('../views/project/ProjectTrash.vue'),
-  },
-  {
     path: '/project',
     name: 'project',
     component: () => import('../views/project/ProjectOverview.vue'),
+    children: [
+      {
+        path: 'desktop',
+        name: 'ProjectDesktop',
+        component: () => import('../views/project/ProjectDesktop.vue'),
+      },
+      {
+        path: 'trash',
+        name: 'ProjectTrash',
+        component: () => import('../views/project/ProjectTrash.vue'),
+      },
+    ]
   },
   {
     path: '/team',
@@ -44,11 +46,6 @@ const routes: RouteRecordRaw[] = [
         ],
       },
     ],
-  },
-  {
-    path: '/team/project',
-    name: 'TeamProject',
-    component: () => import('../views/team/TeamProject.vue'),
   },
   {
     path: '/user',

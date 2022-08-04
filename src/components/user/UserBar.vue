@@ -42,7 +42,7 @@
 </template>
 
 <script setup>
-import { defineComponent, h, ref ,computed} from "vue";
+import { defineComponent, h, ref ,computed, watch} from "vue";
 import { MenuOpenRound } from '@vicons/material';
 import { useRouter , RouterLink} from 'vue-router';
 
@@ -88,6 +88,12 @@ const menuOptions = [
   },
 ];
 
+watch(
+  ()=>router.currentRoute.value.name,
+  (newValue, oldValue) => {
+    activeKey.value = newValue;
+  },{ immediate: true }
+)
 </script>
 
 <style lang="less" scoped>

@@ -75,7 +75,6 @@ backend.interceptors.response.use(
     } else return Promise.resolve(response);
   },
   (error) => {
-    console.log(123);
     return Promise.reject(error);
   }
 );
