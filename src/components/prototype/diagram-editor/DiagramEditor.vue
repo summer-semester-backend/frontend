@@ -42,7 +42,9 @@
       @wheel="onScroll"
       @scroll="onScroll"
       @mousemove="onMouseMove"
+      @dragover="onDragOver"
       @click.stop="editable && !shiftPressed && onCanvasClick($event)"
+      @drop="onCanvasClick($event)"
     >
       <div
         ref="viewport"
@@ -324,6 +326,7 @@
         @property-changed="onPropertyChange"
       />
     </div>
+
     <Moveable
       v-if="editable && showInspector"
       ref="moveableInspector"
@@ -334,6 +337,22 @@
       :hideDefaultLines="true"
       @dragStart="onDragStartInspector"
       @drag="onDragInspector"
+    />
+
+    <div class="object-toolbox-comtainer">
+      <ToolBox @tool-selected="handleToolBoxSelect"></ToolBox>
+    </div>
+
+    <Moveable
+      v-if="editable && showInspector"
+      ref="moveableToolBox"
+      :target="['.object-toolbox-comtainer']"
+      :throttleDrag="1"
+      :draggable="true"
+      :origin="false"
+      :hideDefaultLines="true"
+      @dragStart="onDragStartToolBox"
+      @drag="onDragToolBox"
     />
 
     <!-- Manage drag of inspector -->
@@ -505,11 +524,26 @@ const origin: Frame = {
 const mouseCoords = ref<Position>({ x: 0, y: 0 });
 
 const inspectorCoords = ref<Position>({ x: 0, y: 0 });
+const toolBoxCoords = ref<Position>({ x: 0, y: 0 });
+
+const handleToolBoxSelect = (selected: EditorTool) => {
+  currentTool.value = selected;
+};
 
 function onMouseMove(e: any) {
   if (!viewport.value) return;
   //console.log('onMouseMove', e.srcElement, e.offsetX, e.offsetY, e);
 
+  // Mouse position
+  const rect = viewport.value.getBoundingClientRect();
+  mouseCoords.value.x = Math.floor((e.clientX - rect.left) / zoomFactor.value);
+  mouseCoords.value.y = Math.floor((e.clientY - rect.top) / zoomFactor.value);
+}
+
+function onDragOver(e: any) {
+  if (!viewport.value) return;
+  // console.log('onDragOver', e.srcElement, e.offsetX, e.offsetY, e);
+  e.preventDefault();
   // Mouse position
   const rect = viewport.value.getBoundingClientRect();
   mouseCoords.value.x = Math.floor((e.clientX - rect.left) / zoomFactor.value);
@@ -822,7 +856,7 @@ function selectCurrentTool(tool: EditorTool): void {
 
 /** Handle the clik in the overall canvas */
 function onCanvasClick(e: any): void {
-  // console.log('onCanvasClick', e);
+  console.log('onCanvasClick', e);
 
   // Was just clicking the scrollbar for scrolling?
   if (e.target?.classList?.contains('infinite-viewer-scroll-thumb')) return;
@@ -1064,8 +1098,6 @@ function onDragStartInspector(e: any): void {
     e.stop();
     return;
   }
-
-  console.log('onDragStartInspector', e);
 }
 
 function onDragInspector(e: any): void {
@@ -1073,11 +1105,25 @@ function onDragInspector(e: any): void {
   inspectorCoords.value.y = Math.floor(e.beforeTranslate[1]);
   e.target.style.transform = e.transform;
 }
+
+function onDragStartToolBox(e: any): void {
+  if (!e.inputEvent.target.className.includes('toolbox-title-drag-handle')) {
+    e.stop();
+    return;
+  }
+}
+
+function onDragToolBox(e: any): void {
+  toolBoxCoords.value.x = Math.floor(e.beforeTranslate[0]);
+  toolBoxCoords.value.y = Math.floor(e.beforeTranslate[1]);
+  e.target.style.transform = e.transform;
+}
 </script>
 
 <style>
 .diagram-item-inline-edit {
   /* marker class */
+  cursor: auto;
 }
 </style>
 

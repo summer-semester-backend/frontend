@@ -3,7 +3,7 @@
     <div class="toolbox-title toolbox-title-drag-handle">ToolBox</div>
     <n-grid :x-gap="8" :y-gap="8" :cols="2">
       <n-gi v-for="t in toolDefinitions">
-        <ToolBoxItem draggable="true" @mousedown="emits('tool-selected', t.type)"></ToolBoxItem>
+        <ToolBoxItem draggable="true" @mousedown="emits('tool-selected', t.type as EditorTool)"></ToolBoxItem>
       </n-gi>
     </n-grid>
   </div>
@@ -13,7 +13,7 @@
 import { ref } from 'vue';
 import { toolDefinitions, EditorTool } from '../diagram-editor/types';
 interface ToolbarEvents {
-  (e: 'tool-selected', toolType: EditorTool | 'separator'): void;
+  (e: 'tool-selected', toolType: EditorTool): void;
 }
 const emits = defineEmits<ToolbarEvents>();
 </script>
