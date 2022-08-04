@@ -65,16 +65,17 @@ const renderSignUpTabPane = () => h('div', { style: 'font-weight: bold;' }, '注
 
 backend.interceptors.response.use(
   (response) => {
+    console.log(response.data.result);
     if (response.data.result == 10) {
       window.$message.error('登录认证失败');
       signOut();
       router.push({ name: 'login' });
-    } else if (response.data.status != 0) {
-      window.$message.error(response.data.message);
+    } else if (response.data.result !== 0) {
       return Promise.reject(response);
     } else return Promise.resolve(response);
   },
   (error) => {
+    console.log(123);
     return Promise.reject(error);
   }
 );
