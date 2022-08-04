@@ -67,6 +67,7 @@ const routes: RouteRecordRaw[] = [
       },
       {
         path: '',
+        name: 'UserDefault',
         redirect: '/user/personInfo',
       },
     ],
@@ -74,7 +75,7 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/workspace',
     name: 'workspace',
-    component: () => import('../views/workspace/WorkSpaceOverview.vue'),
+    component: () => import('../views/workspace/WorkspaceOverview.vue'),
     children: [],
   },
   {
