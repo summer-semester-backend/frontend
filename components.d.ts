@@ -9,6 +9,7 @@ declare module 'vue' {
     ColorEditor: typeof import('./src/components/prototype/inspector/property-editors/ColorEditor.vue')['default']
     Connection: typeof import('./src/components/prototype/diagram-editor/blocks/Connection.vue')['default']
     CreateModal: typeof import('./src/components/project/CreateModal.vue')['default']
+    DiagramEditor: typeof import('./src/components/prototype/diagram-editor/DiagramEditor.vue')['default']
     Doc: typeof import('./src/components/workspace/Doc.vue')['default']
     DraggableArea: typeof import('./src/components/prototype/DraggableArea.vue')['default']
     EditorIcon: typeof import('./src/components/prototype/diagram-editor/components/EditorIcon.vue')['default']

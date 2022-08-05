@@ -218,7 +218,7 @@ class OTClient extends EventEmitter {
     const doc = connection.get(collectionName, docId);
     this.doc = doc;
     // 订阅
-    doc.subscribe((error) => {
+    doc.subscribe((error: any) => {
       console.log('subscribe');
       if (error) {
         console.log('collab doc subscribe error', error);
@@ -245,15 +245,15 @@ class OTClient extends EventEmitter {
       this.sendMessage('ready');
     });
 
-    doc.on('op', (op, type) => {
+    doc.on('op', (op: any, type: any) => {
       console.log('op', op, type ? 'local' : 'server');
     });
 
-    doc.on('del', (t, n) => {
+    doc.on('del', (t: any, n: any) => {
       console.log('collab doc deleted', t, n);
     });
 
-    doc.on('error', (error) => {
+    doc.on('error', (error: any) => {
       console.error(error);
     });
   }
