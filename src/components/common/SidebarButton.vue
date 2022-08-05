@@ -15,12 +15,12 @@
   </div>
 </template>
 <script setup lang="ts">
-import { computed } from '@vue/reactivity';
+import { computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
 const router = useRouter();
 const route = useRoute();
-const props = defineProps<{ buttonName: string; routeName: string; rootRoute: string}>();
+const props = defineProps<{ buttonName: string; routeName: string; rootRoute: string }>();
 const handleDirect = () => {
   router.push({ name: props.routeName });
 };

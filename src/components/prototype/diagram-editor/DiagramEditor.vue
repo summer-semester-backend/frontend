@@ -1234,7 +1234,7 @@ function onDragToolBox(e: any): void {
   left: 0px;
   width: 30px;
   height: 30px;
-  background-color: #333;
+  background-color: #18181c;
 }
 
 .toolbars-container {

@@ -611,3 +611,18 @@ export const inputModel: ObjectInspectorModel = {
     },
   ],
 };
+
+export const buttonModel: ObjectInspectorModel = {
+  tabs: [
+    {
+      title: '样式',
+      sections: [
+        {
+          name: 'properties',
+          title: '属性',
+          properties: [],
+        },
+      ],
+    },
+  ],
+};
