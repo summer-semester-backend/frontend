@@ -98,6 +98,11 @@ const routes: RouteRecordRaw[] = [
         name: 'PrototypeList',
         component: () => import('../views/workspace/PrototypeList.vue'),
       },
+      {
+        path: 'recycleBin',
+        name: 'TrashList',
+        component: () => import('../views/workspace/TrashList.vue'),
+      },
     ],
   },
   {

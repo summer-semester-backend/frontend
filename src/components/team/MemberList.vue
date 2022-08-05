@@ -105,9 +105,11 @@ function handleFilterSearch(value: string) {
   nameColumn.filterOptionValue = value;
 }
 
-function handleInviteUser() {}
+function handleInviteUser() {
+  teamInvite.value?.open();
+}
 function handleDeleteMember(rowData: any) {
-  deleteTeamMember({ teamID: route.params.teamID as string, userID: rowData.id })
+  deleteTeamMember({ teamID: route.params.teamID as string, userID: rowData.userID })
     .then((res) => {
       if (res.data.result == 0) {
         window.$message.info(res.data.message);
@@ -138,13 +140,12 @@ function reload() {
   isReloading.value = true;
   getTeamMember({ teamID: route.params.teamID as string }).then((res) => {
     if (res.data.result == 0) {
-      console.log('before', res.data.userList);
       tableData.value = res.data.userList.map(
         (item: { userID: number; username: string; email: string; authority: number }, index: number) => {
           if (userID == item.userID && item.authority > 0) {
             isManager.value = true;
           }
-          var identity;
+          var identity = '普通成员';
           if (item.authority == 2) {
             identity = '项目创建人';
           } else if (item.authority == 1) {

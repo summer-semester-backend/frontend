@@ -15,10 +15,12 @@
 import { NButton, NIcon, NSpace } from 'naive-ui';
 import { h, ref, computed, onMounted } from 'vue';
 import { AddCircleOutline, Trash, ArrowRedo } from '@vicons/ionicons5';
+import { deleteFile } from '@/api/file';
 import { readFile } from '@/api/file';
 import { useRoute } from 'vue-router';
 import { ToolBar } from './components';
 import { useProjStore } from '@/store/proj';
+import router from '@/router';
 interface File {
   fileID: number;
   fileName: string;
@@ -51,21 +53,34 @@ const columns = ref([
   {
     title: '操作',
     key: 'actions',
-    render() {
+    render(row: any) {
       return h(NSpace, [
-        h(
+        /*h(
           NButton,
           {
             type: 'error',
             size: 'small',
             strong: true,
             secondary: true,
+            onClick(e) {
+              console.log(row);
+              deleteFile({ fileID: row.fileID }).then((res) => {
+                if (res.data.result == 0) {
+                  window.$message.success(res.data.message);
+                  getFileList(getProjID());
+                } else if (res.data.result == 1) {
+                  window.$message.warning(res.data.message);
+                } else if (res.data.result == 2) {
+                  window.$message.error(res.data.message);
+                }
+              });
+            },
           },
           {
             default: '删除',
             icon: h(NIcon, { component: Trash }),
           }
-        ),
+        ),*/
         h(
           NButton,
           {
@@ -73,6 +88,15 @@ const columns = ref([
             size: 'small',
             strong: true,
             secondary: true,
+            onClick(e) {
+              console.log(row);
+              router.push({
+                name: 'editor',
+                params: {
+                  id: row.fileID,
+                },
+              });
+            },
           },
           {
             default: '打开',
@@ -87,9 +111,9 @@ const columns = ref([
 const files = ref([
   {
     fileID: 1,
-    fileName: '项目1',
-    userName: '张三',
-    lastEditTime: '2020-01-01',
+    fileName: '',
+    userName: '',
+    lastEditTime: '',
   },
 ]);
 const getFileList = (id: number | null) => {
@@ -99,7 +123,7 @@ const getFileList = (id: number | null) => {
   }).then((res) => {
     console.log(res.data);
     files.value = [];
-    res.data.sonList.forEach((item) => {
+    res.data.sonList.forEach((item: any) => {
       if (item.fileType === 14) {
         files.value.push({
           fileID: item.fileID,
