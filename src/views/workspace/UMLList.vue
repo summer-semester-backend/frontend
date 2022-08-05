@@ -1,7 +1,7 @@
 <template>
   <ToolBar title="UML">
     <template #toolbar>
-      <n-button text @click="create()">
+      <n-button text @click="openModel">
         <n-icon size="26" class="icon">
           <AddCircleOutline />
         </n-icon>
@@ -9,12 +9,65 @@
     </template>
   </ToolBar>
   <n-data-table :columns="columns" :data="files" :pagination="pagination" :bordered="false" />
+
+
+  <n-modal v-model:show="showModel">
+    <n-card
+      style="width: 600px"
+      title="新建文件"
+      :bordered="false"
+      size="huge"
+      role="dialog"
+      aria-modal="true"
+      header-style="text-align:center"
+    >
+      <template #default>
+        <n-form ref="formRef" label-placement="left" require-mark-placement="left">
+          <n-form-item label="&emsp;文件名：" path="email">
+            <n-input v-model:value="fileNameRef"  placeholder="请输入" clearable style="width: 350px;"/>
+          </n-form-item>
+        </n-form>
+      </template>
+      <template #footer>
+        <n-space justify="center" :size="50">
+          <n-button type="info" @click="create">确定</n-button>
+          <n-button type="default" @click="closeModel">取消</n-button>
+        </n-space>
+      </template>
+    </n-card>
+  </n-modal>
+
+  <n-modal v-model:show="showModelEdit">
+    <n-card
+      style="width: 600px"
+      title="更改文件名"
+      :bordered="false"
+      size="huge"
+      role="dialog"
+      aria-modal="true"
+      header-style="text-align:center"
+    >
+      <template #default>
+        <n-form ref="formRef" label-placement="left" require-mark-placement="left">
+          <n-form-item label="&emsp;文件名：" path="email">
+            <n-input v-model:value="fileNameRef"  placeholder="请输入" clearable style="width: 350px;"/>
+          </n-form-item>
+        </n-form>
+      </template>
+      <template #footer>
+        <n-space justify="center" :size="50">
+          <n-button type="info" @click="editFileName">确定</n-button>
+          <n-button type="default" @click="closeModelEdit">取消</n-button>
+        </n-space>
+      </template>
+    </n-card>
+  </n-modal>
 </template>
 
 <script setup lang="ts">
-import { NButton, NIcon, NSpace } from 'naive-ui';
+import { NButton, NIcon, NSpace ,useDialog} from 'naive-ui';
 import { h, ref, computed, onMounted } from 'vue';
-import { AddCircleOutline, Trash, ArrowRedo } from '@vicons/ionicons5';
+import { AddCircleOutline, Trash, ArrowRedo ,Create} from '@vicons/ionicons5';
 import { readFile ,createFile ,editFile,deleteFile} from '@/api/file';
 import { useRoute } from 'vue-router';
 import { ToolBar } from './components';
@@ -27,10 +80,39 @@ interface File {
   fileName: string;
   userName: string;
   lastEditTime: string;
+  fileImage: string;
 }
-const fileOnOpen =  ref<File | null>(null);
+
+interface FileEdit {
+  fileID: number;
+  fileName: string;
+  fileImage: string;
+  fatherID: number;
+  data: any;
+}
+
+
+const fileNameRef = ref<string>("");
+const showModel = ref(false);
+const openModel = () => {
+    showModel.value = true;
+}
+const closeModel = () => {
+    showModel.value = false;
+    fileNameRef.value = "";
+}
+const showModelEdit = ref(false);
+const openModelEdit = () => {
+    showModelEdit.value = true;
+}
+const closeModelEdit = () => {
+    showModelEdit.value = false;
+    fileNameRef.value = "";
+}
+
 const route = useRoute();
 const message = useMessage();
+const dialog = useDialog();
 const { getProjID } = useProjStore();
 const projID = ref<number | null>(null);
 const pagination = ref({
@@ -66,7 +148,16 @@ const columns = ref([
             strong: true,
             secondary: true,
             onClick(e){
-              console.log(row);
+              dialog.warning({
+                title: "警告",
+                content: "你确定要删除这个文件吗？",
+                positiveText: "确定",
+                negativeText: "取消",
+                onPositiveClick: () => {
+                  deleFlie(row.fileID);
+                },
+                onNegativeClick: () => {}
+              });
             }
           },
           {
@@ -82,7 +173,9 @@ const columns = ref([
             strong: true,
             secondary: true,
             onClick(e){
-              getFileInfo(row,1);
+              fileOnOpen.value = row;
+              // console.log(fileOnOpen.value.fileImage);
+              openDeskWithFile(fileOnOpen.value.fileImage);
           }
           },
           {
@@ -90,25 +183,38 @@ const columns = ref([
             icon: h(NIcon, { component: ArrowRedo }),
           }
         ),
+        h(
+          NButton,
+          {
+            type: 'warning',
+            size: 'small',
+            strong: true,
+            secondary: true,
+            onClick(e){
+              fileOnOpen.value = row;
+              fileNameRef.value = fileOnOpen.value.fileName;
+              openModelEdit();
+            }
+          },
+          {
+            default: '修改',
+            icon: h(NIcon, { component: Create }),
+          }
+        ),
       ]);
     },
   },
 ]);
 
-const files = ref([
-  {
-    fileID: 1,
-    fileName: '项目1',
-    userName: '张三',
-    lastEditTime: '2020-01-01',
-  },
-]);
+const files = ref([{}]);
+const fileOnOpen =  ref<File | null>(null);
+
+
 const getFileList = (id: number | null) => {
   readFile({
     fileID: id,
     teamID: null,
   }).then((res) => {
-    console.log(res.data);
     files.value = [];
     res.data.sonList.forEach((item: any) => {
       if (item.fileType === 12) {
@@ -117,6 +223,7 @@ const getFileList = (id: number | null) => {
           fileName: item.fileName,
           userName: item.userName,
           lastEditTime: item.lastEditTime,
+          fileImage: item.fileImage,
         });
       }
     });
@@ -124,10 +231,16 @@ const getFileList = (id: number | null) => {
 };
 
 const create = () =>{
-    let fileName = new Date().getTime() + "";
-    createFile({ teamID: null,fileName: fileName,fileType: 12, fileImage: "", fatherID: projID.value}).then((res) => {
+    if(fileNameRef.value == null || fileNameRef.value == "")
+    {
+      message.warning("文件名不能为空!");
+      return;
+    }
+    createFile({ teamID: null,fileName: fileNameRef.value,fileType: 12, fileImage: "", fatherID: projID.value}).then((res) => {
       if (res.data.result == 0) {
         window.$message.success('创建成功');
+        closeModel();
+        
         getFileList(getProjID());
       } else if (res.data.result == 1) {
         window.$message.warning(res.data.message);
@@ -140,17 +253,11 @@ const create = () =>{
     });
 }
 
-const getFileInfo = (file,needopen) => {
-
+const getFileInfo = (file: File) => {
     readFile( { fileID:file.fileID, teamID:null}).then((res) => {
       if (res.data.result == 0) {
         window.$message.success('获取成功');
-        fileOnOpen.value = file;
-        if(needopen == 1)
-        openDeskWithFile(res.data.fileImage);
-        // console.log(res.data);
-        // console.log(res.data.fileImage);
-        return res.data.fileImage;
+        // return res.data.fileImage;
       } else if (res.data.result == 1) {
         window.$message.warning(res.data.message);
       } else if (res.data.result == 2) {
@@ -162,11 +269,12 @@ const getFileInfo = (file,needopen) => {
     });
 }
 
-const edit = (svgStream) => {//只修改了数据，其他名字等还不支持
-    let file = fileOnOpen.value;
-    editFile({  fileID: file.fileID, fileName: file.fileName, fileImage: svgStream, fatherID: projID.value, data:null}).then((res) => {
+const edit = (file: FileEdit) => {//只修改了数据，其他名字等还不支持
+
+    editFile(file).then((res) => {
       if (res.data.result == 0) {
         window.$message.success('修改成功');
+        getFileList(getProjID());
       } else if (res.data.result == 1) {
         window.$message.warning(res.data.message);
       } else if (res.data.result == 2) {
@@ -178,8 +286,38 @@ const edit = (svgStream) => {//只修改了数据，其他名字等还不支持
     });
 }
 
-const deleFlie = () => {
-    return 0;
+const editFileName = () => {
+    if(fileNameRef.value == null || fileNameRef.value == "")
+    {
+      message.warning("文件名不能为空!");
+      return;
+    }
+    let fileEdit : FileEdit = {
+      fileID: fileOnOpen.value?.fileID as number,
+      fileName: fileNameRef.value,
+      fileImage: fileOnOpen.value?.fileImage as string,
+      fatherID: getProjID() as number,
+      data: null,
+    }
+    edit(fileEdit);
+    closeModelEdit();
+}
+
+const deleFlie = (fileID : number) => {
+
+    deleteFile({fileID:fileID}).then((res) => {
+      if (res.data.result == 0) {
+        window.$message.success('删除成功');
+        getFileList(getProjID());
+      } else if (res.data.result == 1) {
+        window.$message.warning(res.data.message);
+      } else if (res.data.result == 2) {
+        window.$message.error(res.data.message);
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+    });
 }
 
 onMounted(() => {
@@ -188,19 +326,24 @@ onMounted(() => {
 });
 
 
-
-// let state = ref("Preparing……");
 // 初始化
-// const time = new Date().getTime();
-// console.log("https://app.diagrams.net?ran=" + time);
 const openDrawio = drawioEmbed("http://43.138.71.3:8070/");
 
 //监听返回的图片数据
-window.addEventListener("drawioImageCreated", evt => {
-    const { imageType, imageContent } = evt;
+window.addEventListener("drawioImageCreated", (evt:any) => {
+    const { imageType , imageContent } = evt;
     if (imageType == "svg")
     {
-        edit(imageContent)
+        let fileEdit : FileEdit = {
+            fileID: fileOnOpen.value?.fileID as number,
+            fileName: fileOnOpen.value?.fileName as string,
+            fileImage: imageContent,
+            fatherID: getProjID() as number,
+            data: null,
+        }
+        if(fileEdit.fileID == null || fileEdit.fileName == null)
+        return;
+        edit(fileEdit)
         // console.log(imageContent);
         // svgDom.innerHTML = imageContent;
         // str = imageContent;
@@ -216,7 +359,7 @@ window.addEventListener("drawioLoaded", evt => {
 
 // 在需要时打开 drawio 开始编辑
 const openDesk = () => {
-    if(openDrawio == null ||  openDrawio == "" || openDrawio.isLoaded() == false)
+    if(openDrawio == null || openDrawio.isLoaded() == false)
     {
         message.loading("UML编辑器正在初始化……")
         return;
@@ -225,8 +368,8 @@ const openDesk = () => {
 }
 
 // 携带参数的打开
-const openDeskWithFile = (svgStream) => {
-    if(openDrawio == null ||  openDrawio == "" || openDrawio.isLoaded() == false)
+const openDeskWithFile = (svgStream : any) => {
+    if(openDrawio == null || openDrawio.isLoaded() == false)
     {
         message.loading("UML编辑器正在初始化……")
         return;
