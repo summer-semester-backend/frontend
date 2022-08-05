@@ -6,6 +6,8 @@ import {
   shapeModel,
   shapeWithoutRadiusModel,
   textModel,
+  inputModel,
+  buttonModel,
 } from './item-properties';
 import {
   ClipType,
@@ -138,7 +140,7 @@ export function createConnection(fromID: string, toID: string, c?: DeepPartial<I
     style: c?.style || ConnectionStyle.SOLID,
     thick: c?.thick || 1,
 
-    backgroundColor: c?.backgroundColor || '#333',
+    backgroundColor: c?.backgroundColor || '#18181c',
   } as ItemConnection;
 }
 
@@ -344,6 +346,45 @@ export function registerDefaultItemTypes() {
       h: 60,
     },
     iconModel
+  );
+
+  // ----------------------------------------------------------------------
+  type = 'Input';
+  registerItemType(
+    {
+      ...defaults,
+
+      component: type,
+      title: 'input',
+      supportsRoundable: true,
+
+      placeholder: '请输入内容',
+      disabled: false,
+      round: false,
+      size: 'medium',
+      status: 'success',
+      value: '',
+    },
+    inputModel
+  );
+
+  // ----------------------------------------------------------------------
+  type = 'Button';
+  registerItemType(
+    {
+      ...defaults,
+
+      component: type,
+      title: 'button',
+      supportsRoundable: true,
+      value: '按钮',
+      disabled: false,
+      bordered: true,
+      circle: false,
+      type: 'default',
+      color: undefined,
+    },
+    buttonModel
   );
 } // func
 

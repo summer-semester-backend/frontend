@@ -1,9 +1,16 @@
 <template>
   <div class="toolbox">
-    <div class="toolbox-title toolbox-title-drag-handle">工具箱</div>
+    <div class="toolbox-title toolbox-title-drag-handle">
+      <div>工具箱</div>
+      <div style="flex-grow: 1; pointer-events: none"></div>
+      <div @click="expanded = !expanded" style="cursor: pointer">
+        <EditorIcon v-show="expanded" size="16px" icon="keyboard_arrow_down" color="white" />
+        <EditorIcon v-show="!expanded" size="16px" icon="keyboard_arrow_right" color="white" />
+      </div>
+    </div>
     <div class="toolbox-content">
       <n-config-provider :theme="darkTheme">
-        <n-card>
+        <n-card v-if="expanded" class="card">
           <n-collapse>
             <n-collapse-item title="图形">
               <n-grid :x-gap="8" :y-gap="8" :cols="4">
@@ -12,6 +19,7 @@
                     :tool-name="t.title"
                     :icon="t.iconComponent"
                     draggable="true"
+                    @drag.stop=""
                     @mousedown="emits('tool-selected', t.type as EditorTool)"
                   ></ToolBoxItem>
                 </n-gi>
@@ -24,6 +32,7 @@
                     :tool-name="t.title"
                     :icon="t.iconComponent"
                     draggable="true"
+                    @drag.stop=""
                     @mousedown="emits('tool-selected', t.type as EditorTool)"
                   ></ToolBoxItem>
                 </n-gi>
@@ -37,12 +46,13 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from '@vue/reactivity';
+import { computed, ref } from 'vue';
 import { darkTheme } from 'naive-ui';
 import { toolDefinitions, EditorTool, ToolBoxGroup } from '../diagram-editor/types';
 interface ToolbarEvents {
   (e: 'tool-selected', toolType: EditorTool): void;
 }
+const expanded = ref(true);
 const emits = defineEmits<ToolbarEvents>();
 const shapes = computed(() => {
   return toolDefinitions.filter((tool) => {
@@ -62,12 +72,17 @@ const basic = computed(() => {
 }
 .toolbox-content {
   cursor: auto;
+  background-color: #18181c;
+}
+
+.card :deep(.n-card) {
+  background-color: #18181c;
 }
 </style>
 
 <style scoped>
 .toolbox {
-  background-color: #333;
+  background-color: #18181c;
   height: 100%;
   overflow-x: hidden;
   overflow-y: auto;

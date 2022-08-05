@@ -1,6 +1,6 @@
 <template>
   <div id="my-content">
-    <Header :title="title">
+    <Header :title="teamId == null ? '我的项目' : '团队项目'">
       <template #toolbar>
         <n-button v-if="!isInputShow" @click="showInput" quaternary circle>
           <template #icon>
@@ -32,7 +32,7 @@
                     }"
                     footer-style="padding: 0.5vw 0;"
                     hoverable
-                    @click="isCreateModalShow = true"
+                    @click="jumpToProj(item.fileID)"
                   >
                     <template #cover>
                       <div v-if="isManage" style="position: absolute; top: 5px; right: 5px">
@@ -116,10 +116,12 @@
   />
 </template>
 <script setup lang="ts">
-import { ref, computed, reactive, defineProps, onMounted, h } from 'vue';
+import { ref, computed, reactive, defineProps, onMounted, h, watch } from 'vue';
 import { Add, Search, EllipsisHorizontal, TrashOutline, ArchiveOutline, CreateOutline } from '@vicons/ionicons5';
 import { deleteFile, editFile, readFile } from '@/api/file';
 import { NIcon, NInput } from 'naive-ui';
+import { useRouter } from 'vue-router';
+import { useProjStore } from '@/store/proj';
 interface Project {
   fileID: number;
   fileName: string;
@@ -157,6 +159,8 @@ const page = ref(1); //当前页
 const isManage = ref(false); //是否进入删除状态
 const input = ref(''); //搜索关键字
 const newFileName = ref(''); //新命名项目名称
+const router = useRouter();
+const { setProjID } = useProjStore();
 const currentProject = ref({
   fileName: '项目名称',
   teamName: '团队名称',
@@ -324,11 +328,13 @@ const formatDate = (date: string) => {
   return new Date(Date.parse(date.replace(/-/g, '/')));
 };
 
-onMounted(() => {
-  if (props.teamId != null) {
-    title.value = '团队项目';
-  }
-});
+//跳转到指定项目
+const jumpToProj = (fileID: number) => {
+  setProjID(fileID);
+  router.push({
+    path: '/workspace',
+  });
+};
 </script>
 <style scoped lang="less">
 #my-content {

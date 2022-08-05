@@ -6,6 +6,7 @@ declare module 'vue' {
   export interface GlobalComponents {
     AmEditor: typeof import('./src/components/editor/AmEditor.vue')['default']
     BooleanEditor: typeof import('./src/components/prototype/inspector/property-editors/BooleanEditor.vue')['default']
+    Button: typeof import('./src/components/prototype/diagram-editor/blocks/Button.vue')['default']
     ColorEditor: typeof import('./src/components/prototype/inspector/property-editors/ColorEditor.vue')['default']
     Connection: typeof import('./src/components/prototype/diagram-editor/blocks/Connection.vue')['default']
     CreateModal: typeof import('./src/components/project/CreateModal.vue')['default']
@@ -21,6 +22,7 @@ declare module 'vue' {
     Icon: typeof import('./src/components/prototype/diagram-editor/blocks/Icon.vue')['default']
     IconListEditor: typeof import('./src/components/prototype/inspector/property-editors/IconListEditor.vue')['default']
     Image: typeof import('./src/components/prototype/diagram-editor/blocks/Image.vue')['default']
+    Input: typeof import('./src/components/prototype/diagram-editor/blocks/Input.vue')['default']
     KeyboardHelp: typeof import('./src/components/prototype/diagram-editor/components/KeyboardHelp.vue')['default']
     Line: typeof import('./src/components/prototype/diagram-editor/blocks/Line.vue')['default']
     Loading: typeof import('./src/components/editor/loading.vue')['default']
