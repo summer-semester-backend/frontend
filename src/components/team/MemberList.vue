@@ -109,7 +109,7 @@ function handleInviteUser() {
   teamInvite.value?.open();
 }
 function handleDeleteMember(rowData: any) {
-  deleteTeamMember({ teamID: route.params.teamID as string, userID: rowData.id })
+  deleteTeamMember({ teamID: route.params.teamID as string, userID: rowData.userID })
     .then((res) => {
       if (res.data.result == 0) {
         window.$message.info(res.data.message);
@@ -145,7 +145,7 @@ function reload() {
           if (userID == item.userID && item.authority > 0) {
             isManager.value = true;
           }
-          var identity;
+          var identity = '普通成员';
           if (item.authority == 2) {
             identity = '项目创建人';
           } else if (item.authority == 1) {
