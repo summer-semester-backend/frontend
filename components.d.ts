@@ -4,13 +4,16 @@
 
 declare module 'vue' {
   export interface GlobalComponents {
+    AmEditor: typeof import('./src/components/editor/AmEditor.vue')['default']
     BooleanEditor: typeof import('./src/components/prototype/inspector/property-editors/BooleanEditor.vue')['default']
     ColorEditor: typeof import('./src/components/prototype/inspector/property-editors/ColorEditor.vue')['default']
     Connection: typeof import('./src/components/prototype/diagram-editor/blocks/Connection.vue')['default']
     CreateModal: typeof import('./src/components/project/CreateModal.vue')['default']
     DiagramEditor: typeof import('./src/components/prototype/diagram-editor/DiagramEditor.vue')['default']
+    Doc: typeof import('./src/components/workspace/Doc.vue')['default']
     EditorIcon: typeof import('./src/components/prototype/diagram-editor/components/EditorIcon.vue')['default']
     Ellipse: typeof import('./src/components/prototype/diagram-editor/blocks/Ellipse.vue')['default']
+    Empty: typeof import('./src/components/editor/Empty.vue')['default']
     ForgetForm: typeof import('./src/components/login/ForgetForm.vue')['default']
     GlobalContent: typeof import('./src/components/common/GlobalContent.vue')['default']
     GlobalSidebar: typeof import('./src/components/common/GlobalSidebar.vue')['default']
@@ -18,9 +21,12 @@ declare module 'vue' {
     Icon: typeof import('./src/components/prototype/diagram-editor/blocks/Icon.vue')['default']
     IconListEditor: typeof import('./src/components/prototype/inspector/property-editors/IconListEditor.vue')['default']
     Image: typeof import('./src/components/prototype/diagram-editor/blocks/Image.vue')['default']
+    Input: typeof import('./src/components/prototype/diagram-editor/blocks/Input.vue')['default']
     KeyboardHelp: typeof import('./src/components/prototype/diagram-editor/components/KeyboardHelp.vue')['default']
     Line: typeof import('./src/components/prototype/diagram-editor/blocks/Line.vue')['default']
+    Loading: typeof import('./src/components/editor/loading.vue')['default']
     MemberList: typeof import('./src/components/team/MemberList.vue')['default']
+    Mention: typeof import('./src/components/editor/mention.vue')['default']
     NaiveProvider: typeof import('./src/components/common/NaiveProvider.vue')['default']
     NumberEditor: typeof import('./src/components/prototype/inspector/property-editors/NumberEditor.vue')['default']
     ObjectInspector: typeof import('./src/components/prototype/inspector/ObjectInspector.vue')['default']
@@ -40,7 +46,6 @@ declare module 'vue' {
     SignInForm: typeof import('./src/components/login/SignInForm.vue')['default']
     SignUpForm: typeof import('./src/components/login/SignUpForm.vue')['default']
     Star: typeof import('./src/components/prototype/diagram-editor/blocks/Star.vue')['default']
-    Star1: typeof import('./src/components/prototype/diagram-editor/blocks/Star1.vue')['default'];
     TeamAdd: typeof import('./src/components/team/modal/TeamAdd.vue')['default']
     TeamBar: typeof import('./src/components/team/TeamBar.vue')['default']
     TeamInfo: typeof import('./src/components/team/TeamInfo.vue')['default']
@@ -56,6 +61,7 @@ declare module 'vue' {
     UploadButton: typeof import('./src/components/common/UploadButton.vue')['default']
     UserBar: typeof import('./src/components/user/UserBar.vue')['default']
     Vditor: typeof import('./src/components/document/Vditor.vue')['default']
+    WorkBar: typeof import('./src/components/workspace/WorkBar.vue')['default']
     ZoomToolbar: typeof import('./src/components/prototype/diagram-editor/components/ZoomToolbar.vue')['default']
   }
 }

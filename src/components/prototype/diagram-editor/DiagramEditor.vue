@@ -41,8 +41,7 @@
       :style="{ cursor: currentTool == EditorTool.SELECT ? 'auto' : 'crosshair' }"
       @wheel="onScroll"
       @scroll="onScroll"
-      @mousemove="onMouseMove"
-      @dragover="onDragOver($event)"
+      @dragover.stop="onDragOver($event)"
       @click.stop="editable && !shiftPressed && onCanvasClick($event)"
       @drop.stop="onCanvasClick($event)"
     >
@@ -78,14 +77,14 @@
           style="z-index: -100000"
           selected
         />
-
         <!-- Render Items -->
         <div
           v-for="(item, i) in items"
           class="item"
           :key="item.id"
+          :id="item.id"
           :data-item-id="item.id"
-          :class="{ target: item.id === selectedItem?.id, locked: item.locked === true, 'mouse-hover': item.hover }"
+          :class="{ target: item.id === selectedItem?.id, locked: item.locked === true }"
           :style="getItemStyle(item)"
           @click.stop="!creatingConnection && editable && selectItem(item)"
           @dblclick.stop="!creatingConnection && editable && inlineEdit(item)"
@@ -255,9 +254,10 @@
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 1024 1024"
-            :style="{ transform: 'scale(1.5)', opacity: selectedItemActive ? 1 : 0.3 }"
+            :style="{ transform: 'scale(1.0)', opacity: selectedItemActive ? 1 : 0.3 }"
           >
             <path
+              fill="gray"
               d="M469.333333 128a42.666667 42.666667 0 0 1 42.666667 42.666667v85.333333h213.333333a42.666667 42.666667 0 0 1 42.666667 42.666667v213.333333h85.333333a42.666667 42.666667 0 0 1 42.666667 42.666667v298.666666a42.666667 42.666667 0 0 1-42.666667 42.666667h-298.666666a42.666667 42.666667 0 0 1-42.666667-42.666667v-85.333333H298.666667a42.666667 42.666667 0 0 1-42.666667-42.666667v-213.333333H170.666667a42.666667 42.666667 0 0 1-42.666667-42.666667V170.666667a42.666667 42.666667 0 0 1 42.666667-42.666667h298.666666z m213.333334 213.333333h-170.666667v128a42.666667 42.666667 0 0 1-42.666667 42.666667H341.333333v170.666667h170.666667v-128a42.666667 42.666667 0 0 1 42.666667-42.666667h128V341.333333z"
             />
           </svg>
@@ -265,16 +265,23 @@
         <button class="toolbar-item" @click="bringToFront" :disabled="!selectedItemActive" title="Bring to front">
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            :style="{ transform: 'scale(1.5)', opacity: selectedItemActive ? 1 : 0.3 }"
+            :style="{ transform: 'scale(1.0)', opacity: selectedItemActive ? 1 : 0.3 }"
             viewBox="0 0 24 24"
           >
             <g>
               <path fill="none" d="M0 0H24V24H0z" />
               <path
+                fill="gray"
                 d="M11 3c.552 0 1 .448 1 1v2h5c.552 0 1 .448 1 1v5h2c.552 0 1 .448 1 1v7c0 .552-.448 1-1 1h-7c-.552 0-1-.448-1-1v-2H7c-.552 0-1-.448-1-1v-5H4c-.552 0-1-.448-1-1V4c0-.552.448-1 1-1h7zm5 5H8v8h8V8z"
               />
             </g>
           </svg>
+        </button>
+        <button class="toolbar-item" @click="saveProto" title="SavePrototype">
+          <EditorIcon icon="save" />
+        </button>
+        <button class="toolbar-item" @click="saveToImage" title="SaveImage">
+          <EditorIcon icon="perm_media" />
         </button>
       </div>
       <div class="toolbar-separator"></div>
@@ -367,7 +374,7 @@
 
 <script setup lang="ts">
 import { onKeyStroke, useKeyModifier } from '@vueuse/core';
-import { computed, nextTick, onMounted, onUpdated, ref } from 'vue';
+import { computed, nextTick, onBeforeMount, onMounted, onUpdated, ref } from 'vue';
 import Guides from 'vue3-guides';
 import { VueInfiniteViewer } from 'vue3-infinite-viewer';
 import Moveable from 'vue3-moveable';
@@ -416,6 +423,8 @@ import ClipCommand from './commands/ClipCommand';
 import DeleteCommand from './commands/DeleteCommand';
 import KeyboardHelp from './components/KeyboardHelp.vue';
 import { DefaultZoomManager, IZoomManager } from './ZoomManager';
+import domtoimage from 'dom-to-image';
+import FileSaver, { saveAs } from 'file-saver';
 export type Item = _Item & { hover?: boolean };
 
 // The component props and events
@@ -457,6 +466,10 @@ onMounted(() => {
   viewer.value.scrollCenter();
 });
 
+onBeforeMount(() => {
+  loadElements.value = elements;
+});
+
 onUpdated(() => {
   //console.log('DiagramEditor updated')
 });
@@ -484,6 +497,7 @@ const showGuides = ref(true); // Show or hide all the guides
 const showInspector = ref(true); // Show or hide all the guides
 const showKeyboard = ref(false); // Show or hide all the guides
 
+const loadElements = ref<Array<DiagramElement>>([]);
 const selectedItem = ref<DiagramElement | null>(null);
 
 const selectedItemActive = computed(() => {
@@ -499,8 +513,8 @@ const currentTool = ref(EditorTool.SELECT);
 
 const creatingConnection = computed<boolean>(() => currentTool.value === EditorTool.CONNECTION);
 
-const items = computed(() => elements.filter((e) => isItem(e)) as Item[]);
-const connections = computed(() => elements.filter((e) => isConnection(e)) as ItemConnection[]);
+const items = computed(() => loadElements.value.filter((e) => isItem(e)) as Item[]);
+const connections = computed(() => loadElements.value.filter((e) => isConnection(e)) as ItemConnection[]);
 
 const itemToPaste = ref(null as Item | null);
 const inlineEditing = ref(false);
@@ -530,18 +544,22 @@ const handleToolBoxSelect = (selected: EditorTool) => {
   currentTool.value = selected;
 };
 
-const allowDrop = (e: any) => {
-  e.preventDefault();
-};
-
-function onMouseMove(e: any) {
-  if (!viewport.value) return;
-  //console.log('onMouseMove', e.srcElement, e.offsetX, e.offsetY, e);
-
-  // Mouse position
-  const rect = viewport.value.getBoundingClientRect();
-  mouseCoords.value.x = Math.floor((e.clientX - rect.left) / zoomFactor.value);
-  mouseCoords.value.y = Math.floor((e.clientY - rect.top) / zoomFactor.value);
+function saveToImage() {
+  let dom = document.createElement('div');
+  let elems = Array.from(document.getElementsByClassName('item') as HTMLCollectionOf<Element>);
+  elems.forEach((elem) => {
+    var node = elem.cloneNode();
+    dom.appendChild(node);
+  });
+  domtoimage
+    .toBlob(dom)
+    .then((blob) => {
+      console.log(blob);
+      FileSaver.saveAs(blob, 'test.png');
+    })
+    .catch((reason) => {
+      console.log(reason);
+    });
 }
 
 function onDragOver(e: any) {
@@ -795,16 +813,22 @@ function bringToFront(): void {
     );
 }
 
+/** Save the scene into a json file */
+function saveProto(): void {
+  localStorage.setItem('proto', JSON.stringify(elements as Item[]));
+  window.$message.info('已保存');
+}
+
 /** Delete current selected item / connection */
 function deleteItem() {
   if (isItem(selectedItem.value)) {
-    historyManager.value.execute(new DeleteCommand(elements, selectedItem.value));
+    historyManager.value.execute(new DeleteCommand(loadElements.value, selectedItem.value));
     emit('delete-item', selectedItem.value);
     selectNone();
   }
 
   if (isConnection(selectedItem.value)) {
-    historyManager.value.execute(new DeleteCommand(elements, selectedItem.value));
+    historyManager.value.execute(new DeleteCommand(loadElements.value, selectedItem.value));
     emit('delete-connection', selectedItem.value);
     selectNone();
   }
@@ -889,7 +913,7 @@ function onCanvasClick(e: any): void {
   });
 
   console.log('creating new item', toolDef, toolDef.itemType, newItem);
-  historyManager.value.execute(new AddItemCommand(elements, newItem));
+  historyManager.value.execute(new AddItemCommand(loadElements.value, newItem));
   emit('add-item', newItem);
   currentTool.value = EditorTool.SELECT;
 }
@@ -919,7 +943,7 @@ function connectionHandleClick(item: Item, point: ConnectionHandle) {
   ci.startItem = null;
   ci.endItem = null;
 
-  historyManager.value.execute(new AddConnectionCommand(elements, newConnection));
+  historyManager.value.execute(new AddConnectionCommand(loadElements.value, newConnection));
   emit('add-connection', newConnection);
 }
 
@@ -1069,7 +1093,7 @@ function pasteItem() {
   newItem.x += 20;
   newItem.y += 20;
 
-  historyManager.value.execute(new AddItemCommand(elements, newItem));
+  historyManager.value.execute(new AddItemCommand(loadElements.value, newItem));
   itemToPaste.value = newItem;
   nextTick(() => selectItem(newItem));
 
@@ -1112,7 +1136,7 @@ function onDragInspector(e: any): void {
 }
 
 function onDragStartToolBox(e: any): void {
-  if (!e.inputEvent.target.className.includes('toolbox-title-drag-handle')) {
+  if (!e.inputEvent.target?.className?.includes('toolbox-title-drag-handle')) {
     e.stop();
     return;
   }
@@ -1168,20 +1192,22 @@ function onDragToolBox(e: any): void {
   left: 30px;
   width: calc(100% - 30px);
   height: calc(100% - 30px);
-  background-color: white;
+  background-color: rgb(220, 220, 220);
   user-select: none;
+  background-image: linear-gradient(90deg, rgba(180, 180, 180, 0.15) 10%, rgba(0, 0, 0, 0) 10%),
+    linear-gradient(rgba(180, 180, 180, 0.15) 10%, rgba(0, 0, 0, 0) 10%);
+  background-size: 10px 10px;
 }
 
 .viewport {
   box-sizing: border-box;
   position: relative;
-  width: 100%;
-  height: 100%;
 }
 
 .viewport-area {
   background-color: lightyellow;
   border: 2px dashed #ccc;
+  width: 600px;
 }
 .ruler {
   position: absolute !important;

@@ -77,7 +77,7 @@ const handleSubmit = () => {
   }
   register({ username: model.username, email: model.email, password: model.passwd, code: model.code }).then((res) => {
     if (res.data.result == 0) {
-      window.$message.info('注册成功');
+      window.$message.success('注册成功');
       emits('finish-register');
     }
   });

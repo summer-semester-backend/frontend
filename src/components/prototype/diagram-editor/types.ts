@@ -136,7 +136,8 @@ export enum EditorTool {
   WIDGET = 'widget',
   ICON = 'icon',
   CONNECTION = 'connection',
-  TEST = 'test',
+  // Custom
+  INPUT = 'input',
 }
 
 export enum ToolBoxGroup {
@@ -164,6 +165,7 @@ import {
   TabletLandscapeOutline,
   TriangleOutline,
   StarOutline,
+  CreateOutline,
 } from '@vicons/ionicons5';
 
 export const toolDefinitions: ToolDefinition[] = [
@@ -178,20 +180,20 @@ export const toolDefinitions: ToolDefinition[] = [
     iconComponent: Text,
   },
   {
-    type: EditorTool.TEST,
-    title: '测试',
-    group: ToolBoxGroup.BASIC,
-    icon: 'text_fields',
-    itemType: 'Test',
-    iconComponent: Text,
-  },
-  {
     type: EditorTool.IMAGE,
     title: '图片',
     group: ToolBoxGroup.BASIC,
     icon: 'image',
     itemType: 'Image',
     iconComponent: Image,
+  },
+  {
+    type: EditorTool.INPUT,
+    title: '输入',
+    group: ToolBoxGroup.BASIC,
+    icon: 'input',
+    itemType: 'Input',
+    iconComponent: CreateOutline,
   },
   {
     type: EditorTool.LINE,
@@ -290,4 +292,13 @@ export interface WidgetDefinition {
   componentOptions?: any; // The default Vue component options used to instantiate this widget
 
   canBeResized?: boolean; // Is the widget resizable? Default: true
+}
+
+export interface InputItem extends Item {
+  inputType: 'text' | 'password' | 'textarea';
+  placeholder: string;
+  disabled: boolean;
+  round: boolean;
+  status: 'success' | 'warning' | 'error' | undefined;
+  value: string;
 }

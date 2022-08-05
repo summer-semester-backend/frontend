@@ -1,5 +1,5 @@
 <template>
-  <div id="teamBar"></div>
+  <!-- <div id="teamBar"></div> -->
   <router-view id="view" />
 </template>
 
@@ -8,7 +8,7 @@ import { RouterView } from 'vue-router';
 </script>
 
 <style scoped>
-#teamBar {
+/* #teamBar {
   float: left;
   width: 140px;
   height: 100%;
@@ -19,5 +19,5 @@ import { RouterView } from 'vue-router';
   width: 100%;
   height: 100%;
   float: left;
-}
+} */
 </style>

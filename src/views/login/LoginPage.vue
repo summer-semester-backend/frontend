@@ -7,7 +7,7 @@
     <div id="cloud2"></div>
     <div id="saly"></div>
     <div id="sun"></div>
-    <div class="absolute right-1/8 top-1/4">
+    <div id="loginCard">
       <n-card :bordered="false" size="large" class="w-100 rounded-md shadow-md">
         <n-gradient-text type="primary" class="m-auto" :size="28">项目管理平台</n-gradient-text>
         <main class="pt-24px">
@@ -65,12 +65,12 @@ const renderSignUpTabPane = () => h('div', { style: 'font-weight: bold;' }, '注
 
 backend.interceptors.response.use(
   (response) => {
+    console.log(response.data.result);
     if (response.data.result == 10) {
       window.$message.error('登录认证失败');
       signOut();
       router.push({ name: 'login' });
-    } else if (response.data.result != 0) {
-      window.$message.error(response.data.message);
+    } else if (response.data.result !== 0) {
       return Promise.reject(response);
     } else return Promise.resolve(response);
   },
@@ -123,5 +123,14 @@ backend.interceptors.response.use(
   top: 50px;
 
   background: url(/resource/Icon.png);
+}
+
+#loginCard {
+  display: flex;
+  align-items: center;
+  justify-self: center;
+  position: absolute;
+  height: 100%;
+  right: 10%;
 }
 </style>

@@ -31,7 +31,12 @@
     <n-form-item path="confirmpasswd">
       <n-input v-model:value="model.confirmpasswd" type="password" show-password-on="click" placeholder="确认新密码" />
     </n-form-item>
-    <n-button type="primary" size="large" :block="true" :round="true" @click="handleSubmit">确定修改密码</n-button>
+    <n-form-item>
+      <div class="buttonbox">
+        <n-button type="primary" size="large" :block="true" :round="true" @click="handleSubmit">确定</n-button>
+        <n-button size="large" :block="true" :round="true" @click="handleBack"> 返回 </n-button>
+      </div>
+    </n-form-item>
   </n-form>
 </template>
 
@@ -72,9 +77,28 @@ const handleSubmit = () => {
   }
   forgetPassword({ email: model.email, password: model.passwd, code: model.code }).then((res) => {
     if (res.data.result == 0) {
-      window.$message.info('密码修改成功！');
+      window.$message.success('密码修改成功！');
       emits('finish-forget');
     }
   });
 };
+
+const handleBack = () => {
+  emits('finish-forget');
+};
 </script>
+
+<style lang="less" scoped>
+.buttonbox {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  padding: 0px;
+  width: 100%;
+  position: relative;
+  justify-content: space-between;
+  .n-button {
+    width: 45%;
+  }
+}
+</style>

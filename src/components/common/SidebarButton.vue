@@ -20,11 +20,11 @@ import { useRoute, useRouter } from 'vue-router';
 
 const router = useRouter();
 const route = useRoute();
-const props = defineProps<{ buttonName: string; routeName: string;}>();
+const props = defineProps<{ buttonName: string; routeName: string; rootRoute: string}>();
 const handleDirect = () => {
   router.push({ name: props.routeName });
 };
 const isSelect = computed(() => {
-  return route.fullPath.split('/')[1] == props.routeName;
+  return route.fullPath.split('/')[1] == props.rootRoute;
 });
 </script>

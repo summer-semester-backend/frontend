@@ -1,26 +1,17 @@
 <template>
   <div id="content">
-    <Header title="回收站">
+    <Header title="我的文档">
       <template #toolbar>
-        <n-button v-if="!isInputShow" @click="showInput" quaternary circle>
+        <n-button quaternary>
           <template #icon>
-            <n-icon size="18" color="rgb(100,100,100)"><search /></n-icon>
+            <div style="width: 100px">
+              <n-icon size="25" color="rgb(100,100,100)"><AddCircleOutline /></n-icon>
+            </div>
           </template>
         </n-button>
-        <n-input v-model:value="input" v-else round placeholder="搜索名称" @blur="hideInput" style="width: 200px">
-          <template #suffix>
-            <n-icon size="18" :component="Search" />
-          </template>
-        </n-input>
-        <n-dropdown :options="options" @select="handleSelect">
-          <n-button quaternary circle
-            ><template #icon>
-              <n-icon size="18" color="rgb(100,100,100)"><ellipsis-horizontal /></n-icon> </template
-          ></n-button>
-        </n-dropdown>
       </template>
       <template #content>
-        <n-data-table :columns="columns" :data="dataFilter" :pagination="pagination" :bordered="false" />
+        <n-data-table :columns="columns" :pagination="pagination" :bordered="false" />
       </template>
     </Header>
   </div>
@@ -28,7 +19,7 @@
 <script setup lang="ts">
 import { NButton, NIcon, NSpace } from 'naive-ui';
 import { h, ref, computed, onMounted } from 'vue';
-import { Refresh, Trash, Search, EllipsisHorizontal } from '@vicons/ionicons5';
+import { Refresh, Trash, Search, EllipsisHorizontal, AddCircleOutline } from '@vicons/ionicons5';
 import { binList, recoverFile, deleteFile, clearBin } from '@/api/file';
 type Project = {
   fileID: number;
@@ -47,17 +38,17 @@ const options = ref([
 ]);
 const columns = ref([
   {
-    title: '项目名称',
+    title: '文件名',
     key: 'fileName',
     sorter: (row1: Project, row2: Project) => (row1.fileName > row2.fileName ? 1 : -1),
   },
   {
-    title: '所属团队',
+    title: '创建者',
     key: 'teamName',
     sorter: (row1: Project, row2: Project) => (row1.teamName > row2.teamName ? 1 : -1),
   },
   {
-    title: '删除时间',
+    title: '最近更新',
     key: 'abandonTime',
     sorter: (row1: Project, row2: Project) => (row1.abandonTime > row2.abandonTime ? 1 : -1),
   },
@@ -66,32 +57,6 @@ const columns = ref([
     key: 'actions',
     render(row: Project) {
       return h(NSpace, [
-        h(
-          NButton,
-          {
-            type: 'primary',
-            size: 'small',
-            strong: true,
-            secondary: true,
-            onClick(e) {
-              console.log(row);
-              recoverFile({ fileID: row.fileID }).then((res) => {
-                if (res.data.result == 0) {
-                  window.$message.success(res.data.message);
-                  getProjectList();
-                } else if (res.data.result == 1) {
-                  window.$message.warning(res.data.message);
-                } else if (res.data.result == 2) {
-                  window.$message.error(res.data.message);
-                }
-              });
-            },
-          },
-          {
-            default: '恢复',
-            icon: h(NIcon, { component: Refresh }),
-          }
-        ),
         h(
           NButton,
           {
@@ -135,14 +100,6 @@ const pagination = ref({
   pageSize: 10,
 });
 
-//显示搜索
-const showInput = () => {
-  isInputShow.value = true;
-};
-//隐藏搜索
-const hideInput = () => {
-  isInputShow.value = false;
-};
 //选择操作
 const handleSelect = (key: string | number) => {
   console.log(key);
@@ -173,18 +130,10 @@ const getProjectList = () => {
 onMounted(() => {
   getProjectList();
 });
-
-//搜索
-const dataFilter = computed(() => {
-  return trashs.value.filter((data) => {
-    return !input.value || data.fileName.toLowerCase().includes(input.value.toLowerCase());
-  });
-});
 </script>
 <style scope lang="less">
 #content {
   padding: 40px 60px;
   position: relative;
 }
-
 </style>
