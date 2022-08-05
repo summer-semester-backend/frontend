@@ -53,7 +53,6 @@ declare module 'vue' {
     TeamInfo: typeof import('./src/components/team/TeamInfo.vue')['default']
     TeamInvite: typeof import('./src/components/team/modal/TeamInvite.vue')['default']
     TeamSetting: typeof import('./src/components/team/TeamSetting.vue')['default']
-    Test: typeof import('./src/components/prototype/diagram-editor/blocks/Test.vue')['default']
     Text: typeof import('./src/components/prototype/diagram-editor/blocks/Text.vue')['default']
     TextEditor: typeof import('./src/components/prototype/inspector/property-editors/TextEditor.vue')['default']
     ToolBox: typeof import('./src/components/prototype/toolbox/ToolBox.vue')['default']
