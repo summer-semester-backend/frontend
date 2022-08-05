@@ -1,374 +1,353 @@
 <template>
-  <div class="editor-container">
-    <!-- Rulers -->
-    <Guides
-      v-show="guidesVisible"
-      class="ruler ruler-horizontal"
-      :showGuides="showGuides"
-      @changeGuides="hGuideValues = $event.guides"
-      type="horizontal"
-      ref="hGuides"
-      :zoom="zoomFactor"
-      :snapThreshold="5"
-      :unit="zoomFactor >= 1 ? 50 : Math.floor(50 / zoomFactor)"
-      :rulerStyle="{ left: '30px', width: 'calc(100% - 30px)', height: '30px' }"
-      :style="{ width: '100%', height: '30px' }"
-    />
-    <Guides
-      v-show="guidesVisible"
-      class="ruler ruler-vertical"
-      :showGuides="showGuides"
-      @changeGuides="vGuideValues = $event.guides"
-      type="vertical"
-      ref="vGuides"
-      :zoom="zoomFactor"
-      :snapThreshold="5"
-      :unit="zoomFactor >= 1 ? 50 : Math.floor(50 / zoomFactor)"
-      :rulerStyle="{ top: '30px', height: 'calc(100% - 30px)', width: '30px' }"
-      :style="{ height: '100%', width: '30px', top: '-30px' }"
-    />
-    <div v-show="guidesVisible" class="rulers-left-top-box"></div>
-
-    <!-- Editor Canvas -->
-    <VueInfiniteViewer
-      ref="viewer"
-      class="viewer"
-      :useMouseDrag="shiftPressed"
-      :useWheelScroll="true"
-      :zoom="zoomFactor"
-      :zoomOffsetX="mouseCoords.x"
-      :zoomOffsetY="mouseCoords.y"
-      :style="{ cursor: currentTool == EditorTool.SELECT ? 'auto' : 'crosshair' }"
-      @wheel="onScroll"
-      @scroll="onScroll"
-      @dragover.stop="onDragOver($event)"
-      @click.stop="editable && !shiftPressed && onCanvasClick($event)"
-      @drop.stop="onCanvasClick($event)"
-    >
-      <div
-        ref="viewport"
-        :class="{ viewport: true, 'viewport-area': viewportSize }"
-        :style="{
-          width: viewportSize ? viewportSize[0] + 'px' : '100%',
-          height: viewportSize ? viewportSize[1] + 'px' : '100%',
-        }"
-      >
-        <!-- Render Connections (default component='Connection') -->
-        <component
-          v-for="(c, i) in connections"
-          :is="c.component"
-          :key="c.id"
-          :from="getItemById(items, c.from.item)!"
-          :to="getItemById(items, c.to.item)!"
-          :connection="c"
-          :style="{ zIndex: c.z }"
-          :selected="c.id === selectedItem?.id"
-          @selected="selectItem(c)"
-        />
-
-        <!-- Use to render a connection line during a new connection creation -->
-        <RawConnection
-          v-if="creatingConnection && connectionInfo.startItem"
-          :x1="getHandlePosition(connectionInfo.startItem, connectionInfo.startPoint).x"
-          :y1="getHandlePosition(connectionInfo.startItem, connectionInfo.startPoint).y"
-          :x2="mouseCoords.x"
-          :y2="mouseCoords.y"
-          :type="ConnectionType.LINE"
-          style="z-index: -100000"
-          selected
-        />
-        <!-- Render Items -->
-        <div
-          v-for="(item, i) in items"
-          class="item"
-          :key="item.id"
-          :data-item-id="item.id"
-          :class="{ target: item.id === selectedItem?.id, locked: item.locked === true }"
-          :style="getItemStyle(item)"
-          @click.stop="!creatingConnection && editable && selectItem(item)"
-          @dblclick.stop="!creatingConnection && editable && inlineEdit(item)"
-          @mousedown="!creatingConnection && editable && selectItem(item, $event)"
-          @mouseover.stop="creatingConnection && onMouseOver(item, $event)"
-          @mouseleave.self="creatingConnection && onMouseLeave(item, $event)"
-        >
-          <component :is="item.component" :item="item" />
-
-          <!-- Item decorators (delete, locked, size info) -->
-          <div
-            class="decorator decorator-delete"
-            v-if="!creatingConnection && editable && item.id === selectedItem?.id && (selectedItem as Item)?.locked !== true"
-            :style="{ zoom: 1 / zoomFactor }"
-            @click.stop="deleteItem"
-            title="delete item"
-          >
-            &times;
-          </div>
-          <div
-            class="decorator decorator-locked"
-            v-if="!creatingConnection && editable && item.id === selectedItem?.id"
-            :style="{ zoom: 1 / zoomFactor }"
-            v-show="item.locked === true"
-            title="locked"
-          >
-            &#x1F512;
-          </div>
-          <div
-            class="decorator decorator-size"
-            v-if="!creatingConnection && editable && item.id === selectedItem?.id"
-            :style="{ zoom: 1 / zoomFactor }"
-          >
-            X: {{ item.x }} &nbsp; Y: {{ item.y }} &nbsp; W: {{ item.w }} &nbsp; H: {{ item.h }} &nbsp;{{
-              item.r !== 0 ? ' R: ' + item.r + '°' : ''
-            }}
-          </div>
-
-          <!-- Connection Handles - When the item is rotated, only the center handle is active -->
-          <div
-            class="connection-handle connection-handle-left"
-            v-if="item.r === 0 && editable && creatingConnection && item.hover === true"
-            :style="{ zoom: 1 / zoomFactor }"
-            @click="connectionHandleClick(item, ConnectionHandle.LEFT)"
-          ></div>
-          <div
-            class="connection-handle connection-handle-right"
-            v-if="item.r === 0 && editable && creatingConnection && item.hover === true"
-            :style="{ zoom: 1 / zoomFactor }"
-            @click="connectionHandleClick(item, ConnectionHandle.RIGHT)"
-          ></div>
-          <div
-            class="connection-handle connection-handle-top"
-            v-if="item.r === 0 && editable && creatingConnection && item.hover === true"
-            :style="{ zoom: 1 / zoomFactor }"
-            @click="connectionHandleClick(item, ConnectionHandle.TOP)"
-          ></div>
-          <div
-            class="connection-handle connection-handle-bottom"
-            v-if="item.r === 0 && editable && creatingConnection && item.hover === true"
-            :style="{ zoom: 1 / zoomFactor }"
-            @click="connectionHandleClick(item, ConnectionHandle.BOTTOM)"
-          ></div>
-          <div
-            class="connection-handle connection-handle-center"
-            v-if="editable && creatingConnection && item.hover === true"
-            :style="{ zoom: 1 / zoomFactor }"
-            @click="connectionHandleClick(item, ConnectionHandle.CENTER)"
-          ></div>
-        </div>
-        <!-- item -->
-
-        <!-- Manage drag / resize / rotate / rounding of selected item -->
-        <Moveable
-          ref="moveable"
-          :target="isItem(selectedItem) ? [`[data-item-id='${selectedItem.id}']`] : []"
-          :zoom="1 / zoomFactor"
-          :origin="false"
-          :stopPropagation="true"
-          :throttleDrag="1"
-          :throttleResize="1"
-          :throttleRotate="shiftPressed ? 45 : 1"
-          :keepRatio="shiftPressed"
-          :snappable="showGuides"
-          :snapGap="true"
-          :snapThreshold="5"
-          :snapDirections="{ top: true, bottom: true, left: true, right: true, center: true, middle: true }"
-          :elementSnapDirections="{ top: true, bottom: true, left: true, right: true, center: true, middle: true }"
-          :isDisplayInnerSnapDigit="true"
-          :horizontalGuidelines="
-            showGuides ? (viewportSize ? [0, viewportSize[1] / 2, viewportSize[1], ...hGuideValues] : hGuideValues) : []
-          "
-          :verticalGuidelines="
-            showGuides ? (viewportSize ? [0, viewportSize[0] / 2, viewportSize[0], ...vGuideValues] : vGuideValues) : []
-          "
-          :elementGuidelines="showGuides ? elementGuidelines() : []"
-          :clippable="isItem(selectedItem) && selectedItem.clipType !== ClipType.NONE"
-          :clipArea="false"
-          :clipRelative="false"
-          :dragWithClip="true"
-          :clipSnapThreshold="5"
-          :defaultClipPath="isItem(selectedItem) ? selectedItem.clipType : ClipType.NONE"
-          :roundable="selectedItemActive && (selectedItem as Item)?.supportsRoundable === true"
-          :draggable="selectedItemActive"
-          :rotatable="selectedItemActive"
-          :resizable="selectedItemActive && (selectedItem as Item)?.supportsResizable === true"
-          @dragStart="onDragStart"
-          @drag="onDrag"
-          @dragEnd="onDragEnd"
-          @resizeStart="onResizeStart"
-          @resize="onResize"
-          @resizeEnd="onResizeEnd"
-          @rotateStart="onRotateStart"
-          @rotate="onRotate"
-          @rotateEnd="onRotateEnd"
-          @roundStart="onRoundStart"
-          @round="onRound"
-          @roundEnd="onRoundEnd"
-          @clipStart="onClipStart"
-          @clip="onClip"
-          @clipEnd="onClipEnd"
-        />
-      </div>
-      <!-- viewport -->
-    </VueInfiniteViewer>
-
-    <div
-      class="toolbars-container"
-      :style="{ top: showRulers && editable ? '40px' : '10px', left: showRulers && editable ? '40px' : '10px' }"
-    >
-      <!-- Editor Toolbar -->
-      <ToolsToolbar
-        v-if="editable"
-        :customWidgets="customWidgets"
-        :selectedTool="currentTool"
-        @toolSelected="selectCurrentTool"
-      />
-      <div class="toolbar-separator"></div>
-      <ZoomToolbar :zoomManager="zoomManager" @zoomChanged="onZoomChanged" />
-      <div class="toolbar-separator"></div>
-      <div v-if="editable" class="toolbar">
-        <button class="toolbar-item" @click="undo" :disabled="!historyManager.canUndo()" title="Undo">
-          <EditorIcon icon="undo" />
-        </button>
-        <button class="toolbar-item" @click="redo" :disabled="!historyManager.canRedo()" title="Redo">
-          <EditorIcon icon="redo" />
-        </button>
-
-        <div class="toolbar-item-separator"></div>
-        <button class="toolbar-item" @click="deleteItem" :disabled="!selectedItemActive" title="Delete">
-          <EditorIcon icon="delete" />
-        </button>
-
-        <div class="toolbar-item-separator"></div>
-        <button class="toolbar-item" @click="copyItem" :disabled="!isItem(selectedItem)" title="Copy">
-          <EditorIcon icon="content_copy" />
-        </button>
-        <button class="toolbar-item" @click="cutItem" :disabled="!isItem(selectedItem)" title="Cut">
-          <EditorIcon icon="content_cut" />
-        </button>
-        <button class="toolbar-item" @click="pasteItem" :disabled="itemToPaste === null" title="Paste">
-          <EditorIcon icon="content_paste" />
-        </button>
-
-        <div class="toolbar-item-separator"></div>
-        <button class="toolbar-item" @click="sendToBack" :disabled="!selectedItemActive" title="Send to back">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 1024 1024"
-            :style="{ transform: 'scale(1.0)', opacity: selectedItemActive ? 1 : 0.3 }"
-          >
-            <path
-              fill="gray"
-              d="M469.333333 128a42.666667 42.666667 0 0 1 42.666667 42.666667v85.333333h213.333333a42.666667 42.666667 0 0 1 42.666667 42.666667v213.333333h85.333333a42.666667 42.666667 0 0 1 42.666667 42.666667v298.666666a42.666667 42.666667 0 0 1-42.666667 42.666667h-298.666666a42.666667 42.666667 0 0 1-42.666667-42.666667v-85.333333H298.666667a42.666667 42.666667 0 0 1-42.666667-42.666667v-213.333333H170.666667a42.666667 42.666667 0 0 1-42.666667-42.666667V170.666667a42.666667 42.666667 0 0 1 42.666667-42.666667h298.666666z m213.333334 213.333333h-170.666667v128a42.666667 42.666667 0 0 1-42.666667 42.666667H341.333333v170.666667h170.666667v-128a42.666667 42.666667 0 0 1 42.666667-42.666667h128V341.333333z"
-            />
-          </svg>
-        </button>
-        <button class="toolbar-item" @click="bringToFront" :disabled="!selectedItemActive" title="Bring to front">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            :style="{ transform: 'scale(1.0)', opacity: selectedItemActive ? 1 : 0.3 }"
-            viewBox="0 0 24 24"
-          >
-            <g>
-              <path fill="none" d="M0 0H24V24H0z" />
-              <path
-                fill="gray"
-                d="M11 3c.552 0 1 .448 1 1v2h5c.552 0 1 .448 1 1v5h2c.552 0 1 .448 1 1v7c0 .552-.448 1-1 1h-7c-.552 0-1-.448-1-1v-2H7c-.552 0-1-.448-1-1v-5H4c-.552 0-1-.448-1-1V4c0-.552.448-1 1-1h7zm5 5H8v8h8V8z"
-              />
-            </g>
-          </svg>
-        </button>
-        <button class="toolbar-item" @click="saveProto" title="SavePrototype">
-          <EditorIcon icon="save" />
-        </button>
-        <button class="toolbar-item" @click="saveToImage" title="SaveImage">
-          <EditorIcon icon="perm_media" />
-        </button>
-      </div>
-      <div class="toolbar-separator"></div>
-      <div v-if="editable" class="toolbar">
-        <button
-          class="toolbar-item"
-          @click="showRulers = !showRulers"
-          title="Show / Hide rulers"
-          :style="{ backgroundColor: showRulers ? '#4af' : '', color: showRulers ? 'white' : '' }"
-        >
-          <EditorIcon icon="straighten" />
-        </button>
-        <button
-          class="toolbar-item"
-          @click="showGuides = !showGuides"
-          title="Show / Hide alignment guidelines"
-          :style="{ backgroundColor: showGuides ? '#4af' : '', color: showGuides ? 'white' : '' }"
-        >
-          <EditorIcon icon="border_style" />
-        </button>
-        <button
-          class="toolbar-item"
-          @click="showInspector = !showInspector"
-          itle="Show / Hide inspector"
-          :style="{ backgroundColor: showInspector ? '#4af' : '', color: showInspector ? 'white' : '' }"
-        >
-          <EditorIcon icon="brush" />
-        </button>
-        <button
-          class="toolbar-item"
-          @click="showKeyboard = !showKeyboard"
-          title="Show / Hide keyboards shortcuts"
-          :style="{ backgroundColor: showKeyboard ? '#4af' : '', color: showKeyboard ? 'white' : '' }"
-        >
-          <EditorIcon icon="keyboard_hide" />
-        </button>
-      </div>
+  <div class="flex h-full">
+    <div class="basis-1/7 h-full">
+      <ToolBox @tool-selected="handleToolBoxSelect"></ToolBox>
     </div>
+    <div class="basis-5/7 h-full">
+      <div class="editor-container">
+        <!-- Rulers -->
+        <Guides
+          v-show="guidesVisible"
+          class="ruler ruler-horizontal"
+          :showGuides="showGuides"
+          @changeGuides="hGuideValues = $event.guides"
+          type="horizontal"
+          ref="hGuides"
+          :zoom="zoomFactor"
+          :snapThreshold="5"
+          :unit="zoomFactor >= 1 ? 50 : Math.floor(50 / zoomFactor)"
+          :rulerStyle="{ left: '30px', width: 'calc(100% - 30px)', height: '30px' }"
+          :style="{ width: '100%', height: '30px' }"
+        />
+        <Guides
+          v-show="guidesVisible"
+          class="ruler ruler-vertical"
+          :showGuides="showGuides"
+          @changeGuides="vGuideValues = $event.guides"
+          type="vertical"
+          ref="vGuides"
+          :zoom="zoomFactor"
+          :snapThreshold="5"
+          :unit="zoomFactor >= 1 ? 50 : Math.floor(50 / zoomFactor)"
+          :rulerStyle="{ top: '30px', height: 'calc(100% - 30px)', width: '30px' }"
+          :style="{ height: '100%', width: '30px', top: '-30px' }"
+        />
+        <div v-show="guidesVisible" class="rulers-left-top-box"></div>
 
-    <!-- Object Inspector -->
-    <div
-      v-if="editable && showInspector"
-      class="object-inspector-container"
-      :style="{ transform: `translate(${inspectorCoords.x}px, ${inspectorCoords.y}px)` }"
-    >
+        <!-- Editor Canvas -->
+        <VueInfiniteViewer
+          ref="viewer"
+          class="viewer"
+          :useMouseDrag="shiftPressed"
+          :useWheelScroll="true"
+          :zoom="zoomFactor"
+          :zoomOffsetX="mouseCoords.x"
+          :zoomOffsetY="mouseCoords.y"
+          :style="{ cursor: currentTool == EditorTool.SELECT ? 'auto' : 'crosshair' }"
+          @wheel="onScroll"
+          @scroll="onScroll"
+          @dragover.stop="onDragOver($event)"
+          @click.stop="editable && !shiftPressed && onCanvasClick($event)"
+          @drop.stop="onCanvasClick($event)"
+        >
+          <div
+            ref="viewport"
+            :class="{ viewport: true, 'viewport-area': viewportSize }"
+            :style="{
+              width: viewportSize ? viewportSize[0] + 'px' : '100%',
+              height: viewportSize ? viewportSize[1] + 'px' : '100%',
+            }"
+          >
+            <!-- Render Connections (default component='Connection') -->
+            <component
+              v-for="(c, i) in connections"
+              :is="c.component"
+              :key="c.id"
+              :from="getItemById(items, c.from.item)!"
+              :to="getItemById(items, c.to.item)!"
+              :connection="c"
+              :style="{ zIndex: c.z }"
+              :selected="c.id === selectedItem?.id"
+              @selected="selectItem(c)"
+            />
+
+            <!-- Use to render a connection line during a new connection creation -->
+            <RawConnection
+              v-if="creatingConnection && connectionInfo.startItem"
+              :x1="getHandlePosition(connectionInfo.startItem, connectionInfo.startPoint).x"
+              :y1="getHandlePosition(connectionInfo.startItem, connectionInfo.startPoint).y"
+              :x2="mouseCoords.x"
+              :y2="mouseCoords.y"
+              :type="ConnectionType.LINE"
+              style="z-index: -100000"
+              selected
+            />
+            <!-- Render Items -->
+            <div
+              v-for="(item, i) in items"
+              class="item"
+              :key="item.id"
+              :data-item-id="item.id"
+              :class="{ target: item.id === selectedItem?.id, locked: item.locked === true }"
+              :style="getItemStyle(item)"
+              @click.stop="!creatingConnection && editable && selectItem(item)"
+              @dblclick.stop="!creatingConnection && editable && inlineEdit(item)"
+              @mousedown="!creatingConnection && editable && selectItem(item, $event)"
+              @mouseover.stop="creatingConnection && onMouseOver(item, $event)"
+              @mouseleave.self="creatingConnection && onMouseLeave(item, $event)"
+            >
+              <component :is="item.component" :item="item" />
+
+              <!-- Item decorators (delete, locked, size info) -->
+              <div
+                class="decorator decorator-delete"
+                v-if="!creatingConnection && editable && item.id === selectedItem?.id && (selectedItem as Item)?.locked !== true"
+                :style="{ zoom: 1 / zoomFactor }"
+                @click.stop="deleteItem"
+                title="delete item"
+              >
+                &times;
+              </div>
+              <div
+                class="decorator decorator-locked"
+                v-if="!creatingConnection && editable && item.id === selectedItem?.id"
+                :style="{ zoom: 1 / zoomFactor }"
+                v-show="item.locked === true"
+                title="locked"
+              >
+                &#x1F512;
+              </div>
+              <div
+                class="decorator decorator-size"
+                v-if="!creatingConnection && editable && item.id === selectedItem?.id"
+                :style="{ zoom: 1 / zoomFactor }"
+              >
+                X: {{ item.x }} &nbsp; Y: {{ item.y }} &nbsp; W: {{ item.w }} &nbsp; H: {{ item.h }} &nbsp;{{
+                  item.r !== 0 ? ' R: ' + item.r + '°' : ''
+                }}
+              </div>
+
+              <!-- Connection Handles - When the item is rotated, only the center handle is active -->
+              <div
+                class="connection-handle connection-handle-left"
+                v-if="item.r === 0 && editable && creatingConnection && item.hover === true"
+                :style="{ zoom: 1 / zoomFactor }"
+                @click="connectionHandleClick(item, ConnectionHandle.LEFT)"
+              ></div>
+              <div
+                class="connection-handle connection-handle-right"
+                v-if="item.r === 0 && editable && creatingConnection && item.hover === true"
+                :style="{ zoom: 1 / zoomFactor }"
+                @click="connectionHandleClick(item, ConnectionHandle.RIGHT)"
+              ></div>
+              <div
+                class="connection-handle connection-handle-top"
+                v-if="item.r === 0 && editable && creatingConnection && item.hover === true"
+                :style="{ zoom: 1 / zoomFactor }"
+                @click="connectionHandleClick(item, ConnectionHandle.TOP)"
+              ></div>
+              <div
+                class="connection-handle connection-handle-bottom"
+                v-if="item.r === 0 && editable && creatingConnection && item.hover === true"
+                :style="{ zoom: 1 / zoomFactor }"
+                @click="connectionHandleClick(item, ConnectionHandle.BOTTOM)"
+              ></div>
+              <div
+                class="connection-handle connection-handle-center"
+                v-if="editable && creatingConnection && item.hover === true"
+                :style="{ zoom: 1 / zoomFactor }"
+                @click="connectionHandleClick(item, ConnectionHandle.CENTER)"
+              ></div>
+            </div>
+            <!-- item -->
+
+            <!-- Manage drag / resize / rotate / rounding of selected item -->
+            <Moveable
+              ref="moveable"
+              :target="isItem(selectedItem) ? [`[data-item-id='${selectedItem.id}']`] : []"
+              :zoom="1 / zoomFactor"
+              :origin="false"
+              :stopPropagation="true"
+              :throttleDrag="1"
+              :throttleResize="1"
+              :throttleRotate="shiftPressed ? 45 : 1"
+              :keepRatio="shiftPressed"
+              :snappable="showGuides"
+              :snapGap="true"
+              :snapThreshold="5"
+              :snapDirections="{ top: true, bottom: true, left: true, right: true, center: true, middle: true }"
+              :elementSnapDirections="{ top: true, bottom: true, left: true, right: true, center: true, middle: true }"
+              :isDisplayInnerSnapDigit="true"
+              :horizontalGuidelines="
+                showGuides
+                  ? viewportSize
+                    ? [0, viewportSize[1] / 2, viewportSize[1], ...hGuideValues]
+                    : hGuideValues
+                  : []
+              "
+              :verticalGuidelines="
+                showGuides
+                  ? viewportSize
+                    ? [0, viewportSize[0] / 2, viewportSize[0], ...vGuideValues]
+                    : vGuideValues
+                  : []
+              "
+              :elementGuidelines="showGuides ? elementGuidelines() : []"
+              :clippable="isItem(selectedItem) && selectedItem.clipType !== ClipType.NONE"
+              :clipArea="false"
+              :clipRelative="false"
+              :dragWithClip="true"
+              :clipSnapThreshold="5"
+              :defaultClipPath="isItem(selectedItem) ? selectedItem.clipType : ClipType.NONE"
+              :roundable="selectedItemActive && (selectedItem as Item)?.supportsRoundable === true"
+              :draggable="selectedItemActive"
+              :rotatable="selectedItemActive"
+              :resizable="selectedItemActive && (selectedItem as Item)?.supportsResizable === true"
+              @dragStart="onDragStart"
+              @drag="onDrag"
+              @dragEnd="onDragEnd"
+              @resizeStart="onResizeStart"
+              @resize="onResize"
+              @resizeEnd="onResizeEnd"
+              @rotateStart="onRotateStart"
+              @rotate="onRotate"
+              @rotateEnd="onRotateEnd"
+              @roundStart="onRoundStart"
+              @round="onRound"
+              @roundEnd="onRoundEnd"
+              @clipStart="onClipStart"
+              @clip="onClip"
+              @clipEnd="onClipEnd"
+            />
+          </div>
+          <!-- viewport -->
+        </VueInfiniteViewer>
+
+        <div
+          class="toolbars-container"
+          :style="{ top: showRulers && editable ? '40px' : '10px', left: showRulers && editable ? '40px' : '10px' }"
+        >
+          <!-- Editor Toolbar -->
+          <ToolsToolbar
+            v-if="editable"
+            :customWidgets="customWidgets"
+            :selectedTool="currentTool"
+            @toolSelected="selectCurrentTool"
+          />
+          <div class="toolbar-separator"></div>
+          <ZoomToolbar :zoomManager="zoomManager" @zoomChanged="onZoomChanged" />
+          <div class="toolbar-separator"></div>
+          <div v-if="editable" class="toolbar">
+            <button class="toolbar-item" @click="undo" :disabled="!historyManager.canUndo()" title="Undo">
+              <EditorIcon icon="undo" />
+            </button>
+            <button class="toolbar-item" @click="redo" :disabled="!historyManager.canRedo()" title="Redo">
+              <EditorIcon icon="redo" />
+            </button>
+
+            <div class="toolbar-item-separator"></div>
+            <button class="toolbar-item" @click="deleteItem" :disabled="!selectedItemActive" title="Delete">
+              <EditorIcon icon="delete" />
+            </button>
+
+            <div class="toolbar-item-separator"></div>
+            <button class="toolbar-item" @click="copyItem" :disabled="!isItem(selectedItem)" title="Copy">
+              <EditorIcon icon="content_copy" />
+            </button>
+            <button class="toolbar-item" @click="cutItem" :disabled="!isItem(selectedItem)" title="Cut">
+              <EditorIcon icon="content_cut" />
+            </button>
+            <button class="toolbar-item" @click="pasteItem" :disabled="itemToPaste === null" title="Paste">
+              <EditorIcon icon="content_paste" />
+            </button>
+
+            <div class="toolbar-item-separator"></div>
+            <button class="toolbar-item" @click="sendToBack" :disabled="!selectedItemActive" title="Send to back">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 1024 1024"
+                :style="{ transform: 'scale(1.0)', opacity: selectedItemActive ? 1 : 0.3 }"
+              >
+                <path
+                  fill="gray"
+                  d="M469.333333 128a42.666667 42.666667 0 0 1 42.666667 42.666667v85.333333h213.333333a42.666667 42.666667 0 0 1 42.666667 42.666667v213.333333h85.333333a42.666667 42.666667 0 0 1 42.666667 42.666667v298.666666a42.666667 42.666667 0 0 1-42.666667 42.666667h-298.666666a42.666667 42.666667 0 0 1-42.666667-42.666667v-85.333333H298.666667a42.666667 42.666667 0 0 1-42.666667-42.666667v-213.333333H170.666667a42.666667 42.666667 0 0 1-42.666667-42.666667V170.666667a42.666667 42.666667 0 0 1 42.666667-42.666667h298.666666z m213.333334 213.333333h-170.666667v128a42.666667 42.666667 0 0 1-42.666667 42.666667H341.333333v170.666667h170.666667v-128a42.666667 42.666667 0 0 1 42.666667-42.666667h128V341.333333z"
+                />
+              </svg>
+            </button>
+            <button class="toolbar-item" @click="bringToFront" :disabled="!selectedItemActive" title="Bring to front">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                :style="{ transform: 'scale(1.0)', opacity: selectedItemActive ? 1 : 0.3 }"
+                viewBox="0 0 24 24"
+              >
+                <g>
+                  <path fill="none" d="M0 0H24V24H0z" />
+                  <path
+                    fill="gray"
+                    d="M11 3c.552 0 1 .448 1 1v2h5c.552 0 1 .448 1 1v5h2c.552 0 1 .448 1 1v7c0 .552-.448 1-1 1h-7c-.552 0-1-.448-1-1v-2H7c-.552 0-1-.448-1-1v-5H4c-.552 0-1-.448-1-1V4c0-.552.448-1 1-1h7zm5 5H8v8h8V8z"
+                  />
+                </g>
+              </svg>
+            </button>
+            <button class="toolbar-item" @click="saveProto" title="SavePrototype">
+              <EditorIcon icon="save" />
+            </button>
+            <button class="toolbar-item" @click="saveToImage" title="SaveImage">
+              <EditorIcon icon="perm_media" />
+            </button>
+          </div>
+          <div class="toolbar-separator"></div>
+          <div v-if="editable" class="toolbar">
+            <button
+              class="toolbar-item"
+              @click="showRulers = !showRulers"
+              title="Show / Hide rulers"
+              :style="{ backgroundColor: showRulers ? '#4af' : '', color: showRulers ? 'white' : '' }"
+            >
+              <EditorIcon icon="straighten" />
+            </button>
+            <button
+              class="toolbar-item"
+              @click="showGuides = !showGuides"
+              title="Show / Hide alignment guidelines"
+              :style="{ backgroundColor: showGuides ? '#4af' : '', color: showGuides ? 'white' : '' }"
+            >
+              <EditorIcon icon="border_style" />
+            </button>
+            <button
+              class="toolbar-item"
+              @click="showInspector = !showInspector"
+              itle="Show / Hide inspector"
+              :style="{ backgroundColor: showInspector ? '#4af' : '', color: showInspector ? 'white' : '' }"
+            >
+              <EditorIcon icon="brush" />
+            </button>
+            <button
+              class="toolbar-item"
+              @click="showKeyboard = !showKeyboard"
+              title="Show / Hide keyboards shortcuts"
+              :style="{ backgroundColor: showKeyboard ? '#4af' : '', color: showKeyboard ? 'white' : '' }"
+            >
+              <EditorIcon icon="keyboard_hide" />
+            </button>
+          </div>
+        </div>
+
+        <KeyboardHelp
+          v-if="showKeyboard"
+          style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-order: 1000"
+        />
+      </div>
+      <!-- editor-container -->
+    </div>
+    <div class="basis-1/7 h-full">
       <ObjectInspector
         :schema="selectedItem ? getItemBlueprint(selectedItem.component)[1] : null"
         :object="selectedItem"
         @property-changed="onPropertyChange"
       />
     </div>
-
-    <Moveable
-      v-if="editable && showInspector"
-      ref="moveableInspector"
-      :target="['.object-inspector-container']"
-      :throttleDrag="1"
-      :draggable="true"
-      :origin="false"
-      :hideDefaultLines="true"
-      @dragStart="onDragStartInspector"
-      @drag="onDragInspector"
-    />
-
-    <div class="tool-box-container">
-      <ToolBox @tool-selected="handleToolBoxSelect"></ToolBox>
-    </div>
-
-    <Moveable
-      v-if="editable && showInspector"
-      ref="moveableToolBox"
-      :target="['.tool-box-container']"
-      :throttleDrag="1"
-      :draggable="true"
-      :origin="false"
-      :hideDefaultLines="true"
-      @dragStart="onDragStartToolBox"
-      @drag="onDragToolBox"
-    />
-
-    <!-- Manage drag of inspector -->
-
-    <KeyboardHelp
-      v-if="showKeyboard"
-      style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-order: 1000"
-    />
   </div>
-  <!-- editor-container -->
 </template>
 
 <script setup lang="ts">
@@ -537,7 +516,6 @@ const origin: Frame = {
 const mouseCoords = ref<Position>({ x: 0, y: 0 });
 
 const inspectorCoords = ref<Position>({ x: 0, y: 0 });
-const toolBoxCoords = ref<Position>({ x: 0, y: 0 });
 
 const handleToolBoxSelect = (selected: EditorTool) => {
   currentTool.value = selected;
@@ -1127,19 +1105,6 @@ function onDragStartInspector(e: any): void {
 function onDragInspector(e: any): void {
   inspectorCoords.value.x = Math.floor(e.beforeTranslate[0]);
   inspectorCoords.value.y = Math.floor(e.beforeTranslate[1]);
-  e.target.style.transform = e.transform;
-}
-
-function onDragStartToolBox(e: any): void {
-  if (!e.inputEvent.target?.className?.includes('toolbox-title-drag-handle')) {
-    e.stop();
-    return;
-  }
-}
-
-function onDragToolBox(e: any): void {
-  toolBoxCoords.value.x = Math.floor(e.beforeTranslate[0]);
-  toolBoxCoords.value.y = Math.floor(e.beforeTranslate[1]);
   e.target.style.transform = e.transform;
 }
 </script>

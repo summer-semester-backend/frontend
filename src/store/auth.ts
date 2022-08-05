@@ -11,6 +11,7 @@ export const useAuthStore = defineStore('auth', () => {
     token.value = userToken;
   }
   function signOut() {
+    localStorage.clear();
     token.value = '';
   }
 
