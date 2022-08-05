@@ -11,7 +11,7 @@
         </n-button>
       </template>
       <template #content>
-        <n-data-table :columns="columns" :data="dataFilter" :pagination="pagination" :bordered="false" />
+        <n-data-table :columns="columns" :pagination="pagination" :bordered="false" />
       </template>
     </Header>
   </div>
