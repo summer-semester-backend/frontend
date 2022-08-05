@@ -4,7 +4,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
 import { readFile } from '@/api/file';
-const teamID = ref(1);
+const teamID = ref(2);
 const projects = ref([]);
 const getProjectList = () => {
   readFile({ fileID: -1, teamID: 1 })

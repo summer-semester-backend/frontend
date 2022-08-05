@@ -20,7 +20,7 @@ import { ref } from 'vue';
 import { createTeam } from '@/api/team.js';
 
 const emits = defineEmits(['update:team-created']);
-const { show = false } = defineProps<{ show: boolean }>();
+const props = withDefaults(defineProps<{ show: boolean }>(), { show: false });
 const newTeamName = ref('');
 const newTeamProfile = ref('');
 

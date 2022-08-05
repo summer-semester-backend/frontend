@@ -14,9 +14,9 @@
           <AddCircleOutlineFilled />
         </n-icon>
       </n-button>
-      <n-icon size="30" class="icon">
+      <!-- <n-icon size="30" class="icon">
         <MenuOpenRound />
-      </n-icon>
+      </n-icon> -->
     </div>
 
     <n-space vertical>
@@ -54,7 +54,7 @@
 </template>
 
 <script setup>
-import { defineComponent, h, ref, computed, onMounted ,watch} from 'vue';
+import { defineComponent, h, ref, computed, onMounted, watch } from 'vue';
 import { MenuOpenRound, AddCircleOutlineFilled } from '@vicons/material';
 import { useRouter, RouterLink } from 'vue-router';
 import { getTeamList } from '@/api/team';
@@ -84,7 +84,7 @@ const menuOptions = [
       h(
         RouterLink,
         {
-          to:"/team/" + value.value + "/project"
+          to: '/team/' + value.value + '/project',
         },
         { default: () => '团队项目' }
       ),
@@ -96,11 +96,11 @@ const menuOptions = [
       h(
         RouterLink,
         {
-          to:"/team/" + value.value
+          to: '/team/' + value.value,
         },
         { default: () => '团队设置' }
       ),
-    key: "teamDetail",
+    key: 'teamDetail',
     icon: renderIcon(SettingOutlined),
   },
 ];
@@ -112,7 +112,6 @@ const getTeams = () => {
         options.value = res.data.list;
         value.value = res.data.list[0].teamID;
         console.log(value.value);
-        
       } else {
         window.$message.error(res.data.message);
       }
@@ -120,7 +119,6 @@ const getTeams = () => {
     .catch(() => {
       console.log('error');
     });
-
 };
 
 const handleUpdateTeamCreated = () => {
@@ -132,30 +130,30 @@ onMounted(() => {
   getTeams();
 });
 
-watch(//路由变化改变value
-  ()=>router.currentRoute.value.name,
+watch(
+  //路由变化改变value
+  () => router.currentRoute.value.name,
   (newValue, oldValue) => {
-    if(newValue == 'team')
-    {
-      router.push("/team/" + value.value + "/project");
+    if (newValue == 'team') {
+      router.push('/team/' + value.value + '/project');
     }
     activeKey.value = newValue;
-  },{ immediate: true }
-)
+  },
+  { immediate: true }
+);
 
-watch(//value变化改变路由
-  ()=>value.value,
+watch(
+  //value变化改变路由
+  () => value.value,
   (newValue, oldValue) => {
-    if(router.currentRoute.value.name == 'teamProject')
-    {
-      router.push("/team/" + value.value + "/project");
+    if (router.currentRoute.value.name == 'teamProject') {
+      router.push('/team/' + value.value + '/project');
+    } else {
+      router.push('/team/' + value.value);
     }
-    else
-    {
-      router.push("/team/" + value.value);
-    }
-  },{ immediate: true }
-)
+  },
+  { immediate: true }
+);
 </script>
 
 <style lang="less" scoped>
