@@ -37,10 +37,12 @@ declare module 'vue' {
     PersonInfo: typeof import('./src/components/user/PersonInfo.vue')['default']
     ProjectBar: typeof import('./src/components/project/ProjectBar.vue')['default']
     ProjectList: typeof import('./src/components/project/ProjectList.vue')['default']
+    Radio: typeof import('./src/components/prototype/diagram-editor/blocks/Radio.vue')['default']
     RangeEditor: typeof import('./src/components/prototype/inspector/property-editors/RangeEditor.vue')['default']
     RawConnection: typeof import('./src/components/prototype/diagram-editor/blocks/RawConnection.vue')['default']
     RecentProject: typeof import('./src/components/project/RecentProject.vue')['default']
     Rectangle: typeof import('./src/components/prototype/diagram-editor/blocks/Rectangle.vue')['default']
+    Redion: typeof import('./src/components/prototype/diagram-editor/blocks/Radio.vue')['default'];
     SelectEditor: typeof import('./src/components/prototype/inspector/property-editors/SelectEditor.vue')['default']
     SidebarButton: typeof import('./src/components/common/SidebarButton.vue')['default']
     SignInForm: typeof import('./src/components/login/SignInForm.vue')['default']

@@ -611,3 +611,29 @@ export const inputModel: ObjectInspectorModel = {
     },
   ],
 };
+
+export const radioModel: ObjectInspectorModel = {
+  tabs: [
+    {
+      title: '样式',
+      sections: [
+        {
+          name: 'properties',
+          title: '属性',
+          properties: [
+            { name: 'checked', label: '选中', type: PropertyType.BOOLEAN, editorFullsize: true },
+            { name: 'value', label: '文字', type: PropertyType.TEXT, editorFullsize: true },
+
+            // { name: 'disabled', label: '禁用', type: PropertyType.BOOLEAN, editorFullsize: true },
+          ],
+        },
+        {
+          // Position & size
+          name: 'pos_size',
+          title: '位置与大小',
+          properties: [x$, y$, w$, h$, separator$, rotate$],
+        },
+      ],
+    },
+  ],
+};
