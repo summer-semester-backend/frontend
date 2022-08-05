@@ -1,7 +1,7 @@
 <template>
   <!-- <work-space /> -->
   <RecentProject />
-  <ProjectList :projects="projects" @refresh="getProjectList" :page-size="10" />
+  <ProjectList :projects="projects" :team-id="null" @refresh="getProjectList" :page-size="10" />
 </template>
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
@@ -28,5 +28,4 @@ onMounted(() => {
   width: 270px;
   background-color: aqua;
 }
-
 </style>
