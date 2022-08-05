@@ -53,7 +53,7 @@ const buttomColumn = reactive<DataTableBaseColumn>({
         <NButton
           size="small"
           disabled={!isManager.value as boolean}
-          type={rowData.authority > 0 ? 'primary' : 'tertiary'}
+          type={rowData.isManager ? 'primary' : 'tertiary'}
           onClick={() => {
             handleUpdateManager(rowData);
           }}
@@ -63,7 +63,7 @@ const buttomColumn = reactive<DataTableBaseColumn>({
         <NButton
           size={'small'}
           disabled={!isManager.value as boolean}
-          type={rowData.authority > 0 ? 'tertiary' : 'primary'}
+          type={rowData.isManager ? 'tertiary' : 'warning'}
           onClick={() => {
             handleDeleteManager(rowData);
           }}
@@ -85,8 +85,8 @@ const columns = reactive<DataTableColumns>([
     key: 'identity',
     render(rowData: any) {
       return (
-        <NButton style={'cursor: auto;'} size={'tiny'} type={rowData.authority > 0 ? 'info' : 'warning'}>
-          {rowData.authority > 0 ? '管理员' : '组员'}
+        <NButton size={'tiny'} type={rowData.authority > 0 ? 'info' : 'warning'} style={'pointer-events: none'}>
+          {rowData.identity}
         </NButton>
       );
     },
@@ -97,7 +97,7 @@ const columns = reactive<DataTableColumns>([
     key: 'status',
     render(rowData: any) {
       return (
-        <NButton disabled={true} size={'tiny'} type={rowData.authority > 0 ? 'default' : 'tertiary'}>
+        <NButton size={'tiny'} type={rowData.authority > 0 ? 'default' : 'tertiary'} style={'pointer-events: none'}>
           {rowData.status}
         </NButton>
       );
@@ -135,6 +135,7 @@ function handleUpdateManager(rowData: any) {
   if (rowData.isManager) return;
   addTeamManager({ teamID: route.params.teamID as string, userID: rowData.userID }).then((res) => {
     if (res.data.result == 0) {
+      window.$message.info(res.data.message);
       tableData.value[rowData.key].identity = '管理员';
       tableData.value[rowData.key].isManager = true;
     }
@@ -142,8 +143,9 @@ function handleUpdateManager(rowData: any) {
 }
 function handleDeleteManager(rowData: any) {
   if (!rowData.isManager) return;
-  deleteTeamManager({ teamID: route.params.id as string, userID: rowData.userID }).then((res) => {
-    if (res.data.result) {
+  deleteTeamManager({ teamID: route.params.teamID as string, userID: rowData.userID }).then((res) => {
+    if (res.data.result == 0) {
+      window.$message.info(res.data.message);
       tableData.value[rowData.key].identity = '组员';
       tableData.value[rowData.key].isManager = false;
     }
@@ -171,6 +173,7 @@ function reload() {
             ...item,
             key: index,
             identity: identity,
+            isManager: item.authority > 0,
             status: item.authority < 0 ? '暂未加入' : '已加入',
           };
         }
