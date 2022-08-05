@@ -1,6 +1,14 @@
 <template>
   <div class="flex h-full">
     <div class="basis-1/7 h-full">
+      <n-button text secondary @click="handleBackToWorkspace">
+        <template #icon>
+          <n-icon>
+            <chevron-back />
+          </n-icon>
+        </template>
+        返回项目
+      </n-button>
       <ToolBox @tool-selected="handleToolBoxSelect"></ToolBox>
     </div>
     <div class="basis-5/7 h-full">
@@ -351,6 +359,8 @@
 </template>
 
 <script setup lang="ts">
+import { ChevronBack } from '@vicons/ionicons5';
+import { useRouter } from 'vue-router';
 import { onKeyStroke, useKeyModifier } from '@vueuse/core';
 import { computed, nextTick, onBeforeMount, onMounted, onUpdated, ref } from 'vue';
 import Guides from 'vue3-guides';
@@ -515,7 +525,7 @@ const origin: Frame = {
 // Track mouse position within the viewport coordinates
 const mouseCoords = ref<Position>({ x: 0, y: 0 });
 
-const inspectorCoords = ref<Position>({ x: 0, y: 0 });
+const router = useRouter();
 
 const handleToolBoxSelect = (selected: EditorTool) => {
   currentTool.value = selected;
@@ -1095,17 +1105,8 @@ function inlineEdit(item: Item) {
   }
 }
 
-function onDragStartInspector(e: any): void {
-  if (!e.inputEvent.target.className.includes('inspector-title-drag-handle')) {
-    e.stop();
-    return;
-  }
-}
-
-function onDragInspector(e: any): void {
-  inspectorCoords.value.x = Math.floor(e.beforeTranslate[0]);
-  inspectorCoords.value.y = Math.floor(e.beforeTranslate[1]);
-  e.target.style.transform = e.transform;
+function handleBackToWorkspace() {
+  router.push({ name: 'PrototypeList' });
 }
 </script>
 
@@ -1131,7 +1132,7 @@ function onDragInspector(e: any): void {
   right: 20px;
   width: 300px;
   height: auto;
-  max-height: 90%;
+  max-height: 100%;
   overflow-x: hidden;
   overflow-y: auto;
 }
@@ -1152,7 +1153,7 @@ function onDragInspector(e: any): void {
   left: 30px;
   width: calc(100% - 30px);
   height: calc(100% - 30px);
-  background-color: rgb(220, 220, 220);
+  background-color: rgb(237, 237, 237);
   user-select: none;
   background-image: linear-gradient(90deg, rgba(180, 180, 180, 0.15) 10%, rgba(0, 0, 0, 0) 10%),
     linear-gradient(rgba(180, 180, 180, 0.15) 10%, rgba(0, 0, 0, 0) 10%);

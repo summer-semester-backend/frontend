@@ -200,7 +200,7 @@ export function registerDefaultItemTypes() {
     supportsRoundable: false,
     supportsResizable: true,
 
-    backgroundColor: 'gray',
+    backgroundColor: 'white',
     textColor: 'black',
     fontSize: 14,
 
@@ -210,7 +210,7 @@ export function registerDefaultItemTypes() {
     textVAlign: TextVAlign.CENTER,
 
     border: {
-      width: 0,
+      width: 1,
       style: ConnectionStyle.SOLID,
       color: 'gray',
     },
@@ -271,6 +271,8 @@ export function registerDefaultItemTypes() {
     {
       ...defaults,
       component: type,
+      w: 200,
+      h: 150,
       supportsRoundable: true,
     },
     shapeModel
