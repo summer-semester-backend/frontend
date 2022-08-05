@@ -6,6 +6,7 @@ import {
   shapeModel,
   shapeWithoutRadiusModel,
   textModel,
+  inputModel,
 } from './item-properties';
 import {
   ClipType,
@@ -344,6 +345,26 @@ export function registerDefaultItemTypes() {
       h: 60,
     },
     iconModel
+  );
+
+  // ----------------------------------------------------------------------
+  type = 'Input';
+  registerItemType(
+    {
+      ...defaults,
+
+      component: type,
+      title: 'input',
+      supportsRoundable: true,
+
+      placeholder: '请输入内容',
+      disabled: false,
+      round: false,
+      size: 'medium',
+      status: 'success',
+      value: '',
+    },
+    inputModel
   );
 } // func
 

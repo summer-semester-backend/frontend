@@ -136,6 +136,8 @@ export enum EditorTool {
   WIDGET = 'widget',
   ICON = 'icon',
   CONNECTION = 'connection',
+  // Custom
+  INPUT = 'input',
 }
 
 export enum ToolBoxGroup {
@@ -163,6 +165,7 @@ import {
   TabletLandscapeOutline,
   TriangleOutline,
   StarOutline,
+  CreateOutline,
 } from '@vicons/ionicons5';
 
 export const toolDefinitions: ToolDefinition[] = [
@@ -183,6 +186,14 @@ export const toolDefinitions: ToolDefinition[] = [
     icon: 'image',
     itemType: 'Image',
     iconComponent: Image,
+  },
+  {
+    type: EditorTool.INPUT,
+    title: '输入',
+    group: ToolBoxGroup.BASIC,
+    icon: 'input',
+    itemType: 'Input',
+    iconComponent: CreateOutline,
   },
   {
     type: EditorTool.LINE,
@@ -276,4 +287,13 @@ export interface WidgetDefinition {
   componentOptions?: any; // The default Vue component options used to instantiate this widget
 
   canBeResized?: boolean; // Is the widget resizable? Default: true
+}
+
+export interface InputItem extends Item {
+  inputType: 'text' | 'password' | 'textarea';
+  placeholder: string;
+  disabled: boolean;
+  round: boolean;
+  status: 'success' | 'warning' | 'error' | undefined;
+  value: string;
 }

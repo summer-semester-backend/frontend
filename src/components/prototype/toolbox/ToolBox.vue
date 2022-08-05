@@ -12,6 +12,7 @@
                     :tool-name="t.title"
                     :icon="t.iconComponent"
                     draggable="true"
+                    @drag.stop=""
                     @mousedown="emits('tool-selected', t.type as EditorTool)"
                   ></ToolBoxItem>
                 </n-gi>
@@ -24,6 +25,7 @@
                     :tool-name="t.title"
                     :icon="t.iconComponent"
                     draggable="true"
+                    @drag.stop=""
                     @mousedown="emits('tool-selected', t.type as EditorTool)"
                   ></ToolBoxItem>
                 </n-gi>
