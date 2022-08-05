@@ -12,11 +12,11 @@ export const id$: ObjectProperty = {
   readonly: true,
   formatValue: (obj, prop, value) => value + ' (' + obj.component + ')',
 };
-export const title$: ObjectProperty = { name: 'title', label: 'Text', type: PropertyType.TEXT, editorFullsize: true };
+export const title$: ObjectProperty = { name: 'title', label: '文字', type: PropertyType.TEXT, editorFullsize: true };
 
 export const fontSize$: ObjectProperty = {
   name: 'fontSize',
-  label: 'Font Size',
+  label: '字号',
   type: PropertyType.RANGE,
   editorFullsize: true,
   editorOptions: { min: 4, max: 120, step: 1 },
@@ -24,7 +24,7 @@ export const fontSize$: ObjectProperty = {
 
 export const textHAlign$: ObjectProperty = {
   name: 'textHAlign',
-  label: 'H Align',
+  label: '纵向对齐',
   type: PropertyType.ICON_LIST,
   editorOptions: {
     items: [
@@ -37,7 +37,7 @@ export const textHAlign$: ObjectProperty = {
 
 export const textVAlign$: ObjectProperty = {
   name: 'textVAlign',
-  label: 'V Align',
+  label: '横向对齐',
   type: PropertyType.ICON_LIST,
   editorRightAlign: true,
   editorOptions: {
@@ -49,38 +49,38 @@ export const textVAlign$: ObjectProperty = {
   },
 };
 
-export const backColor$: ObjectProperty = { name: 'backgroundColor', label: 'Back Color', type: PropertyType.COLOR };
+export const backColor$: ObjectProperty = { name: 'backgroundColor', label: '背景颜色', type: PropertyType.COLOR };
 export const textColor$: ObjectProperty = {
   name: 'textColor',
-  label: 'Text Color',
+  label: '文字颜色',
   type: PropertyType.COLOR,
   editorRightAlign: true,
 };
-export const shadow$: ObjectProperty = { name: 'shadow', label: 'Shadow', type: PropertyType.BOOLEAN };
-export const locked$: ObjectProperty = { name: 'locked', label: 'Locked', type: PropertyType.BOOLEAN };
+export const shadow$: ObjectProperty = { name: 'shadow', label: '阴影', type: PropertyType.BOOLEAN };
+export const locked$: ObjectProperty = { name: 'locked', label: '锁定', type: PropertyType.BOOLEAN };
 
 export const x$: ObjectProperty = { name: 'x', label: 'X', type: PropertyType.NUMBER };
 export const y$: ObjectProperty = { name: 'y', label: 'Y', type: PropertyType.NUMBER };
-export const w$: ObjectProperty = { name: 'w', label: 'Width', type: PropertyType.NUMBER };
-export const h$: ObjectProperty = { name: 'h', label: 'Height', type: PropertyType.NUMBER };
+export const w$: ObjectProperty = { name: 'w', label: '宽度', type: PropertyType.NUMBER };
+export const h$: ObjectProperty = { name: 'h', label: '高度', type: PropertyType.NUMBER };
 
 export const rotate$: ObjectProperty = {
   name: 'r',
-  label: 'Rotation',
+  label: '旋转',
   type: PropertyType.RANGE,
   editorFullsize: true,
   editorOptions: { min: -360, max: 360, step: 1 },
 };
 export const radius$: ObjectProperty = {
   name: 'borderRadius',
-  label: 'Radius',
+  label: '圆角半径',
   type: PropertyType.RANGE,
   editorFullsize: true,
   editorOptions: { min: 0, max: 100, step: 1 },
 };
 export const opacity$: ObjectProperty = {
   name: 'opacity',
-  label: 'Opacity %',
+  label: '透明度',
   type: PropertyType.RANGE,
   editorFullsize: true,
   editorOptions: { min: 0, max: 100, step: 1 },
@@ -89,29 +89,29 @@ export const opacity$: ObjectProperty = {
 export const borderSection$ = {
   // Border
   name: 'border',
-  title: 'Border',
+  title: '边框',
   properties: [
     {
       name: 'border.width',
-      label: 'Width',
+      label: '宽度',
       type: PropertyType.RANGE,
       editorFullsize: true,
       editorOptions: { min: 0, max: 50, step: 1 },
     },
     {
       name: 'border.style',
-      label: 'Style',
+      label: '样式',
       type: PropertyType.ICON_LIST,
       editorFullsize: true,
       editorOptions: {
         items: [
-          { name: ConnectionStyle.SOLID, text: 'Solid' },
-          { name: ConnectionStyle.DASHED, text: 'Dashed' },
-          { name: ConnectionStyle.DOTTED, text: 'Dotted' },
+          { name: ConnectionStyle.SOLID, text: '实线' },
+          { name: ConnectionStyle.DASHED, text: '虚线' },
+          { name: ConnectionStyle.DOTTED, text: '点线' },
         ],
       },
     },
-    { name: 'border.color', label: 'Color', type: PropertyType.COLOR, editorFullsize: true },
+    { name: 'border.color', label: '颜色', type: PropertyType.COLOR, editorFullsize: true },
     radius$,
   ],
 };
@@ -119,41 +119,41 @@ export const borderSection$ = {
 export const borderWithoutRadiusSection$ = {
   // Border
   name: 'border',
-  title: 'Border',
+  title: '边框',
   properties: [
     {
       name: 'border.width',
-      label: 'Width',
+      label: '宽度',
       type: PropertyType.RANGE,
       editorFullsize: true,
       editorOptions: { min: 0, max: 50, step: 1 },
     },
     {
       name: 'border.style',
-      label: 'Style',
+      label: '样式',
       type: PropertyType.ICON_LIST,
       editorFullsize: true,
       editorOptions: {
         items: [
-          { name: ConnectionStyle.SOLID, text: 'Solid' },
-          { name: ConnectionStyle.DASHED, text: 'Dashed' },
-          { name: ConnectionStyle.DOTTED, text: 'Dotted' },
+          { name: ConnectionStyle.SOLID, text: '实线' },
+          { name: ConnectionStyle.DASHED, text: '虚线' },
+          { name: ConnectionStyle.DOTTED, text: '点线' },
         ],
       },
     },
-    { name: 'border.color', label: 'Color', type: PropertyType.COLOR, editorFullsize: true },
+    { name: 'border.color', label: '颜色', type: PropertyType.COLOR, editorFullsize: true },
   ],
 };
 
 const otherTab: InspectorTab = {
-  title: 'Other',
+  title: '其他',
   sections: [
     {
       name: 'comp_info',
-      title: 'Component Info',
+      title: '组件信息',
       properties: [
         id$,
-        { name: 'component', label: 'Component', type: PropertyType.TEXT, editorFullsize: true, readonly: true },
+        { name: 'component', label: '组件', type: PropertyType.TEXT, editorFullsize: true, readonly: true },
         separator$,
         {
           name: 'id',
@@ -171,12 +171,12 @@ const otherTab: InspectorTab = {
 export const basicModel: ObjectInspectorModel = {
   tabs: [
     {
-      title: 'Style',
+      title: '样式',
       sections: [
         {
           // Style
           name: 'style',
-          title: 'Style',
+          title: '样式',
           properties: [backColor$, opacity$, locked$, shadow$],
         },
         borderWithoutRadiusSection$,
@@ -195,12 +195,12 @@ export const basicModel: ObjectInspectorModel = {
 export const shapeModel: ObjectInspectorModel = {
   tabs: [
     {
-      title: 'Style',
+      title: '样式',
       sections: [
         {
           // Style
           name: 'style',
-          title: 'Text and style',
+          title: '文本与样式',
           properties: [
             title$,
             fontSize$,
@@ -230,12 +230,12 @@ export const shapeModel: ObjectInspectorModel = {
 export const shapeWithoutRadiusModel: ObjectInspectorModel = {
   tabs: [
     {
-      title: 'Style',
+      title: '样式',
       sections: [
         {
           // Style
           name: 'style',
-          title: 'Text and style',
+          title: '文本与样式',
           properties: [
             title$,
             fontSize$,
@@ -265,7 +265,7 @@ export const shapeWithoutRadiusModel: ObjectInspectorModel = {
 export const imageModel: ObjectInspectorModel = {
   tabs: [
     {
-      title: 'Style',
+      title: '样式',
       sections: [
         {
           // Style
@@ -462,9 +462,9 @@ export const connectionModel: ObjectInspectorModel = {
               editorFullsize: true,
               editorOptions: {
                 items: [
-                  { name: ConnectionStyle.SOLID, text: 'Solid' },
-                  { name: ConnectionStyle.DASHED, text: 'Dashed' },
-                  { name: ConnectionStyle.DOTTED, text: 'Dotted' },
+                  { name: ConnectionStyle.SOLID, text: '实线' },
+                  { name: ConnectionStyle.DASHED, text: '虚线' },
+                  { name: ConnectionStyle.DOTTED, text: '点线' },
                 ],
               },
             },
@@ -508,9 +508,9 @@ export const lineModel: ObjectInspectorModel = {
               editorFullsize: true,
               editorOptions: {
                 items: [
-                  { name: ConnectionStyle.SOLID, text: 'Solid' },
-                  { name: ConnectionStyle.DASHED, text: 'Dashed' },
-                  { name: ConnectionStyle.DOTTED, text: 'Dotted' },
+                  { name: ConnectionStyle.SOLID, text: '实线' },
+                  { name: ConnectionStyle.DASHED, text: '虚线' },
+                  { name: ConnectionStyle.DOTTED, text: '点线' },
                 ],
               },
             },
@@ -531,7 +531,7 @@ export const lineModel: ObjectInspectorModel = {
 export const iconModel: ObjectInspectorModel = {
   tabs: [
     {
-      title: 'Style',
+      title: '样式',
       sections: [
         {
           // Style
@@ -607,6 +607,38 @@ export const inputModel: ObjectInspectorModel = {
             },
           ],
         },
+        {
+          // Position & size
+          name: 'pos_size',
+          title: '位置与大小',
+          properties: [x$, y$, w$, h$, separator$, rotate$],
+        },
+      ],
+    },
+  ],
+};
+
+export const radioModel: ObjectInspectorModel = {
+  tabs: [
+    {
+      title: '样式',
+      sections: [
+        {
+          name: 'properties',
+          title: '属性',
+          properties: [
+            { name: 'checked', label: '选中', type: PropertyType.BOOLEAN, editorFullsize: true },
+            { name: 'value', label: '文字', type: PropertyType.TEXT, editorFullsize: true },
+
+            // { name: 'disabled', label: '禁用', type: PropertyType.BOOLEAN, editorFullsize: true },
+          ],
+        },
+        {
+          // Position & size
+          name: 'pos_size',
+          title: '位置与大小',
+          properties: [x$, y$, w$, h$, separator$, rotate$],
+        },
       ],
     },
   ],
@@ -620,7 +652,34 @@ export const buttonModel: ObjectInspectorModel = {
         {
           name: 'properties',
           title: '属性',
-          properties: [],
+          properties: [
+            { name: 'value', label: '文字', type: PropertyType.TEXT, editorFullsize: true },
+            { name: 'disabled', label: '禁用', type: PropertyType.BOOLEAN, editorFullsize: true },
+            { name: 'bordered', label: '边框', type: PropertyType.BOOLEAN, editorFullsize: true },
+            { name: 'circle', label: '圆形', type: PropertyType.BOOLEAN, editorFullsize: true },
+            {
+              name: 'buttonType',
+              label: '按钮类型',
+              type: PropertyType.ICON_LIST,
+              editorFullsize: true,
+              editorOptions: {
+                items: [
+                  // { name: 'default', text: 'default' },
+                  // { name: 'tertiary', text: 'tertiary' },
+                  // { name: 'primary', text: 'primary' },
+                  { name: 'info', text: 'info' },
+                  { name: 'warning', text: 'warning' },
+                  { name: 'error', text: 'error' },
+                ],
+              },
+            },
+          ],
+        },
+        {
+          // Position & size
+          name: 'pos_size',
+          title: '位置与大小',
+          properties: [x$, y$, w$, h$, separator$, rotate$],
         },
       ],
     },

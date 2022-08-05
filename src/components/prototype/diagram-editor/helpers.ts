@@ -7,6 +7,7 @@ import {
   shapeWithoutRadiusModel,
   textModel,
   inputModel,
+  radioModel,
   buttonModel,
 } from './item-properties';
 import {
@@ -19,6 +20,8 @@ import {
   Item,
   ItemConnection,
   LineItem,
+  RadioItem,
+  // TestItem,
   Position,
   TextHAlign,
   TextVAlign,
@@ -252,6 +255,17 @@ export function registerDefaultItemTypes() {
   );
 
   // ----------------------------------------------------------------------
+  type = 'Test';
+  registerItemType(
+    {
+      ...defaults,
+      component: type,
+      supportsRoundable: true,
+    },
+    shapeModel
+  );
+
+  // ----------------------------------------------------------------------
   type = 'Rectangle';
   registerItemType(
     {
@@ -368,6 +382,22 @@ export function registerDefaultItemTypes() {
     inputModel
   );
 
+  type = 'Radio';
+  registerItemType(
+    {
+      ...defaults,
+      component: type,
+      title: 'radio',
+      supportsRoundable: true,
+
+      checked: false,
+      disabled: false,
+      value: '单选框',
+      w: 150,
+      h: 30,
+    },
+    radioModel
+  );
   // ----------------------------------------------------------------------
   type = 'Button';
   registerItemType(
