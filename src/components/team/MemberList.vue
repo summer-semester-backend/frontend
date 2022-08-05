@@ -137,24 +137,25 @@ function handleDeleteManager(rowData: any) {
 function reload() {
   isReloading.value = true;
   getTeamMember({ teamID: route.params.teamID as string }).then((res) => {
-    if (res.data.result) {
+    if (res.data.result == 0) {
+      console.log('before', res.data.userList);
       tableData.value = res.data.userList.map(
         (item: { userID: number; username: string; email: string; authority: number }, index: number) => {
           if (userID == item.userID && item.authority > 0) {
             isManager.value = true;
           }
+          var identity;
+          if (item.authority == 2) {
+            identity = '项目创建人';
+          } else if (item.authority == 1) {
+            identity = '管理员';
+          } else if (item.authority == 0) {
+            identity = '普通成员';
+          }
           return {
             ...item,
             key: index,
-            identity: () => {
-              if (item.authority == 2) {
-                return '项目创建人';
-              } else if (item.authority == 1) {
-                return '管理员';
-              } else if (item.authority == 0) {
-                return '普通成员';
-              }
-            },
+            identity: identity,
             status: item.authority < 0 ? '暂未加入' : '已加入',
           };
         }
