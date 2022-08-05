@@ -138,6 +138,7 @@ export enum EditorTool {
   CONNECTION = 'connection',
   // Custom
   INPUT = 'input',
+  RADIO = 'radio',
 }
 
 export enum ToolBoxGroup {
@@ -193,6 +194,14 @@ export const toolDefinitions: ToolDefinition[] = [
     group: ToolBoxGroup.BASIC,
     icon: 'input',
     itemType: 'Input',
+    iconComponent: CreateOutline,
+  },
+  {
+    type: EditorTool.RADIO,
+    title: '单选框',
+    group: ToolBoxGroup.BASIC,
+    icon: 'radio',
+    itemType: 'Radio',
     iconComponent: CreateOutline,
   },
   {
@@ -258,6 +267,11 @@ export interface LineItem extends Item {
   style: ConnectionStyle;
 }
 
+// export interface TestItem extends Item {
+//   thick: number;
+//   style: ConnectionStyle;
+// }
+
 export interface ImageItem extends Item {
   url: string;
   fit: 'contain' | 'cover' | 'fill' | 'none';
@@ -295,5 +309,11 @@ export interface InputItem extends Item {
   disabled: boolean;
   round: boolean;
   status: 'success' | 'warning' | 'error' | undefined;
+  value: string;
+}
+
+export interface RadioItem extends Item {
+  checked: boolean;
+  disabled: boolean;
   value: string;
 }

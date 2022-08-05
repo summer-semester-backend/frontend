@@ -10,6 +10,8 @@ import Text from './diagram-editor/blocks/Text.vue';
 import Triangle from './diagram-editor/blocks/Triangle.vue';
 // Custom
 import Input from './diagram-editor/blocks/Input.vue';
+import Radio from './diagram-editor/blocks/Radio.vue';
+
 export function setupPrototypeComponents(app: App) {
   app.component('Text', Text);
   app.component('Line', Line);
@@ -20,6 +22,6 @@ export function setupPrototypeComponents(app: App) {
   app.component('Image', Image);
   app.component('Icon', Icon);
   app.component('Input', Input);
-
+  app.component('Radio', Radio);
   app.component('Connection', Connection);
 }
