@@ -607,6 +607,12 @@ export const inputModel: ObjectInspectorModel = {
             },
           ],
         },
+        {
+          // Position & size
+          name: 'pos_size',
+          title: '位置与大小',
+          properties: [x$, y$, w$, h$, separator$, rotate$],
+        },
       ],
     },
   ],
@@ -646,7 +652,34 @@ export const buttonModel: ObjectInspectorModel = {
         {
           name: 'properties',
           title: '属性',
-          properties: [],
+          properties: [
+            { name: 'value', label: '文字', type: PropertyType.TEXT, editorFullsize: true },
+            { name: 'disabled', label: '禁用', type: PropertyType.BOOLEAN, editorFullsize: true },
+            { name: 'bordered', label: '边框', type: PropertyType.BOOLEAN, editorFullsize: true },
+            { name: 'circle', label: '圆形', type: PropertyType.BOOLEAN, editorFullsize: true },
+            {
+              name: 'buttonType',
+              label: '按钮类型',
+              type: PropertyType.ICON_LIST,
+              editorFullsize: true,
+              editorOptions: {
+                items: [
+                  // { name: 'default', text: 'default' },
+                  // { name: 'tertiary', text: 'tertiary' },
+                  // { name: 'primary', text: 'primary' },
+                  { name: 'info', text: 'info' },
+                  { name: 'warning', text: 'warning' },
+                  { name: 'error', text: 'error' },
+                ],
+              },
+            },
+          ],
+        },
+        {
+          // Position & size
+          name: 'pos_size',
+          title: '位置与大小',
+          properties: [x$, y$, w$, h$, separator$, rotate$],
         },
       ],
     },
