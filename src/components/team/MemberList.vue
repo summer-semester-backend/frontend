@@ -4,7 +4,7 @@
     :data="tableData"
     :loading="isReloading"
     :pagination="pagination"
-    style="height: 620px"
+    style="height: 400px"
   >
   </n-data-table>
   <team-invite ref="teamInvite" />
@@ -43,7 +43,7 @@ const buttomColumn = reactive<DataTableBaseColumn>({
       <NButtonGroup>
         <NButton
           size="small"
-          disabled={!isManager.value || rowData.id === userID}
+          disabled={!isManager.value || rowData.userID === userID}
           onClick={() => {
             handleDeleteMember(rowData);
           }}
@@ -53,7 +53,7 @@ const buttomColumn = reactive<DataTableBaseColumn>({
         <NButton
           size="small"
           disabled={!isManager.value as boolean}
-          type={rowData.isManager ? 'primary' : 'tertiary'}
+          type={rowData.authority > 0 ? 'primary' : 'tertiary'}
           onClick={() => {
             handleUpdateManager(rowData);
           }}
@@ -63,7 +63,7 @@ const buttomColumn = reactive<DataTableBaseColumn>({
         <NButton
           size={'small'}
           disabled={!isManager.value as boolean}
-          type={rowData.isManager ? 'tertiary' : 'primary'}
+          type={rowData.authority > 0 ? 'tertiary' : 'primary'}
           onClick={() => {
             handleDeleteManager(rowData);
           }}
@@ -83,11 +83,25 @@ const columns = reactive<DataTableColumns>([
   {
     title: '身份',
     key: 'identity',
+    render(rowData: any) {
+      return (
+        <NButton style={'cursor: auto;'} size={'tiny'} type={rowData.authority > 0 ? 'info' : 'warning'}>
+          {rowData.authority > 0 ? '管理员' : '组员'}
+        </NButton>
+      );
+    },
     sorter: 'default',
   },
   {
     title: '加入状态',
     key: 'status',
+    render(rowData: any) {
+      return (
+        <NButton disabled={true} size={'tiny'} type={rowData.authority > 0 ? 'default' : 'tertiary'}>
+          {rowData.status}
+        </NButton>
+      );
+    },
     sorter: 'default',
   },
   buttomColumn,
