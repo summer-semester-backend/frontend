@@ -1,7 +1,7 @@
 <template>
   <div class="object-inspector">
     <div class="inspector-title inspector-title-drag-handle">
-      <div>Inspector</div>
+      <div>查看器</div>
       <div style="flex-grow: 1; pointer-events: none"></div>
       <div @click="expanded = !expanded" style="cursor: pointer">
         <EditorIcon v-show="expanded" size="16px" icon="keyboard_arrow_down" color="white" />
@@ -10,7 +10,7 @@
     </div>
     <div v-if="expanded && (object === null || object === undefined)">
       <div style="color: #aaa; font-size: 12px; text-align: center; margin-bottom: 8px; font-style: italic">
-        No selected object
+        暂无选择的物体
       </div>
     </div>
     <template v-else>
