@@ -152,12 +152,15 @@ watch(
   (newValue, oldValue) => {
     if (router.currentRoute.value.name == 'teamProject') {
       router.push('/team/' + value.value + '/project');
-    } else {
-      router.push('/team/' + value.value);
+    } 
+    else if(router.currentRoute.value.name == 'teamDetail')
+    {
+      router.push("/team/" + value.value);
     }
   },
   { immediate: true }
 );
+
 </script>
 
 <style lang="less" scoped>
