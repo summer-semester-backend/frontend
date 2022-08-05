@@ -13,7 +13,6 @@
       boxShadow: item.shadow ? '3px 3px 5px #aaa' : 'none',
     }"
   >
-    123
     <div><div class="diagram-item-inline-edit" v-html="item.title" :style="{ alignItems: item.textHAlign }" /></div>
   </div>
 </template>
