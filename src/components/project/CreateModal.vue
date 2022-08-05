@@ -154,7 +154,7 @@ const getTeamList = () => {
     .then((res) => {
       if (res.data.result == 0) {
         teams.value = res.data.list;
-        isTeamList.value = true;
+        isTeamList.value = false;
       } else if (res.data.result == 1) {
         window.$message.warning(res.data.message);
       } else if (res.data.result == 2) {

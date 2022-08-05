@@ -46,11 +46,7 @@ const initEditor = () => {
 
     // 协同编辑
     const ot = new OTClient(engineInstance);
-    ot.connect(
-      `ws://43.138.77.8:8088${'?uid=' + currentMember.value.userID + '?uname=' + currentMember.value.nickname}`,
-      fileID.value,
-      ''
-    );
+    ot.connect(`ws://43.138.77.8:8088${'?uid=' + currentMember.value.nickname}`, fileID.value, '');
     ot.on('ready', (member) => {
       if (member) {
         localStorage.setItem('member', JSON.stringify(member));
@@ -67,7 +63,7 @@ onMounted(() => {
   getUserInfo({ userID: useid })
     .then((res) => {
       if (res.data.result == 0) {
-        currentMember.value.nickname = res.data.nickname;
+        currentMember.value.nickname = res.data.data.nickname;
         currentMember.value.userID = useid;
         fileID.value = route.params.id.toString();
       }

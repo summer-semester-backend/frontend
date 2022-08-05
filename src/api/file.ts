@@ -21,7 +21,7 @@ export function createFile(data: {
   fileName: string;
   fileType: number;
   fileImage: string;
-  fatherID: number;
+  fatherID: number | null;
 }) {
   return backend.post('/file/create', data);
 }
