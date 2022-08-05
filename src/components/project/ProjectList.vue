@@ -46,7 +46,7 @@
                         </n-space>
                       </div>
                       <n-image
-                        style="border-radius: 8px 8px 0 0"
+                        style="border-radius: 8px 8px 0 0; height: 8vw"
                         :src="item.fileImage"
                         object-fit="cover"
                         preview-disabled

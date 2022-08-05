@@ -21,7 +21,7 @@ const routes: RouteRecordRaw[] = [
         name: 'ProjectTrash',
         component: () => import('../views/project/ProjectTrash.vue'),
       },
-    ]
+    ],
   },
   {
     path: '/team',
@@ -76,8 +76,8 @@ const routes: RouteRecordRaw[] = [
     children: [
       {
         path: 'doc',
-        name: 'Doc',
-        component: () => import('../components/workspace/Doc.vue'),
+        name: 'DocumentList',
+        component: () => import('../views/workspace/DocumentList.vue'),
       },
     ],
   },

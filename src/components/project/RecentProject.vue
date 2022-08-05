@@ -16,7 +16,7 @@
               >
                 <template #cover>
                   <n-image
-                    style="border-radius: 8px 8px 0 0"
+                    style="border-radius: 8px 8px 0 0; height: 6vw"
                     :src="item?.fileImage"
                     object-fit="cover"
                     preview-disabled
@@ -48,7 +48,7 @@ const projects = ref([
   {
     fileID: 1,
     fileName: 'project',
-    fileImage: '/resource/image/project1.jpeg',
+    fileImage: '',
     createTime: '2020-01-01',
     lastVisitTime: '2020-01-01',
   },
@@ -97,7 +97,7 @@ onMounted(() => {
   #recent-box {
     margin-top: 20px;
     .n-card {
-      height: 10vw;
+      height: 8vw;
       border-radius: 10px;
       border: 2px solid rgba(0, 0, 0, 0.3);
       overflow: hidden;
