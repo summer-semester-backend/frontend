@@ -50,11 +50,7 @@
             </n-layout> -->
       </n-layout>
     </n-space>
-    <TeamAdd
-      :show="isCreateModalShow"
-      @update:team-created="handleUpdateTeamCreated"
-      @close="isCreateModalShow = false"
-    />
+    <TeamAdd :isCreateModalShow="isCreateModalShow" @refresh="getTeams" @close="isCreateModalShow = false" />
   </div>
 </template>
 
@@ -63,7 +59,7 @@ import { defineComponent, h, ref, computed, onMounted, watch } from 'vue';
 import { MenuOpenRound, AddCircleOutlineFilled } from '@vicons/material';
 import { useRouter, RouterLink } from 'vue-router';
 import { getTeamList } from '@/api/team';
-import { NIcon } from 'naive-ui';
+import { NButton, NIcon } from 'naive-ui';
 import { AppstoreAddOutlined, SettingOutlined } from '@vicons/antd';
 
 function renderIcon(icon) {
@@ -87,8 +83,11 @@ const menuOptions = [
   {
     label: () =>
       h(
-        RouterLink,
+        NButton,
         {
+          onClick: () => {
+            router.push('/team/create');
+          },
           to: '/team/' + localStorage.getItem('teamID') + '/project',
         },
         { default: () => '团队项目' }

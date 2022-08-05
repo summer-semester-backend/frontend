@@ -123,14 +123,7 @@ const columns = ref([
     },
   },
 ]);
-const trashs = ref([
-  {
-    fileID: 1,
-    fileName: '项目名称',
-    teamName: '所属团队',
-    abandonTime: '1970-1-1',
-  },
-]);
+const trashs = ref<Project[]>([]);
 const pagination = ref({
   current: 1,
   pageSize: 10,

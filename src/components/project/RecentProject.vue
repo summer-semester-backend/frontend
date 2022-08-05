@@ -1,5 +1,5 @@
 <template>
-  <div id="recent-content">
+  <div id="recent-content" v-if="projects.length != 0">
     <n-text>最近</n-text>
     <div id="recent-box">
       <n-grid x-gap="30" :cols="6">
@@ -24,7 +24,7 @@
                   ></n-image>
                 </template>
                 <template #footer>
-                  <n-ellipsis style="background-color: #fff; font-size: 1rem; font-weight: 400">
+                  <n-ellipsis :tooltip="false" style="background-color: #fff; font-size: 1rem; font-weight: 400">
                     {{ item?.fileName }}
                   </n-ellipsis>
                 </template>
@@ -53,7 +53,7 @@ const projects = ref([
   {
     fileID: 1,
     fileName: '',
-    fileImage: '/resource/image/project.jpg',
+    fileImage: '',
     createTime: '',
     lastVisitTime: '',
     teamName: '',

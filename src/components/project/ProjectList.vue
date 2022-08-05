@@ -40,7 +40,7 @@
                           <n-button circle type="error" size="small" @click.stop="handleDelete(item.fileID)">
                             <n-icon size="20"><trash-outline /></n-icon
                           ></n-button>
-                          <n-button circle type="info" size="small" @click.stop="handleEdit(item.fileID)">
+                          <n-button circle type="info" size="small" @click.stop="handleEdit(item)">
                             <n-icon size="20"><create-outline /></n-icon
                           ></n-button>
                         </n-space>
@@ -53,7 +53,10 @@
                       ></n-image>
                     </template>
                     <template #footer>
-                      <n-ellipsis style="background-color: #fff; font-size: 1rem; font-weight: 500">
+                      <n-ellipsis
+                        :tooltip="false"
+                        style="background-color: #fff; font-size: 1rem; font-weight: 500; margin: 0 24px"
+                      >
                         {{ item.fileName }}
                       </n-ellipsis>
                     </template>
@@ -141,7 +144,7 @@ const props = withDefaults(defineProps<Props>(), {
     {
       fileID: 2,
       fileName: '',
-      fileImage: '/resource/image/project.jpg',
+      fileImage: '',
       createTime: '',
       lastVisitTime: '',
       teamName: '',
@@ -240,13 +243,14 @@ const handleDelete = (fileID: number) => {
 };
 
 //修改项目名称
-const handleEdit = (fileID: number) => {
+const handleEdit = (item: any) => {
   window.$dialog.info({
     title: '修改项目名称',
     content: () => {
       return h(NInput, {
         style: 'width: 100%;',
         placeholder: '请输入项目名称',
+        value: item.fileName,
         onInput: (e: any) => {
           newFileName.value = e;
           console.log(newFileName.value);
@@ -263,18 +267,22 @@ const handleEdit = (fileID: number) => {
     maskClosable: false,
     onPositiveClick: () => {
       if (newFileName.value.length > 0) {
-        editFile({ fileID: fileID, fileName: newFileName.value, fileImage: null, fatherID: null, data: null }).then(
-          (res) => {
-            if (res.data.result == 0) {
-              window.$message.success('修改成功');
-              emits('refresh');
-            } else if (res.data.result == 1) {
-              window.$message.warning(res.data.message);
-            } else if (res.data.result == 2) {
-              window.$message.error(res.data.message);
-            }
+        editFile({
+          fileID: item.fileID,
+          fileName: newFileName.value,
+          fileImage: null,
+          fatherID: null,
+          data: null,
+        }).then((res) => {
+          if (res.data.result == 0) {
+            window.$message.success('修改成功');
+            emits('refresh');
+          } else if (res.data.result == 1) {
+            window.$message.warning(res.data.message);
+          } else if (res.data.result == 2) {
+            window.$message.error(res.data.message);
           }
-        );
+        });
       } else {
         window.$message.warning('请输入项目名称');
       }
