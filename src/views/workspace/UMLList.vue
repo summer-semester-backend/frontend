@@ -99,7 +99,7 @@ const getFileList = (id: number | null) => {
   }).then((res) => {
     console.log(res.data);
     files.value = [];
-    res.data.sonList.forEach((item) => {
+    res.data.sonList.forEach((item: any) => {
       if (item.fileType === 12) {
         files.value.push({
           fileID: item.fileID,
