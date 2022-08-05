@@ -34,7 +34,7 @@
               <n-tab name="doc" :tab="renderDoc" />
               <n-tab name="prototype" :tab="renderPrototype" />
               <n-tab name="uml" :tab="renderUml" />
-              <n-tab name="recycleBin" :tab="renderRecycleBin" />
+              <!-- <n-tab name="recycleBin" :tab="renderRecycleBin" /> -->
               <!-- <n-tab name="prototype"> 原型 </n-tab>
               <n-tab name="uml"> UML图 </n-tab>
               <n-tab name="recycleBin"> 回收站 </n-tab> -->
@@ -51,6 +51,8 @@
 import { KeyboardArrowLeftOutlined } from '@vicons/material';
 import { CaretDown, InformationCircleOutline } from '@vicons/ionicons5';
 import { ref, h } from 'vue';
+import { useRouter } from 'vue-router';
+const router = useRouter();
 
 const tabValue = ref('doc');
 
@@ -61,6 +63,7 @@ const renderRecycleBin = () => h('div', { style: 'font-size:14px;' }, '回收站
 
 const handleUpdateTab = (value: string) => {
   tabValue.value = value;
+  router.push(`/workspace/${value}`);
 };
 </script>
 
@@ -110,6 +113,6 @@ const handleUpdateTab = (value: string) => {
 
 .bottomData {
   font-size: 14px;
-  width: 270px;
+  width: 200px;
 }
 </style>

@@ -4,10 +4,10 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
 import { readFile } from '@/api/file';
-const teamID = ref(2);
+const teamID = ref<number | null>(null);
 const projects = ref([]);
-const getProjectList = () => {
-  readFile({ fileID: -1, teamID: 1 })
+const getProjectList = (id: number | null) => {
+  readFile({ fileID: -1, teamID: id })
     .then((res) => {
       projects.value = res.data.sonList;
     })
@@ -16,6 +16,7 @@ const getProjectList = () => {
     });
 };
 onMounted(() => {
-  getProjectList();
+  teamID.value = parseInt(window.location.pathname.split('/')[2]);
+  getProjectList(teamID.value);
 });
 </script>

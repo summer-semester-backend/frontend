@@ -7,6 +7,8 @@
     positive-text="确认"
     negative-text="取消"
     @positive-click="handlePositiveClick"
+    @negative-click="handleClose"
+    @close="handleClose"
   >
     <n-divider style="margin: 15px auto" />
     <n-input v-model:value="newTeamName" type="text" placeholder="请输入团队名称"> </n-input>
@@ -19,7 +21,7 @@
 import { ref } from 'vue';
 import { createTeam } from '@/api/team.js';
 
-const emits = defineEmits(['update:team-created']);
+const emits = defineEmits(['update:team-created', 'close']);
 const props = withDefaults(defineProps<{ show: boolean }>(), { show: false });
 const newTeamName = ref('');
 const newTeamProfile = ref('');
@@ -41,6 +43,10 @@ function handlePositiveClick() {
       emits('update:team-created');
     }
   });
+}
+
+function handleClose() {
+  emits('close');
 }
 </script>
 

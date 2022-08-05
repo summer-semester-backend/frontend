@@ -13,6 +13,7 @@
                 }"
                 footer-style="padding: 0.5vw 0;"
                 hoverable
+                @click="jumpToProj(item.fileID)"
               >
                 <template #cover>
                   <n-image
@@ -44,6 +45,10 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { readFile, recentProjectList } from '@/api/file';
+import { useRouter } from 'vue-router';
+import { useProjStore } from '@/store/proj';
+const router = useRouter();
+const { setProjID } = useProjStore();
 const projects = ref([
   {
     fileID: 1,
@@ -81,6 +86,15 @@ const getProjectList = () => {
       console.log(err);
     });
 };
+
+//跳转到指定项目
+const jumpToProj = (fileID: number) => {
+  setProjID(fileID);
+  router.push({
+    path: '/workspace',
+  });
+};
+
 onMounted(() => {
   getProjectList();
 });

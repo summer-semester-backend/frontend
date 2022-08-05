@@ -6,6 +6,9 @@ import {
   shapeModel,
   shapeWithoutRadiusModel,
   textModel,
+  inputModel,
+  radioModel,
+  buttonModel,
 } from './item-properties';
 import {
   ClipType,
@@ -17,6 +20,8 @@ import {
   Item,
   ItemConnection,
   LineItem,
+  RadioItem,
+  // TestItem,
   Position,
   TextHAlign,
   TextVAlign,
@@ -138,7 +143,7 @@ export function createConnection(fromID: string, toID: string, c?: DeepPartial<I
     style: c?.style || ConnectionStyle.SOLID,
     thick: c?.thick || 1,
 
-    backgroundColor: c?.backgroundColor || '#333',
+    backgroundColor: c?.backgroundColor || '#18181c',
   } as ItemConnection;
 }
 
@@ -250,6 +255,17 @@ export function registerDefaultItemTypes() {
   );
 
   // ----------------------------------------------------------------------
+  type = 'Test';
+  registerItemType(
+    {
+      ...defaults,
+      component: type,
+      supportsRoundable: true,
+    },
+    shapeModel
+  );
+
+  // ----------------------------------------------------------------------
   type = 'Rectangle';
   registerItemType(
     {
@@ -344,6 +360,61 @@ export function registerDefaultItemTypes() {
       h: 60,
     },
     iconModel
+  );
+
+  // ----------------------------------------------------------------------
+  type = 'Input';
+  registerItemType(
+    {
+      ...defaults,
+
+      component: type,
+      title: 'input',
+      supportsRoundable: true,
+
+      placeholder: '请输入内容',
+      disabled: false,
+      round: false,
+      size: 'medium',
+      status: 'success',
+      value: '',
+    },
+    inputModel
+  );
+
+  type = 'Radio';
+  registerItemType(
+    {
+      ...defaults,
+      component: type,
+      title: 'radio',
+      supportsRoundable: true,
+
+      checked: false,
+      disabled: false,
+      value: '单选框',
+      w: 150,
+      h: 30,
+    },
+    radioModel
+  );
+  // ----------------------------------------------------------------------
+  type = 'Button';
+  registerItemType(
+    {
+      ...defaults,
+
+      component: type,
+      title: 'button',
+      supportsRoundable: true,
+      value: '按钮',
+      disabled: false,
+      bordered: true,
+      circle: false,
+      type: 'default',
+      color: undefined,
+    },
+    buttonModel
   );
 } // func
 
