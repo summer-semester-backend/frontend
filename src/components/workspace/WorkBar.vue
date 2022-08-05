@@ -35,7 +35,7 @@
               <n-tab name="doc" :tab="renderDoc" />
               <n-tab name="prototype" :tab="renderPrototype" />
               <n-tab name="uml" :tab="renderUml" />
-              <n-tab name="recycleBin" :tab="renderRecycleBin" />
+              <!-- <n-tab name="recycleBin" :tab="renderRecycleBin" /> -->
               <!-- <n-tab name="prototype"> 原型 </n-tab>
               <n-tab name="uml"> UML图 </n-tab>
               <n-tab name="recycleBin"> 回收站 </n-tab> -->
@@ -136,6 +136,6 @@ onMounted(() => {
 
 .bottomData {
   font-size: 14px;
-  width: 270px;
+  width: 200px;
 }
 </style>

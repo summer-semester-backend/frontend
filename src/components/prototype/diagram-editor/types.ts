@@ -136,6 +136,10 @@ export enum EditorTool {
   WIDGET = 'widget',
   ICON = 'icon',
   CONNECTION = 'connection',
+  // Custom
+  INPUT = 'input',
+  RADIO = 'radio',
+  BUTTON = 'button',
 }
 
 export enum ToolBoxGroup {
@@ -163,6 +167,8 @@ import {
   TabletLandscapeOutline,
   TriangleOutline,
   StarOutline,
+  CreateOutline,
+  RadioButtonOnOutline,
 } from '@vicons/ionicons5';
 
 export const toolDefinitions: ToolDefinition[] = [
@@ -183,6 +189,30 @@ export const toolDefinitions: ToolDefinition[] = [
     icon: 'image',
     itemType: 'Image',
     iconComponent: Image,
+  },
+  {
+    type: EditorTool.INPUT,
+    title: '输入',
+    group: ToolBoxGroup.BASIC,
+    icon: 'input',
+    itemType: 'Input',
+    iconComponent: CreateOutline,
+  },
+  {
+    type: EditorTool.RADIO,
+    title: '单选框',
+    group: ToolBoxGroup.BASIC,
+    icon: 'radio',
+    itemType: 'Radio',
+    iconComponent: CreateOutline,
+  },
+  {
+    type: EditorTool.BUTTON,
+    title: '按钮',
+    group: ToolBoxGroup.BASIC,
+    icon: 'radio_button_checked',
+    itemType: 'Button',
+    iconComponent: RadioButtonOnOutline,
   },
   {
     type: EditorTool.LINE,
@@ -247,6 +277,11 @@ export interface LineItem extends Item {
   style: ConnectionStyle;
 }
 
+// export interface TestItem extends Item {
+//   thick: number;
+//   style: ConnectionStyle;
+// }
+
 export interface ImageItem extends Item {
   url: string;
   fit: 'contain' | 'cover' | 'fill' | 'none';
@@ -276,4 +311,28 @@ export interface WidgetDefinition {
   componentOptions?: any; // The default Vue component options used to instantiate this widget
 
   canBeResized?: boolean; // Is the widget resizable? Default: true
+}
+
+export interface InputItem extends Item {
+  inputType: 'text' | 'password' | 'textarea';
+  placeholder: string;
+  disabled: boolean;
+  round: boolean;
+  status: 'success' | 'warning' | 'error' | undefined;
+  value: string;
+}
+
+export interface ButtonItem extends Item {
+  value: string;
+  disabled: boolean;
+  bordered: boolean;
+  circle: boolean;
+  type: 'default' | 'tertiary' | 'primary' | 'success' | 'info' | 'warning' | 'error';
+  color: string | undefined;
+}
+
+export interface RadioItem extends Item {
+  checked: boolean;
+  disabled: boolean;
+  value: string;
 }
