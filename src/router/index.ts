@@ -21,7 +21,12 @@ const routes: RouteRecordRaw[] = [
         name: 'ProjectTrash',
         component: () => import('../views/project/ProjectTrash.vue'),
       },
-    ]
+    ],
+  },
+  {
+    path: '/project/prototype',
+    name: 'prototype',
+    component: () => import('../views/prototype/WorkSpace.vue'),
   },
   {
     path: '/team',
@@ -75,9 +80,23 @@ const routes: RouteRecordRaw[] = [
     component: () => import('../views/workspace/WorkspaceOverview.vue'),
     children: [
       {
+        path: '',
+        redirect: '/workspace/doc',
+      },
+      {
         path: 'doc',
-        name: 'Doc',
-        component: () => import('../components/workspace/Doc.vue'),
+        name: 'DocumentList',
+        component: () => import('../views/workspace/DocumentList.vue'),
+      },
+      {
+        path: 'uml',
+        name: 'UMLList',
+        component: () => import('../views/workspace/UMLList.vue'),
+      },
+      {
+        path: 'prototype',
+        name: 'PrototypeList',
+        component: () => import('../views/workspace/PrototypeList.vue'),
       },
     ],
   },

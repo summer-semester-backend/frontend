@@ -13,10 +13,11 @@
                 }"
                 footer-style="padding: 0.5vw 0;"
                 hoverable
+                @click="jumpToProj(item.fileID)"
               >
                 <template #cover>
                   <n-image
-                    style="border-radius: 8px 8px 0 0"
+                    style="border-radius: 8px 8px 0 0; height: 6vw"
                     :src="item?.fileImage"
                     object-fit="cover"
                     preview-disabled
@@ -44,11 +45,15 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { readFile, recentProjectList } from '@/api/file';
+import { useRouter } from 'vue-router';
+import { useProjStore } from '@/store/proj';
+const router = useRouter();
+const { setProjID } = useProjStore();
 const projects = ref([
   {
     fileID: 1,
     fileName: 'project',
-    fileImage: '/resource/image/project1.jpeg',
+    fileImage: '',
     createTime: '2020-01-01',
     lastVisitTime: '2020-01-01',
   },
@@ -81,6 +86,15 @@ const getProjectList = () => {
       console.log(err);
     });
 };
+
+//跳转到指定项目
+const jumpToProj = (fileID: number) => {
+  setProjID(fileID);
+  router.push({
+    path: '/workspace',
+  });
+};
+
 onMounted(() => {
   getProjectList();
 });
@@ -97,7 +111,7 @@ onMounted(() => {
   #recent-box {
     margin-top: 20px;
     .n-card {
-      height: 10vw;
+      height: 8vw;
       border-radius: 10px;
       border: 2px solid rgba(0, 0, 0, 0.3);
       overflow: hidden;

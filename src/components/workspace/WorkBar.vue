@@ -51,6 +51,8 @@
 import { KeyboardArrowLeftOutlined } from '@vicons/material';
 import { CaretDown, InformationCircleOutline } from '@vicons/ionicons5';
 import { ref, h } from 'vue';
+import { useRouter } from 'vue-router';
+const router = useRouter();
 
 const tabValue = ref('doc');
 
@@ -61,6 +63,7 @@ const renderRecycleBin = () => h('div', { style: 'font-size:14px;' }, '回收站
 
 const handleUpdateTab = (value: string) => {
   tabValue.value = value;
+  router.push(`/workspace/${value}`);
 };
 </script>
 

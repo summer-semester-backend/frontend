@@ -32,7 +32,7 @@
                     }"
                     footer-style="padding: 0.5vw 0;"
                     hoverable
-                    @click="isCreateModalShow = true"
+                    @click="jumpToProj(item.fileID)"
                   >
                     <template #cover>
                       <div v-if="isManage" style="position: absolute; top: 5px; right: 5px">
@@ -46,7 +46,7 @@
                         </n-space>
                       </div>
                       <n-image
-                        style="border-radius: 8px 8px 0 0"
+                        style="border-radius: 8px 8px 0 0; height: 8vw"
                         :src="item.fileImage"
                         object-fit="cover"
                         preview-disabled
@@ -120,6 +120,8 @@ import { ref, computed, reactive, defineProps, onMounted, h } from 'vue';
 import { Add, Search, EllipsisHorizontal, TrashOutline, ArchiveOutline, CreateOutline } from '@vicons/ionicons5';
 import { deleteFile, editFile, readFile } from '@/api/file';
 import { NIcon, NInput } from 'naive-ui';
+import { useRouter } from 'vue-router';
+import { useProjStore } from '@/store/proj';
 interface Project {
   fileID: number;
   fileName: string;
@@ -157,6 +159,8 @@ const page = ref(1); //当前页
 const isManage = ref(false); //是否进入删除状态
 const input = ref(''); //搜索关键字
 const newFileName = ref(''); //新命名项目名称
+const router = useRouter();
+const { setProjID } = useProjStore();
 const currentProject = ref({
   fileName: '项目名称',
   teamName: '团队名称',
@@ -322,6 +326,14 @@ const dataFilter = computed(() => {
 //将"yyyy-mm-dd"格式的字符串转换为日期对象
 const formatDate = (date: string) => {
   return new Date(Date.parse(date.replace(/-/g, '/')));
+};
+
+//跳转到指定项目
+const jumpToProj = (fileID: number) => {
+  setProjID(fileID);
+  router.push({
+    path: '/workspace',
+  });
 };
 
 onMounted(() => {

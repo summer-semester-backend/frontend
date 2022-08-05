@@ -5,7 +5,7 @@
     "dev": "cross-env VITE_ENV_TYPE=dev vite",
     "dev:test": "cross-env VITE_ENV_TYPE=test vite",
     "dev:prod": "cross-env VITE_ENV_TYPE=prod vite",
-    "build": "npm run typecheck && cross-env VITE_ENV_TYPE=prod vite build",
+    "build": "cross-env VITE_ENV_TYPE=prod vite build",
     "build:dev": "npm run typecheck && cross-env VITE_ENV_TYPE=dev vite build",
     "build:test": "npm run typecheck && cross-env VITE_ENV_TYPE=test vite build",
     "build:vercel": "cross-env VITE_HASH_ROUTE=true vite build",
@@ -81,10 +81,15 @@
     "vditor": "^3.8.15",
     "vue": "^3.2.31",
     "vue-router": "^4.0.14",
-    "vue3-draggable-resizable": "^1.6.4"
+    "vue3-draggable-resizable": "^1.6.4",
+    "vue3-guides": "^0.1.1",
+    "vue3-infinite-viewer": "^0.4.2",
+    "vue3-moveable": "^0.8.0"
   },
   "devDependencies": {
     "@types/events": "^3.0.0",
+    "@types/dom-to-image": "^2.6.4",
+    "@types/file-saver": "^2.0.5",
     "@types/node": "^17.0.21",
     "@types/qs": "^6.9.7",
     "@typescript-eslint/eslint-plugin": "^5.14.0",
