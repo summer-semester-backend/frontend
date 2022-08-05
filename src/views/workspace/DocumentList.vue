@@ -55,7 +55,7 @@ const columns = ref([
     key: 'actions',
     render(row: any) {
       return h(NSpace, [
-        /*h(
+        h(
           NButton,
           {
             type: 'error',
@@ -80,7 +80,7 @@ const columns = ref([
             default: '删除',
             icon: h(NIcon, { component: Trash }),
           }
-        ),*/
+        ),
         h(
           NButton,
           {

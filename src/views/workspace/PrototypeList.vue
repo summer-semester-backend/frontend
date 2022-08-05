@@ -1,7 +1,7 @@
 <template>
-  <ToolBar title="文档">
+  <ToolBar title="原型">
     <template #toolbar>
-      <n-button text>
+      <n-button text @click="handleProto">
         <n-icon size="26" class="icon">
           <AddCircleOutline />
         </n-icon>
@@ -16,7 +16,7 @@ import { NButton, NIcon, NSpace } from 'naive-ui';
 import { h, ref, computed, onMounted } from 'vue';
 import { AddCircleOutline, Trash, ArrowRedo } from '@vicons/ionicons5';
 import { readFile } from '@/api/file';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { ToolBar } from './components';
 import { useProjStore } from '@/store/proj';
 interface File {
@@ -25,13 +25,16 @@ interface File {
   userName: string;
   lastEditTime: string;
 }
-const route = useRoute();
+const router = useRouter();
 const { getProjID } = useProjStore();
 const projID = ref<number | null>(null);
 const pagination = ref({
   current: 1,
   pageSize: 10,
 });
+const handleProto = () => {
+  router.push({ name: 'prototype' });
+};
 const columns = ref([
   {
     title: '项目名称',
@@ -99,7 +102,7 @@ const getFileList = (id: number | null) => {
   }).then((res) => {
     console.log(res.data);
     files.value = [];
-    res.data.sonList.forEach((item) => {
+    res.data.sonList.forEach((item: any) => {
       if (item.fileType === 13) {
         files.value.push({
           fileID: item.fileID,
