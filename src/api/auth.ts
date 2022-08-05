@@ -21,5 +21,5 @@ export function forgetPassword(data: { email: string; password: string; code: st
 }
 
 export function changePassword(data: { password: string; newPassword: string }) {
-  return backend.put('auth/changePassword', data);
+  return backend.post('auth/changePassword', data);
 }
