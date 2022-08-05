@@ -10,39 +10,27 @@
   >
     <n-divider style="margin: 15px auto" />
     <n-space>
-      <n-select v-model:value="userIdentity" :options="identityOptions" style="width: 100px"> </n-select>
-      <n-input v-model:value="userEmail" type="text" placeholder="请输入添加的成员邮箱" style="width: 275px" />
+      <n-input v-model:value="userEmail" type="text" placeholder="请输入添加的成员邮箱" style="width: 375px" />
     </n-space>
   </n-modal>
 </template>
 
 <script setup lang="ts">
-import { NModal, NDivider, NSelect, NInput, NSpace } from 'naive-ui';
+import { inviteTeamMember } from '@/api/team';
+
 import { ref } from 'vue';
 import { useRoute } from 'vue-router';
 
 const route = useRoute();
 const userEmail = ref('');
-const userIdentity = ref('组员');
 const show = ref(false);
 
-const identityOptions = [
-  {
-    label: '组员',
-    value: '组员',
-  },
-  {
-    label: '管理员',
-    value: '管理员',
-  },
-];
-
 function handlePositiveClick() {
-  // createInvitation({
-  //   email: userEmail.value,
-  //   isAdmin: userIdentity.value === '管理员',
-  //   teamID: route.params.id as string,
-  // });
+  inviteTeamMember({ teamID: route.params.teamID as string, email: userEmail.value }).then((res) => {
+    if (res.data.result == 0) {
+      window.$message.info('邀请成功');
+    }
+  });
 }
 function open() {
   show.value = true;

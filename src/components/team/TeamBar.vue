@@ -15,9 +15,9 @@
           <AddCircleOutlineFilled />
         </n-icon>
       </n-button>
-      <n-icon size="30" class="icon">
+      <!-- <n-icon size="30" class="icon">
         <MenuOpenRound />
-      </n-icon>
+      </n-icon> -->
     </div>
 
     <n-space vertical>

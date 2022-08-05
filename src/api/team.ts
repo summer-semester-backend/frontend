@@ -29,7 +29,7 @@ export function updateTeamDetail(data: { teamID: string; teamname: string; summa
   return backend.post('team/change', data);
 }
 
-export function inviteTeamMember(data: { teamID: string; userID: number; email: string }) {
+export function inviteTeamMember(data: { teamID: string; email: string }) {
   return backend.post('team/user/invite', data);
 }
 

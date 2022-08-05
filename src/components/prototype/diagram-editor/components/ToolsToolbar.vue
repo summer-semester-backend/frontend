@@ -17,9 +17,9 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from '@vue/reactivity';
+import { computed } from 'vue';
 import { onMounted, onUpdated } from 'vue';
-import { EditorTool, toolDefinitions } from '../types';
+import { EditorTool, ToolBoxGroup, toolDefinitions } from '../types';
 
 interface Tool {
   type: EditorTool | 'separator';
@@ -46,7 +46,9 @@ onMounted(() => console.log('Toolbar mounted', selectedTool));
 onUpdated(() => console.log('Toolbar updated', selectedTool));
 
 const toolList = computed(() => {
-  return customWidgets ? toolDefinitions : toolDefinitions.filter((t) => t.type !== EditorTool.WIDGET);
+  return customWidgets
+    ? toolDefinitions.filter((t) => t.group == ToolBoxGroup.TOOL)
+    : toolDefinitions.filter((t) => t.type !== EditorTool.WIDGET);
 });
 
 function onToolSelected(toolType: EditorTool, currentSelectedTool: EditorTool) {
