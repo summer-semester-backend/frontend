@@ -34,7 +34,7 @@ const routes: RouteRecordRaw[] = [
         component: () => import('../views/team/TeamOverview.vue'),
         children: [
           {
-            path: 'teamDetail',
+            path: '',
             name: 'teamDetail',
             component: () => import('../views/team/TeamDetail.vue'),
           },

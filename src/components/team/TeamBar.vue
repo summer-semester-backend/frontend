@@ -150,7 +150,7 @@ watch(//value变化改变路由
     {
       router.push("/team/" + value.value + "/project");
     }
-    else
+    else if(router.currentRoute.value.name == 'teamDetail')
     {
       router.push("/team/" + value.value);
     }
