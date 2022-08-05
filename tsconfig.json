@@ -19,6 +19,8 @@
 			"~/*": ["./*"]
 		},
 		"types": ["node","naive-ui/volar"],
-    "allowJs": true
+    "allowJs": true,
+    "preserveValueImports": false,
+    "importsNotUsedAsValues": "remove"
 	}
 }
