@@ -12,7 +12,14 @@
   >
     <n-divider style="margin: 15px auto" />
     <n-input v-model:value="newTeamName" type="text" placeholder="请输入团队名称"> </n-input>
-    <n-input v-model:value="newTeamProfile" type="textarea" placeholder="请输入团队简介" style="margin-top: 15px">
+    <n-input
+      v-model:value="newTeamProfile"
+      type="textarea"
+      placeholder="请输入团队简介"
+      maxlength="200"
+      show-count
+      style="margin-top: 15px"
+    >
     </n-input>
   </n-modal>
 </template>

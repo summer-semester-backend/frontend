@@ -9,7 +9,13 @@
         </n-grid-item>
         <n-grid-item span="24">
           <n-form-item label="团队简介" path="summary">
-            <n-input type="textarea" placeholder="请输入团队简介" v-model:value="data.summary" />
+            <n-input
+              type="textarea"
+              placeholder="请输入团队简介"
+              v-model:value="data.summary"
+              maxlength="200"
+              show-count
+            />
           </n-form-item>
         </n-grid-item>
       </n-grid>

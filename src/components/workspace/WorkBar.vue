@@ -2,13 +2,12 @@
   <div id="workBar">
     <div id="barBox">
       <div id="leftOptions">
-        <n-icon style="z-index: 2" size="25" @click="$router.back()">
+        <n-icon style="z-index: 2" size="25" @click="$router.push({ path: '/project/desktop' })">
           <KeyboardArrowLeftOutlined />
         </n-icon>
         <n-image
           object-fit="cover"
-          width="50"
-          style="border-radius: 10px"
+          style="border-radius: 10px; width: 50px; height: 50px"
           :src="currentProject.projImage"
           preview-disabled
         />
@@ -58,8 +57,8 @@ import { useProjStore } from '@/store/proj';
 const router = useRouter();
 const { getProjID } = useProjStore();
 const currentProject = ref({
-  projName: '项目名称',
-  projImage: 'https://07akioni.oss-cn-beijing.aliyuncs.com/07akioni.jpeg',
+  projName: '',
+  projImage: '',
 });
 
 const tabValue = ref('doc');
