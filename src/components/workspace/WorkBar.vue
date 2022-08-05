@@ -2,19 +2,20 @@
   <div id="workBar">
     <div id="barBox">
       <div id="leftOptions">
-        <n-icon size="25">
+        <n-icon style="z-index: 2" size="25" @click="$router.back()">
           <KeyboardArrowLeftOutlined />
         </n-icon>
         <n-image
+          object-fit="cover"
           width="50"
           style="border-radius: 10px"
-          src="https://07akioni.oss-cn-beijing.aliyuncs.com/07akioni.jpeg"
+          :src="currentProject.projImage"
           preview-disabled
         />
         <div id="mainArea">
           <div class="topData">
             <div class="topTest">
-              敏捷开发
+              {{ currentProject.projName }}
               <n-icon size="16">
                 <CaretDown />
               </n-icon>
@@ -50,9 +51,16 @@
 <script setup lang="ts">
 import { KeyboardArrowLeftOutlined } from '@vicons/material';
 import { CaretDown, InformationCircleOutline } from '@vicons/ionicons5';
-import { ref, h } from 'vue';
+import { ref, h, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
+import { readFile } from '@/api/file';
+import { useProjStore } from '@/store/proj';
 const router = useRouter();
+const { getProjID } = useProjStore();
+const currentProject = ref({
+  projName: '项目名称',
+  projImage: 'https://07akioni.oss-cn-beijing.aliyuncs.com/07akioni.jpeg',
+});
 
 const tabValue = ref('doc');
 
@@ -61,13 +69,25 @@ const renderPrototype = () => h('div', { style: 'font-size:14px;' }, '原型');
 const renderUml = () => h('div', { style: 'font-size:14px;' }, 'UML图');
 const renderRecycleBin = () => h('div', { style: 'font-size:14px;' }, '回收站');
 
+const getProjInfo = () => {
+  readFile({ fileID: getProjID(), teamID: -1 }).then((res) => {
+    if (res.data.result == 0) {
+      currentProject.value.projImage = res.data.fileImage;
+      currentProject.value.projName = res.data.fileName;
+    }
+  });
+};
+
 const handleUpdateTab = (value: string) => {
   tabValue.value = value;
   router.push(`/workspace/${value}`);
 };
+onMounted(() => {
+  getProjInfo();
+});
 </script>
 
-<style scoped>
+<style scoped lang="less">
 #barBox {
   display: flex;
   flex-direction: row;
@@ -84,6 +104,9 @@ const handleUpdateTab = (value: string) => {
   flex-direction: row;
   align-items: center;
   gap: 10px;
+  .n-icon:hover {
+    cursor: pointer;
+  }
 }
 
 #mainArea {
