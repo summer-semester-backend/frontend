@@ -1,6 +1,6 @@
 <template>
   <n-modal
-    v-model:show="show"
+    :show="isCreateModalShow"
     preset="dialog"
     title="新建团队"
     size="medium"
@@ -12,7 +12,14 @@
   >
     <n-divider style="margin: 15px auto" />
     <n-input v-model:value="newTeamName" type="text" placeholder="请输入团队名称"> </n-input>
-    <n-input v-model:value="newTeamProfile" type="textarea" placeholder="请输入团队简介" style="margin-top: 15px">
+    <n-input
+      v-model:value="newTeamProfile"
+      type="textarea"
+      placeholder="请输入团队简介"
+      maxlength="200"
+      show-count
+      style="margin-top: 15px"
+    >
     </n-input>
   </n-modal>
 </template>
@@ -21,8 +28,8 @@
 import { ref } from 'vue';
 import { createTeam } from '@/api/team.js';
 
-const emits = defineEmits(['update:team-created', 'close']);
-const props = withDefaults(defineProps<{ show: boolean }>(), { show: false });
+const emits = defineEmits(['close', 'refresh']);
+const props = withDefaults(defineProps<{ isCreateModalShow: boolean }>(), { isCreateModalShow: false });
 const newTeamName = ref('');
 const newTeamProfile = ref('');
 
@@ -38,11 +45,20 @@ function handlePositiveClick() {
   createTeam({
     teamname: newTeamName.value,
     summary: newTeamProfile.value,
-  }).then((res) => {
-    if (res.data.success) {
-      emits('update:team-created');
-    }
-  });
+  })
+    .then((res) => {
+      if (res.data.result == 0) {
+        emits('refresh');
+        emits('close');
+        window.$message.success('创建成功');
+      } else {
+        window.$message.error(res.data.message);
+      }
+    })
+    .finally(() => {
+      newTeamName.value = '';
+      newTeamProfile.value = '';
+    });
 }
 
 function handleClose() {

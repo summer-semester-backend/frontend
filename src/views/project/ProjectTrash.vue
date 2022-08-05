@@ -60,6 +60,7 @@ const columns = ref([
     title: '删除时间',
     key: 'abandonTime',
     sorter: (row1: Project, row2: Project) => (row1.abandonTime > row2.abandonTime ? 1 : -1),
+    render: (row: Project) => h('span', row.abandonTime.slice(0, 10)),
   },
   {
     title: '操作',
@@ -122,14 +123,7 @@ const columns = ref([
     },
   },
 ]);
-const trashs = ref([
-  {
-    fileID: 1,
-    fileName: '项目名称',
-    teamName: '所属团队',
-    abandonTime: '1970-1-1',
-  },
-]);
+const trashs = ref<Project[]>([]);
 const pagination = ref({
   current: 1,
   pageSize: 10,
@@ -186,5 +180,4 @@ const dataFilter = computed(() => {
   padding: 40px 60px;
   position: relative;
 }
-
 </style>

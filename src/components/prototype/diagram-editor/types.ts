@@ -204,7 +204,7 @@ export const toolDefinitions: ToolDefinition[] = [
     group: ToolBoxGroup.BASIC,
     icon: 'radio',
     itemType: 'Radio',
-    iconComponent: CreateOutline,
+    iconComponent: RadioButtonOnOutline,
   },
   {
     type: EditorTool.BUTTON,
