@@ -75,9 +75,23 @@ const routes: RouteRecordRaw[] = [
     component: () => import('../views/workspace/WorkspaceOverview.vue'),
     children: [
       {
+        path: '',
+        redirect: '/workspace/doc',
+      },
+      {
         path: 'doc',
         name: 'DocumentList',
         component: () => import('../views/workspace/DocumentList.vue'),
+      },
+      {
+        path: 'uml',
+        name: 'UMLList',
+        component: () => import('../views/workspace/UMLList.vue'),
+      },
+      {
+        path: 'prototype',
+        name: 'PrototypeList',
+        component: () => import('../views/workspace/PrototypeList.vue'),
       },
     ],
   },
