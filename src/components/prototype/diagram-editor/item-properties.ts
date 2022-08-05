@@ -567,5 +567,47 @@ export const iconModel: ObjectInspectorModel = {
 };
 
 export const inputModel: ObjectInspectorModel = {
-  tabs: [],
+  tabs: [
+    {
+      title: '样式',
+      sections: [
+        {
+          name: 'properties',
+          title: '属性',
+          properties: [
+            { name: 'disabled', label: '禁用', type: PropertyType.BOOLEAN, editorFullsize: true },
+            { name: 'round', label: '圆角', type: PropertyType.BOOLEAN, editorFullsize: true },
+            { name: 'value', label: '文字', type: PropertyType.TEXT, editorFullsize: true },
+            { name: 'placeholder', label: '预留文字', type: PropertyType.TEXT, editorFullsize: true },
+            {
+              name: 'inputType',
+              label: '输入类型',
+              type: PropertyType.ICON_LIST,
+              editorFullsize: true,
+              editorOptions: {
+                items: [
+                  { name: 'text', text: 'text' },
+                  { name: 'password', text: 'password' },
+                  { name: 'textarea', text: 'textarea' },
+                ],
+              },
+            },
+            {
+              name: 'status',
+              label: '状态',
+              type: PropertyType.ICON_LIST,
+              editorFullsize: true,
+              editorOptions: {
+                items: [
+                  { name: 'success', text: 'success' },
+                  { name: 'warning', text: 'warning' },
+                  { name: 'error', text: 'error' },
+                ],
+              },
+            },
+          ],
+        },
+      ],
+    },
+  ],
 };
