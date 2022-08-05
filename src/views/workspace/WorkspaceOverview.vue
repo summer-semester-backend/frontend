@@ -1,7 +1,9 @@
 <template>
   <div id="workspace">
     <WorkBar id="workBar"></WorkBar>
-    <router-view></router-view>
+    <div style="margin: 20px 60px">
+      <router-view></router-view>
+    </div>
   </div>
 </template>
 

@@ -12,6 +12,7 @@ import Triangle from './diagram-editor/blocks/Triangle.vue';
 import Input from './diagram-editor/blocks/Input.vue';
 import Radio from './diagram-editor/blocks/Radio.vue';
 
+import Button from './diagram-editor/blocks/Button.vue';
 export function setupPrototypeComponents(app: App) {
   app.component('Text', Text);
   app.component('Line', Line);
@@ -23,5 +24,7 @@ export function setupPrototypeComponents(app: App) {
   app.component('Icon', Icon);
   app.component('Input', Input);
   app.component('Radio', Radio);
+  app.component('Button', Button);
+
   app.component('Connection', Connection);
 }

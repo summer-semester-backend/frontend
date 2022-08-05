@@ -2,11 +2,12 @@
   <div class="barBox">
     <div class="head">
       <n-select
-        v-model:value="value"
+        v-model:value="teamID"
         :options="options"
         label-field="teamName"
         value-field="teamID"
         style="width: 130px; font-weight: bold"
+        @update:value="handleUpdate"
       />
       <!-- <div class="titleBox">软工小学期</div> -->
       <n-button text @click="isCreateModalShow = true">
@@ -49,12 +50,16 @@
             </n-layout> -->
       </n-layout>
     </n-space>
-    <TeamAdd :show="isCreateModalShow" @update:team-created="handleUpdateTeamCreated" />
+    <TeamAdd
+      :show="isCreateModalShow"
+      @update:team-created="handleUpdateTeamCreated"
+      @close="isCreateModalShow = false"
+    />
   </div>
 </template>
 
 <script setup>
-import { defineComponent, h, ref, computed, onMounted ,watch} from 'vue';
+import { defineComponent, h, ref, computed, onMounted, watch } from 'vue';
 import { MenuOpenRound, AddCircleOutlineFilled } from '@vicons/material';
 import { useRouter, RouterLink } from 'vue-router';
 import { getTeamList } from '@/api/team';
@@ -70,7 +75,7 @@ const activeKey = ref(router.currentRoute.value.name);
 const collapsed = ref(false);
 const isCreateModalShow = ref(false);
 
-const value = ref(null);
+const teamID = ref(null);
 const options = ref([
   {
     teamName: '软工小学期',
@@ -84,7 +89,7 @@ const menuOptions = [
       h(
         RouterLink,
         {
-          to:"/team/" + value.value + "/project"
+          to: '/team/' + localStorage.getItem('teamID') + '/project',
         },
         { default: () => '团队项目' }
       ),
@@ -96,11 +101,11 @@ const menuOptions = [
       h(
         RouterLink,
         {
-          to:"/team/" + value.value
+          to: '/team/' + localStorage.getItem('teamID'),
         },
         { default: () => '团队设置' }
       ),
-    key: "teamDetail",
+    key: 'teamDetail',
     icon: renderIcon(SettingOutlined),
   },
 ];
@@ -110,9 +115,17 @@ const getTeams = () => {
     .then((res) => {
       if (res.data.result == 0) {
         options.value = res.data.list;
-        value.value = res.data.list[0].teamID;
-        console.log(value.value);
-        
+        console.log(options.value);
+        if (!localStorage.getItem('teamID')) {
+          teamID.value = res.data.list[0].teamID;
+          localStorage.setItem('teamID', res.data.list[0].teamID);
+          router.push('/team/' + teamID.value + '/project');
+          activeKey.value = 'teamProject';
+        } else {
+          teamID.value = parseInt(localStorage.getItem('teamID'));
+          router.push('/team/' + teamID.value + '/project');
+          activeKey.value = 'teamProject';
+        }
       } else {
         window.$message.error(res.data.message);
       }
@@ -120,42 +133,19 @@ const getTeams = () => {
     .catch(() => {
       console.log('error');
     });
-
 };
 
-const handleUpdateTeamCreated = () => {
-  getTeams();
-  isCreateModalShow.value = false;
+const handleUpdate = (value) => {
+  localStorage.setItem('teamID', value);
+  if (router.currentRoute.value.name == 'teamProject') {
+    window.open('/team/' + value + '/project', '_self');
+  } else {
+    window.open('/team/' + value, '_self');
+  }
 };
-
 onMounted(() => {
   getTeams();
 });
-
-watch(//路由变化改变value
-  ()=>router.currentRoute.value.name,
-  (newValue, oldValue) => {
-    if(newValue == 'team')
-    {
-      router.push("/team/" + value.value + "/project");
-    }
-    activeKey.value = newValue;
-  },{ immediate: true }
-)
-
-watch(//value变化改变路由
-  ()=>value.value,
-  (newValue, oldValue) => {
-    if(router.currentRoute.value.name == 'teamProject')
-    {
-      router.push("/team/" + value.value + "/project");
-    }
-    else
-    {
-      router.push("/team/" + value.value);
-    }
-  },{ immediate: true }
-)
 </script>
 
 <style lang="less" scoped>

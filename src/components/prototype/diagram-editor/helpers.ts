@@ -8,6 +8,7 @@ import {
   textModel,
   inputModel,
   radioModel,
+  buttonModel,
 } from './item-properties';
 import {
   ClipType,
@@ -142,7 +143,7 @@ export function createConnection(fromID: string, toID: string, c?: DeepPartial<I
     style: c?.style || ConnectionStyle.SOLID,
     thick: c?.thick || 1,
 
-    backgroundColor: c?.backgroundColor || '#333',
+    backgroundColor: c?.backgroundColor || '#18181c',
   } as ItemConnection;
 }
 
@@ -396,6 +397,24 @@ export function registerDefaultItemTypes() {
       h: 30,
     },
     radioModel
+  );
+  // ----------------------------------------------------------------------
+  type = 'Button';
+  registerItemType(
+    {
+      ...defaults,
+
+      component: type,
+      title: 'button',
+      supportsRoundable: true,
+      value: '按钮',
+      disabled: false,
+      bordered: true,
+      circle: false,
+      type: 'default',
+      color: undefined,
+    },
+    buttonModel
   );
 } // func
 

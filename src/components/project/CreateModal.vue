@@ -13,7 +13,7 @@
             label-field="teamName"
             :options="teams"
             placeholder="请选择"
-            :disabled="!isTeamList"
+            :disabled="isTeamList"
           />
         </n-form-item>
         <n-form-item label="上传封面&nbsp;&nbsp;">
@@ -46,15 +46,15 @@
   </n-modal>
 </template>
 <script setup lang="ts">
-import { ref, computed, reactive, defineProps, onMounted } from 'vue';
+import { ref, computed, reactive, defineProps, onMounted, watch } from 'vue';
 import type { FormInst, FormRules, FormItemRule, UploadFileInfo } from 'naive-ui';
 import { createFile } from '@/api/file';
 import { teamList } from '@/api/team';
 //传参
-const { teamId = null, isCreateModalShow = false } = defineProps<{
-  teamId?: number | null;
-  isCreateModalShow?: boolean;
-}>();
+const props = withDefaults(defineProps<{ teamId?: number | null; isCreateModalShow?: boolean }>(), {
+  teamId: null,
+  isCreateModalShow: false,
+});
 //传递事件
 const emits = defineEmits(['close', 'refresh']);
 
@@ -167,11 +167,21 @@ const getTeamList = () => {
 };
 
 onMounted(() => {
-  if (teamId != null) {
-    projModel.value.teamID = teamId;
+  getTeamList();
+  if (props.teamId != null) {
+    projModel.value.teamID = props.teamId;
     isTeamList.value = true;
-  } else {
-    getTeamList();
+  }
+});
+
+const fatherTeamID = computed(() => {
+  return props.teamId;
+});
+
+watch(fatherTeamID, (val) => {
+  if (val != null) {
+    projModel.value.teamID = props.teamId;
+    isTeamList.value = true;
   }
 });
 </script>

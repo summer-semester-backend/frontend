@@ -139,6 +139,7 @@ export enum EditorTool {
   // Custom
   INPUT = 'input',
   RADIO = 'radio',
+  BUTTON = 'button',
 }
 
 export enum ToolBoxGroup {
@@ -167,6 +168,7 @@ import {
   TriangleOutline,
   StarOutline,
   CreateOutline,
+  RadioButtonOnOutline,
 } from '@vicons/ionicons5';
 
 export const toolDefinitions: ToolDefinition[] = [
@@ -203,6 +205,14 @@ export const toolDefinitions: ToolDefinition[] = [
     icon: 'radio',
     itemType: 'Radio',
     iconComponent: CreateOutline,
+  },
+  {
+    type: EditorTool.BUTTON,
+    title: '按钮',
+    group: ToolBoxGroup.BASIC,
+    icon: 'radio_button_checked',
+    itemType: 'Button',
+    iconComponent: RadioButtonOnOutline,
   },
   {
     type: EditorTool.LINE,
@@ -310,6 +320,15 @@ export interface InputItem extends Item {
   round: boolean;
   status: 'success' | 'warning' | 'error' | undefined;
   value: string;
+}
+
+export interface ButtonItem extends Item {
+  value: string;
+  disabled: boolean;
+  bordered: boolean;
+  circle: boolean;
+  type: 'default' | 'tertiary' | 'primary' | 'success' | 'info' | 'warning' | 'error';
+  color: string | undefined;
 }
 
 export interface RadioItem extends Item {

@@ -6,6 +6,7 @@ declare module 'vue' {
   export interface GlobalComponents {
     AmEditor: typeof import('./src/components/editor/AmEditor.vue')['default']
     BooleanEditor: typeof import('./src/components/prototype/inspector/property-editors/BooleanEditor.vue')['default']
+    Button: typeof import('./src/components/prototype/diagram-editor/blocks/Button.vue')['default']
     ColorEditor: typeof import('./src/components/prototype/inspector/property-editors/ColorEditor.vue')['default']
     Connection: typeof import('./src/components/prototype/diagram-editor/blocks/Connection.vue')['default']
     CreateModal: typeof import('./src/components/project/CreateModal.vue')['default']
