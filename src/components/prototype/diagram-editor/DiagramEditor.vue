@@ -277,11 +277,11 @@
             </g>
           </svg>
         </button>
-        <button class="toolbar-item" @click="saveProto" title="Save">
-          <EditorIcon icon="content_paste" />
+        <button class="toolbar-item" @click="saveProto" title="SavePrototype">
+          <EditorIcon icon="save" />
         </button>
-        <button class="toolbar-item" @click="saveToImage" title="Save">
-          <EditorIcon icon="content_paste" />
+        <button class="toolbar-item" @click="saveToImage" title="SaveImage">
+          <EditorIcon icon="perm_media" />
         </button>
       </div>
       <div class="toolbar-separator"></div>
@@ -1136,7 +1136,7 @@ function onDragInspector(e: any): void {
 }
 
 function onDragStartToolBox(e: any): void {
-  if (!e.inputEvent.target?.className.includes('toolbox-title-drag-handle')) {
+  if (!e.inputEvent.target?.className?.includes('toolbox-title-drag-handle')) {
     e.stop();
     return;
   }

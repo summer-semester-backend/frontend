@@ -8,6 +8,8 @@ import Rectangle from './diagram-editor/blocks/Rectangle.vue';
 import Star from './diagram-editor/blocks/Star.vue';
 import Text from './diagram-editor/blocks/Text.vue';
 import Triangle from './diagram-editor/blocks/Triangle.vue';
+// Custom
+import Input from './diagram-editor/blocks/Input.vue';
 export function setupPrototypeComponents(app: App) {
   app.component('Text', Text);
   app.component('Line', Line);
@@ -17,6 +19,7 @@ export function setupPrototypeComponents(app: App) {
   app.component('Star', Star);
   app.component('Image', Image);
   app.component('Icon', Icon);
+  app.component('Input', Input);
 
   app.component('Connection', Connection);
 }

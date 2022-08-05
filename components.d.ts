@@ -21,6 +21,7 @@ declare module 'vue' {
     Icon: typeof import('./src/components/prototype/diagram-editor/blocks/Icon.vue')['default']
     IconListEditor: typeof import('./src/components/prototype/inspector/property-editors/IconListEditor.vue')['default']
     Image: typeof import('./src/components/prototype/diagram-editor/blocks/Image.vue')['default']
+    Input: typeof import('./src/components/prototype/diagram-editor/blocks/Input.vue')['default']
     KeyboardHelp: typeof import('./src/components/prototype/diagram-editor/components/KeyboardHelp.vue')['default']
     Line: typeof import('./src/components/prototype/diagram-editor/blocks/Line.vue')['default']
     Loading: typeof import('./src/components/editor/loading.vue')['default']
