@@ -82,7 +82,6 @@
           v-for="(item, i) in items"
           class="item"
           :key="item.id"
-          :id="item.id"
           :data-item-id="item.id"
           :class="{ target: item.id === selectedItem?.id, locked: item.locked === true }"
           :style="getItemStyle(item)"
@@ -423,7 +422,7 @@ import ClipCommand from './commands/ClipCommand';
 import DeleteCommand from './commands/DeleteCommand';
 import KeyboardHelp from './components/KeyboardHelp.vue';
 import { DefaultZoomManager, IZoomManager } from './ZoomManager';
-import domtoimage from 'dom-to-image';
+import * as htmlToImage from 'html-to-image';
 import FileSaver, { saveAs } from 'file-saver';
 export type Item = _Item & { hover?: boolean };
 
@@ -546,20 +545,16 @@ const handleToolBoxSelect = (selected: EditorTool) => {
 
 function saveToImage() {
   let dom = document.createElement('div');
-  let elems = Array.from(document.getElementsByClassName('item') as HTMLCollectionOf<Element>);
-  elems.forEach((elem) => {
-    var node = elem.cloneNode();
-    dom.appendChild(node);
+  // let elems = Array.from(document.getElementsByClassName('screenshot') as HTMLCollectionOf<Element>);
+  // elems.forEach((elem) => {
+  //   var node = elem.cloneNode();
+  //   dom.appendChild(node);
+  // });
+
+  var canvas = document.getElementsByClassName('viewport-area')[0] as HTMLElement;
+  htmlToImage.toPng(canvas).then((canvas) => {
+    FileSaver.saveAs(canvas, 'test.png');
   });
-  domtoimage
-    .toBlob(dom)
-    .then((blob) => {
-      console.log(blob);
-      FileSaver.saveAs(blob, 'test.png');
-    })
-    .catch((reason) => {
-      console.log(reason);
-    });
 }
 
 function onDragOver(e: any) {
