@@ -92,7 +92,7 @@ const rules = ref<FormRules>({
         if (!value || value == '') {
           return new Error('请输入项目名称');
         } else if (value.length > 50) {
-          return new Error('不超过50个字');
+          return new Error('不超过10个字');
         }
         return true;
       },
