@@ -68,6 +68,7 @@
     "axios": "^0.26.1",
     "dayjs": "^1.11.4",
     "dom-to-image": "^2.6.0",
+    "drawio-embed": "^1.0.2",
     "events": "^3.3.0",
     "file-saver": "^2.0.5",
     "form-data": "^4.0.0",
@@ -87,8 +88,8 @@
     "vue3-moveable": "^0.8.0"
   },
   "devDependencies": {
-    "@types/events": "^3.0.0",
     "@types/dom-to-image": "^2.6.4",
+    "@types/events": "^3.0.0",
     "@types/file-saver": "^2.0.5",
     "@types/node": "^17.0.21",
     "@types/qs": "^6.9.7",

@@ -1,5 +1,5 @@
 <template>
-  <ToolBar title="文档">
+  <ToolBar title="原型">
     <template #toolbar>
       <n-button text>
         <n-icon size="26" class="icon">
