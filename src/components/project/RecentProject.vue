@@ -4,7 +4,7 @@
     <div id="recent-box">
       <n-grid x-gap="30" :cols="6">
         <n-gi v-for="(item, index) in projects" :key="index">
-          <n-tooltip :delay="500" placement="bottom-start" @update:show="handleUpdateShow(item?.fileID)">
+          <n-tooltip :delay="500" placement="bottom-start">
             <template #trigger>
               <n-card
                 :segmented="{
@@ -17,7 +17,7 @@
               >
                 <template #cover>
                   <n-image
-                    style="border-radius: 8px 8px 0 0; height: 6vw"
+                    style="border-radius: 8px 8px 0 0; height: 7vw; width: 100%"
                     :src="item?.fileImage"
                     object-fit="cover"
                     preview-disabled
@@ -31,10 +31,10 @@
               </n-card>
             </template>
             <template #default style="color: white">
-              <div>项目名称：{{ currentProject.fileName }}</div>
-              <div>所属团队：{{ currentProject.teamName }}</div>
-              <div>创建者：{{ currentProject.userName }}</div>
-              <div>创建时间：{{ currentProject.createTime }}</div>
+              <div>项目名称：{{ item.fileName }}</div>
+              <div>所属团队：{{ item.teamName }}</div>
+              <div>创建者：{{ item.userName }}</div>
+              <div>创建时间：{{ item.createTime.slice(0, 10) }}</div>
             </template>
           </n-tooltip>
         </n-gi>
@@ -52,30 +52,14 @@ const { setProjID } = useProjStore();
 const projects = ref([
   {
     fileID: 1,
-    fileName: 'project',
-    fileImage: '',
-    createTime: '2020-01-01',
-    lastVisitTime: '2020-01-01',
+    fileName: '',
+    fileImage: '/resource/image/project.jpg',
+    createTime: '',
+    lastVisitTime: '',
+    teamName: '',
+    userName: '',
   },
 ]);
-const currentProject = ref({
-  fileName: '项目名称',
-  teamName: '团队名称',
-  userName: '创建者',
-  createTime: '1970-1-1',
-}); //当前项目信息
-
-//显示项目信息
-const handleUpdateShow = (fileID: number) => {
-  readFile({ fileID: fileID, teamID: -1 }).then((res) => {
-    if (res.data.result == 0) {
-      currentProject.value.fileName = res.data?.fileName;
-      currentProject.value.createTime = res.data?.createTime.slice(0, 10);
-      currentProject.value.teamName = res.data?.teamName;
-      currentProject.value.userName = res.data?.userName;
-    }
-  });
-};
 
 const getProjectList = () => {
   recentProjectList()

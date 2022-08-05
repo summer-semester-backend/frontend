@@ -23,12 +23,12 @@
         <div id="my-box">
           <n-grid :x-gap="48" :y-gap="24" :cols="5">
             <n-gi v-for="(item, index) in dataFilter.slice((page - 1) * pageSize, page * pageSize)" :key="index">
-              <n-tooltip :delay="500" placement="bottom-start" @update:show="handleUpdateShow(item.fileID)">
+              <n-tooltip :delay="500" placement="bottom-start">
                 <template #trigger>
                   <n-card
                     :segmented="{
                       content: true,
-                      footer: 'soft',
+                      footer: true,
                     }"
                     footer-style="padding: 0.5vw 0;"
                     hoverable
@@ -46,7 +46,7 @@
                         </n-space>
                       </div>
                       <n-image
-                        style="border-radius: 8px 8px 0 0; height: 8vw"
+                        style="border-radius: 8px 8px 0 0; height: 8vw; width: 100%"
                         :src="item.fileImage"
                         object-fit="cover"
                         preview-disabled
@@ -60,10 +60,10 @@
                   </n-card>
                 </template>
                 <template #default style="color: white">
-                  <div>项目名称：{{ currentProject.fileName }}</div>
-                  <div>所属团队：{{ currentProject.teamName }}</div>
-                  <div>创建者：{{ currentProject.userName }}</div>
-                  <div>创建时间：{{ currentProject.createTime }}</div>
+                  <div>项目名称：{{ item.fileName }}</div>
+                  <div>所属团队：{{ item.teamName }}</div>
+                  <div>创建者：{{ item.userName }}</div>
+                  <div>创建时间：{{ item.createTime.slice(0, 10) }}</div>
                 </template>
               </n-tooltip>
             </n-gi>
@@ -128,6 +128,8 @@ interface Project {
   fileImage: string;
   createTime: string;
   lastVisitTime: string;
+  teamName: string;
+  userName: string;
 }
 type Props = {
   projects: Project[];
@@ -138,10 +140,12 @@ const props = withDefaults(defineProps<Props>(), {
   projects: () => [
     {
       fileID: 2,
-      fileName: '敏捷开发',
-      fileImage: '/resource/image/project1.jpeg',
-      createTime: '2020-01-01',
-      lastVisitTime: '2020-01-01',
+      fileName: '',
+      fileImage: '/resource/image/project.jpg',
+      createTime: '',
+      lastVisitTime: '',
+      teamName: '',
+      userName: '',
     },
   ],
   teamId: null,
@@ -161,12 +165,6 @@ const input = ref(''); //搜索关键字
 const newFileName = ref(''); //新命名项目名称
 const router = useRouter();
 const { setProjID } = useProjStore();
-const currentProject = ref({
-  fileName: '项目名称',
-  teamName: '团队名称',
-  userName: '创建者',
-  createTime: '1970-1-1',
-}); //当前项目信息
 //操作列表
 const operates = ref([
   {
@@ -282,18 +280,6 @@ const handleEdit = (fileID: number) => {
       }
     },
     onNegativeClick: () => {},
-  });
-};
-
-//显示项目信息
-const handleUpdateShow = (fileID: number) => {
-  readFile({ fileID: fileID, teamID: -1 }).then((res) => {
-    if (res.data.result == 0) {
-      currentProject.value.fileName = res.data?.fileName;
-      currentProject.value.createTime = res.data?.createTime.slice(0, 10);
-      currentProject.value.teamName = res.data?.teamName;
-      currentProject.value.userName = res.data?.userName;
-    }
   });
 };
 

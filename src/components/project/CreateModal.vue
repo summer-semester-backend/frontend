@@ -13,7 +13,7 @@
             label-field="teamName"
             :options="teams"
             placeholder="请选择"
-            :disabled="isTeamList"
+            :disabled="teamId != null"
           />
         </n-form-item>
         <n-form-item label="上传封面&nbsp;&nbsp;">
@@ -72,7 +72,6 @@ const projModel = ref<{
   fatherID: -1,
 });
 const formRef = ref<FormInst>();
-const isTeamList = ref(false);
 //团队列表
 const teams = ref([
   {
@@ -92,7 +91,7 @@ const rules = ref<FormRules>({
       validator(rule: FormItemRule, value: string) {
         if (!value || value == '') {
           return new Error('请输入项目名称');
-        } else if (Number(value) > 50) {
+        } else if (value.length > 50) {
           return new Error('不超过50个字');
         }
         return true;
@@ -154,7 +153,6 @@ const getTeamList = () => {
     .then((res) => {
       if (res.data.result == 0) {
         teams.value = res.data.list;
-        isTeamList.value = false;
       } else if (res.data.result == 1) {
         window.$message.warning(res.data.message);
       } else if (res.data.result == 2) {
@@ -170,7 +168,6 @@ onMounted(() => {
   getTeamList();
   if (props.teamId != null) {
     projModel.value.teamID = props.teamId;
-    isTeamList.value = true;
   }
 });
 
@@ -181,7 +178,6 @@ const fatherTeamID = computed(() => {
 watch(fatherTeamID, (val) => {
   if (val != null) {
     projModel.value.teamID = props.teamId;
-    isTeamList.value = true;
   }
 });
 </script>

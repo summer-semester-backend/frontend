@@ -60,6 +60,7 @@ const columns = ref([
     title: '删除时间',
     key: 'abandonTime',
     sorter: (row1: Project, row2: Project) => (row1.abandonTime > row2.abandonTime ? 1 : -1),
+    render: (row: Project) => h('span', row.abandonTime.slice(0, 10)),
   },
   {
     title: '操作',
@@ -186,5 +187,4 @@ const dataFilter = computed(() => {
   padding: 40px 60px;
   position: relative;
 }
-
 </style>
