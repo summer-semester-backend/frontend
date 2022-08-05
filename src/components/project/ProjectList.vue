@@ -1,6 +1,6 @@
 <template>
   <div id="my-content">
-    <Header :title="title">
+    <Header :title="teamId == null ? '我的项目' : '团队项目'">
       <template #toolbar>
         <n-button v-if="!isInputShow" @click="showInput" quaternary circle>
           <template #icon>
@@ -116,7 +116,7 @@
   />
 </template>
 <script setup lang="ts">
-import { ref, computed, reactive, defineProps, onMounted, h } from 'vue';
+import { ref, computed, reactive, defineProps, onMounted, h, watch } from 'vue';
 import { Add, Search, EllipsisHorizontal, TrashOutline, ArchiveOutline, CreateOutline } from '@vicons/ionicons5';
 import { deleteFile, editFile, readFile } from '@/api/file';
 import { NIcon, NInput } from 'naive-ui';
@@ -335,12 +335,6 @@ const jumpToProj = (fileID: number) => {
     path: '/workspace',
   });
 };
-
-onMounted(() => {
-  if (props.teamId != null) {
-    title.value = '团队项目';
-  }
-});
 </script>
 <style scoped lang="less">
 #my-content {
