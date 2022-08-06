@@ -11,7 +11,7 @@
     <div class="pagebox-content">
       <n-config-provider :theme="darkTheme">
         <n-card v-if="expanded" :bordered="false" class="card">
-          <n-menu :options="pageOptions" class="w-full" @update-value="handleUpdateValue"></n-menu>
+          <n-menu :options="pageOptions" class="w-full" @update-value="handleUpdateValue" v-model:value="page"></n-menu>
           <n-button class="w-full" @click="emits('page-create', newPageName)">
             <template #icon>
               <n-icon><Add /></n-icon>
@@ -32,9 +32,10 @@ interface PageBoxEvents {
   (e: 'page-selected', pageItem: PageItem): void;
   (e: 'page-create', pageName: string): void;
 }
-const props = defineProps<{ pages: Array<PageItem> }>();
+const props = defineProps<{ pages: Array<PageItem>; selectedPage: string }>();
 const pageOptions = ref<Array<{ key: string; label: string }>>([]);
 const pagesMap = new Map<string, PageItem>();
+const page = ref('');
 const newPageName = computed(() => '页面' + (pageOptions.value.length + 1));
 const expanded = ref(true);
 const emits = defineEmits<PageBoxEvents>();
@@ -59,6 +60,13 @@ watch(
   {
     immediate: true,
     deep: true,
+  }
+);
+
+watch(
+  () => props.selectedPage,
+  (selectedPage: string) => {
+    page.value = selectedPage;
   }
 );
 </script>

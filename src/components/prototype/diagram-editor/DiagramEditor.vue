@@ -10,7 +10,12 @@
           </template>
           返回项目
         </n-button>
-        <PageBox :pages="pages" @page-create="addPage" @page-selected="handleSelectPage" />
+        <PageBox
+          @page-create="handleCreatePage"
+          @page-selected="handleSelectPage"
+          :pages="pages"
+          :selected-page="currentPage?.id as string"
+        />
         <ToolBox @tool-selected="handleToolBoxSelect" />
       </div>
     </div>
@@ -373,7 +378,7 @@
 <script setup lang="ts">
 import { ChevronBack } from '@vicons/ionicons5';
 import { onKeyStroke, useKeyModifier } from '@vueuse/core';
-import { computed, nextTick, onBeforeMount, onMounted, onUpdated, ref } from 'vue';
+import { computed, nextTick, onBeforeMount, onMounted, ref } from 'vue';
 import Guides from 'vue3-guides';
 import { VueInfiniteViewer } from 'vue3-infinite-viewer';
 import Moveable from 'vue3-moveable';
@@ -469,14 +474,35 @@ onMounted(() => {
   viewer.value.scrollCenter();
 
   pages.value = loadElements.value.filter((ele) => ele.isPage == true) as PageItem[];
+  originGroup = Array<Frame>(loadElements.value.length)
+    .fill({
+      x: 0,
+      y: 0,
+      w: 0,
+      h: 0,
+      z: 0,
+      r: 0,
+      borderRadius: 0,
+      opacity: 1,
+      clipType: ClipType.NONE,
+      clipStyle: '',
+    })
+    .map((item: Frame) => ({
+      x: 0,
+      y: 0,
+      w: 0,
+      h: 0,
+      z: 0,
+      r: 0,
+      borderRadius: 0,
+      opacity: 1,
+      clipType: ClipType.NONE,
+      clipStyle: '',
+    }));
 });
 
 onBeforeMount(() => {
   loadElements.value = elements;
-});
-
-onUpdated(() => {
-  //console.log('DiagramEditor updated')
 });
 
 // Set the handlers to manage keyboard shortcuts
@@ -544,6 +570,8 @@ const origin: Frame = {
   clipStyle: '',
 };
 
+let originGroup: Frame[] = [];
+
 // Track mouse position within the viewport coordinates
 const mouseCoords = ref<Position>({ x: 0, y: 0 });
 
@@ -572,7 +600,7 @@ function saveToImage() {
 
 function onDragOver(e: any) {
   if (!viewport.value) return;
-  console.log('onDragOver', e.srcElement, e.offsetX, e.offsetY, e);
+  // console.log('onDragOver', e.srcElement, e.offsetX, e.offsetY, e);
   e.preventDefault();
   // Mouse position
   const rect = viewport.value.getBoundingClientRect();
@@ -619,12 +647,16 @@ function selectItem(item: Item | ItemConnection, e?: MouseEvent): void {
   } else {
     selectNone();
     // handleSelectPage(selectedItem.value as PageItem);
-    console.log('page selected');
+    // console.log('page selected');
+
     nextTick(() => {
       selectedItem.value = item;
       selectedPageItems.value = loadElements.value.filter((elem) => {
         return (item as PageItem).containedIDs.includes(`[data-item-id='${elem.id}']`);
       }) as Item[];
+      nextTick(() => {
+        selectPage(item as PageItem);
+      });
       if (moveableInspector.value) moveableInspector.value.updateRect();
     });
   }
@@ -664,14 +696,9 @@ function onDragStart(e: any): void {
 }
 
 function onDragGroupStart(e: { events: any }): void {
-  if (!isItem(selectedItem.value)) return;
-  origin.x = selectedItem.value.x;
-  origin.y = selectedItem.value.y;
   e.events.forEach((ev: any, i: number) => {
-    console.log('draggroupstart', e);
-    const left = selectedPageItems.value[i].x;
-    const top = selectedPageItems.value[i].y;
-    ev.set([left, top]);
+    originGroup[i].x = selectedPageItems.value[i].x;
+    originGroup[i].y = selectedPageItems.value[i].y;
   });
 }
 
@@ -686,7 +713,6 @@ function onDragGroup(e: { events: any }): void {
   if (!isItem(selectedItem.value)) return;
 
   e.events.forEach((e: any, i: number) => {
-    console.log('ondraggroup', e);
     selectedPageItems.value[i].x = Math.floor(e.beforeTranslate[0]);
     selectedPageItems.value[i].y = Math.floor(e.beforeTranslate[1]);
     e.target.style.transform = e.transform;
@@ -705,12 +731,13 @@ function onDragEnd(e: any): void {
 }
 
 function onDragGroupEnd(e: { events: any }): void {
-  // // Item just cliked, no move ?
-  // if (origin.x === selectedItem.value.x && origin.y === selectedItem.value.y) return;
+  if (!isItem(selectedItem.value)) return;
 
-  selectedPageItems.value.forEach((pageItem) => {
-    console.log('ondragend', pageItem.x, pageItem.y);
-    historyManager.value.execute(new MoveCommand(pageItem, [origin.x, origin.y], [pageItem.x, pageItem.y]));
+  selectedPageItems.value.forEach((pageItem, i: number) => {
+    //console.log('ondragend', pageItem.x, pageItem.y);
+    historyManager.value.execute(
+      new MoveCommand(pageItem, [originGroup[i].x, originGroup[i].y], [pageItem.x, pageItem.y])
+    );
   });
   selectNone();
 }
@@ -792,7 +819,7 @@ function onRoundEnd(e: any): void {
 // ---------------------------------------------------------------------------------------------------------------------
 function onClipStart(e: any): void {
   if (!isItem(selectedItem.value)) return;
-  console.log('onClipStart', e);
+  // console.log('onClipStart', e);
 
   origin.clipType = e.clipType;
   origin.clipStyle = e.clipStyle;
@@ -815,7 +842,7 @@ function onClip(e: any): void {
 }
 
 function onClipEnd(e: any): void {
-  console.log('onClipEnd', e);
+  // console.log('onClipEnd', e);
 
   if (isItem(selectedItem.value))
     historyManager.value.execute(
@@ -865,6 +892,11 @@ function bringToFront(): void {
 function saveProto(): void {
   localStorage.setItem('proto', JSON.stringify(elements as Item[]));
   window.$message.info('已保存');
+}
+
+function handleCreatePage(newPageName: string) {
+  addPage(newPageName);
+  focusPage(currentPage.value as PageItem);
 }
 
 function addPage(newPageName: string): void {
@@ -935,13 +967,13 @@ function redo() {
 
 /** Select the current tool to use (selection, connection, text, image, ...) */
 function selectCurrentTool(tool: EditorTool): void {
-  console.log('selectCurrentTool', tool);
+  // console.log('selectCurrentTool', tool);
 
   currentTool.value = tool;
   selectNone();
 
   if (tool == EditorTool.CONNECTION) {
-    console.log('Creating connection');
+    // console.log('Creating connection');
     nextTick(() => {
       connectionInfo.startItem = null;
       connectionInfo.endItem = null;
@@ -1035,14 +1067,22 @@ function onZoomChanged(newZoomFactor: number, scrollViewerToCenter?: boolean) {
 
 /** Handle scroll to page */
 function handleSelectPage(page: PageItem) {
+  selectPage(page);
+  focusPage(page);
+}
+
+function focusPage(page: PageItem) {
   window.$message.info('聚焦' + page.pageName);
   const left = page.x - 200;
   const top = page.y - 200;
-  currentPage.value = page;
-  currentPageTargets.value = page.containedIDs;
   viewer.value?.scrollTo(left, top);
   zoomToolbar.value?.zoomReset();
   console.log('page info', currentPage.value, currentPageTargets.value);
+}
+
+function selectPage(page: PageItem) {
+  currentPage.value = page;
+  currentPageTargets.value = page.containedIDs;
 }
 
 /** Setup all the keyboard shortcuts */
