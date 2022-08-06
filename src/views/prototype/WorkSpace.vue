@@ -7,8 +7,7 @@
 <script setup lang="ts">
 import { onBeforeMount, ref } from 'vue';
 import DiagramEditor from '@/components/prototype/diagram-editor/DiagramEditor.vue';
-import { createConnection, createItem, createPageItem } from '@/components/prototype/diagram-editor/helpers';
-import { ConnectionStyle, ConnectionType, type DiagramElement } from '@/components/prototype/diagram-editor/types';
+import { type DiagramElement } from '@/components/prototype/diagram-editor/types';
 
 const elements = ref<DiagramElement[]>([]);
 

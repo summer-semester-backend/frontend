@@ -255,7 +255,7 @@
             @toolSelected="selectCurrentTool"
           />
           <div class="toolbar-separator"></div>
-          <ZoomToolbar :zoomManager="zoomManager" @zoomChanged="onZoomChanged" />
+          <ZoomToolbar ref="zoomToolbar" :zoomManager="zoomManager" @zoomChanged="onZoomChanged" />
           <div class="toolbar-separator"></div>
           <div v-if="editable" class="toolbar">
             <button class="toolbar-item" @click="undo" :disabled="!historyManager.canUndo()" title="Undo">
@@ -427,6 +427,7 @@ import { DefaultZoomManager, IZoomManager } from './ZoomManager';
 import * as htmlToImage from 'html-to-image';
 import FileSaver, { saveAs } from 'file-saver';
 import { useRouter } from 'vue-router';
+import ZoomToolbarVue from './components/ZoomToolbar.vue';
 export type Item = _Item & { hover?: boolean };
 
 // The component props and events
@@ -490,6 +491,7 @@ const viewer = ref();
 const viewport = ref<HTMLDivElement>();
 const moveable = ref();
 const moveableInspector = ref();
+const zoomToolbar = ref<InstanceType<typeof ZoomToolbarVue> | null>(null);
 
 const hGuides = ref();
 const vGuides = ref();
@@ -616,13 +618,13 @@ function selectItem(item: Item | ItemConnection, e?: MouseEvent): void {
     });
   } else {
     selectNone();
+    // handleSelectPage(selectedItem.value as PageItem);
     console.log('page selected');
     nextTick(() => {
       selectedItem.value = item;
       selectedPageItems.value = loadElements.value.filter((elem) => {
         return (item as PageItem).containedIDs.includes(`[data-item-id='${elem.id}']`);
       }) as Item[];
-      console.log('after filter', selectedPageItems.value);
       if (moveableInspector.value) moveableInspector.value.updateRect();
     });
   }
@@ -1036,9 +1038,10 @@ function handleSelectPage(page: PageItem) {
   window.$message.info('聚焦' + page.pageName);
   const left = page.x - 200;
   const top = page.y - 200;
-  viewer.value?.scrollTo(left, top);
   currentPage.value = page;
   currentPageTargets.value = page.containedIDs;
+  viewer.value?.scrollTo(left, top);
+  zoomToolbar.value?.zoomReset();
   console.log('page info', currentPage.value, currentPageTargets.value);
 }
 
