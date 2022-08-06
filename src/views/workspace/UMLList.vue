@@ -265,7 +265,6 @@ const getFileInfo = (file: File) => {
 };
 
 const edit = (file: FileEdit) => {
-  //只修改了数据，其他名字等还不支持
 
   editFile(file)
     .then((res) => {
