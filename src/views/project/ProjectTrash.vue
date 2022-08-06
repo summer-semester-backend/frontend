@@ -49,12 +49,10 @@ const columns = ref([
   {
     title: '项目名称',
     key: 'fileName',
-    sorter: (row1: Project, row2: Project) => (row1.fileName > row2.fileName ? 1 : -1),
   },
   {
     title: '所属团队',
     key: 'teamName',
-    sorter: (row1: Project, row2: Project) => (row1.teamName > row2.teamName ? 1 : -1),
   },
   {
     title: '删除时间',

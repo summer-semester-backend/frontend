@@ -122,14 +122,7 @@ const columns = ref([
   },
 ]);
 
-const files = ref([
-  {
-    fileID: 1,
-    fileName: '',
-    userName: '',
-    lastEditTime: '',
-  },
-]);
+const files = ref();
 const getFileList = (id: number | null) => {
   readFile({
     fileID: id,

@@ -24,7 +24,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { NButton, NIcon, NSpace } from 'naive-ui';
+import { NButton, NIcon, NSpace, NText } from 'naive-ui';
 import { h, ref, computed, onMounted } from 'vue';
 import { Refresh, Trash, Search, EllipsisHorizontal } from '@vicons/ionicons5';
 import { binList, recoverFile, deleteFile, clearBin } from '@/api/file';
@@ -55,7 +55,7 @@ const columns = ref([
     title: '文件类型',
     key: 'teamName',
     render: (row: Trash) =>
-      h('span', () => {
+      h(NText, {}, () => {
         switch (row.fileType) {
           case 12:
             return 'UML图';
@@ -70,7 +70,7 @@ const columns = ref([
     title: '删除时间',
     key: 'abandonTime',
     sorter: (row1: Trash, row2: Trash) => (row1.abandonTime > row2.abandonTime ? 1 : -1),
-    render: (row: Trash) => h('span', row.abandonTime?.slice(0, 10)),
+    render: (row: Trash) => h('span', row.abandonTime == null ? '-' : row.abandonTime?.slice(0, 10)),
   },
   {
     title: '操作',
@@ -133,14 +133,7 @@ const columns = ref([
     },
   },
 ]);
-const trashs = ref([
-  {
-    fileID: 1,
-    fileName: '',
-    teamName: '',
-    abandonTime: '',
-  },
-]);
+const trashs = ref();
 const pagination = ref({
   current: 1,
   pageSize: 10,
@@ -188,7 +181,7 @@ onMounted(() => {
 
 //搜索
 const dataFilter = computed(() => {
-  return trashs.value.filter((data) => {
+  return trashs.value?.filter((data: any) => {
     return !input.value || data.fileName.toLowerCase().includes(input.value.toLowerCase());
   });
 });

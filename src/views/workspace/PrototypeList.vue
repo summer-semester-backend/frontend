@@ -85,14 +85,7 @@ const columns = ref([
   },
 ]);
 
-const files = ref([
-  {
-    fileID: 1,
-    fileName: '项目1',
-    userName: '张三',
-    lastEditTime: '2020-01-01',
-  },
-]);
+const files = ref();
 const getFileList = (id: number | null) => {
   readFile({
     fileID: id,
