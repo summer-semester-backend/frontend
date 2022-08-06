@@ -1,5 +1,5 @@
 <template>
-  <div style="width: 100%; height: 95%; padding-top: 16px; margin: 0 auto">
+  <div style="width: 100%; height: 100%; margin: 0 auto">
     <DiagramEditor :elements="elements" :customWidgets="true" :editable="true" />
   </div>
 </template>

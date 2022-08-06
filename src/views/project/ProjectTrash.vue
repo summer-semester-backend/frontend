@@ -177,7 +177,7 @@ const dataFilter = computed(() => {
 </script>
 <style scope lang="less">
 #content {
-  padding: 40px 60px;
+  padding: 35px 60px;
   position: relative;
 }
 </style>

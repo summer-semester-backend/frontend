@@ -1,5 +1,9 @@
 <template>
-  <ProjectList :projects="projects" :team-id="teamID" :page-size="20" @refresh="getProjectList" />
+  <div id="TeamProject">
+    <div id="teamContent">
+      <ProjectList :projects="projects" :team-id="teamID" :page-size="20" @refresh="getProjectList" />
+    </div>
+  </div>
 </template>
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
@@ -20,3 +24,10 @@ onMounted(() => {
   getProjectList(teamID.value);
 });
 </script>
+
+<style scope lang="less">
+#teamContent {
+  padding: 20px 0px;
+  position: relative;
+}
+</style>

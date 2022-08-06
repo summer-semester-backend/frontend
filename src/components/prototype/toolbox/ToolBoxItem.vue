@@ -2,7 +2,7 @@
   <div class="w-15 h-15">
     <div class="flex h-10 items-center flex-col">
       <n-icon size="24" :component="icon"> </n-icon>
-      <div class="text-xs mt-1 text-light-100">{{ toolName }}</div>
+      <n-text class="text-xs mt-1">{{ toolName }}</n-text>
     </div>
   </div>
 </template>
