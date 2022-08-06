@@ -46,9 +46,7 @@
 import { ref, onMounted } from 'vue';
 import { readFile, recentProjectList } from '@/api/file';
 import { useRouter } from 'vue-router';
-import { useProjStore } from '@/store/proj';
 const router = useRouter();
-const { setProjID } = useProjStore();
 const projects = ref([
   {
     fileID: 1,
@@ -73,9 +71,11 @@ const getProjectList = () => {
 
 //跳转到指定项目
 const jumpToProj = (fileID: number) => {
-  setProjID(fileID);
   router.push({
-    path: '/workspace',
+    name: 'workspace',
+    params: {
+      ProjID: fileID,
+    },
   });
 };
 

@@ -124,7 +124,6 @@ import { Add, Search, EllipsisHorizontal, TrashOutline, ArchiveOutline, CreateOu
 import { deleteFile, editFile, readFile } from '@/api/file';
 import { NIcon, NInput } from 'naive-ui';
 import { useRouter } from 'vue-router';
-import { useProjStore } from '@/store/proj';
 interface Project {
   fileID: number;
   fileName: string;
@@ -167,7 +166,6 @@ const isManage = ref(false); //是否进入删除状态
 const input = ref(''); //搜索关键字
 const newFileName = ref(''); //新命名项目名称
 const router = useRouter();
-const { setProjID } = useProjStore();
 //操作列表
 const operates = ref([
   {
@@ -324,9 +322,11 @@ const formatDate = (date: string) => {
 
 //跳转到指定项目
 const jumpToProj = (fileID: number) => {
-  setProjID(fileID);
   router.push({
-    path: '/workspace',
+    name: 'workspace',
+    params: {
+      ProjID: fileID,
+    },
   });
 };
 </script>

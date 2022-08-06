@@ -2,12 +2,12 @@
   <div class="barBox">
     <div class="head">
       <n-select
-        v-model:value="teamID"
+        v-model:value="curTeamID"
         :options="options"
         label-field="teamName"
         value-field="teamID"
         style="width: 130px; font-weight: bold"
-        @update:value="handleUpdate"
+        @update:value="handleSelectUpdate"
       />
       <!-- <div class="titleBox">软工小学期</div> -->
       <n-button text @click="isCreateModalShow = true">
@@ -42,6 +42,7 @@
             :options="menuOptions"
             :icon-size="26"
             style="width: 250px; font-size: 17px; font-weight: bold"
+            @update:value="handleMenuUpdate"
           />
         </n-layout>
         <!-- </n-layout-sider> -->
@@ -57,7 +58,7 @@
 <script setup>
 import { defineComponent, h, ref, computed, onMounted, watch } from 'vue';
 import { MenuOpenRound, AddCircleOutlineFilled } from '@vicons/material';
-import { useRouter, RouterLink } from 'vue-router';
+import { useRouter, RouterLink, useRoute } from 'vue-router';
 import { getTeamList } from '@/api/team';
 import { NIcon } from 'naive-ui';
 import { AppstoreAddOutlined, SettingOutlined } from '@vicons/antd';
@@ -67,11 +68,12 @@ function renderIcon(icon) {
 }
 
 const router = useRouter();
+const route = useRoute();
 const activeKey = ref(router.currentRoute.value.name);
 const collapsed = ref(false);
 const isCreateModalShow = ref(false);
 
-const teamID = ref(null);
+const curTeamID = ref(null);
 const options = ref([
   {
     teamName: '软工小学期',
@@ -81,26 +83,12 @@ const options = ref([
 
 const menuOptions = [
   {
-    label: () =>
-      h(
-        RouterLink,
-        {
-          to: '/team/' + localStorage.getItem('teamID') + '/project',
-        },
-        { default: () => '团队项目' }
-      ),
+    label: '团队项目',
     key: 'teamProject',
     icon: renderIcon(AppstoreAddOutlined),
   },
   {
-    label: () =>
-      h(
-        RouterLink,
-        {
-          to: '/team/' + localStorage.getItem('teamID'),
-        },
-        { default: () => '团队设置' }
-      ),
+    label: '团队设置',
     key: 'teamDetail',
     icon: renderIcon(SettingOutlined),
   },
@@ -111,19 +99,20 @@ const getTeams = () => {
     .then((res) => {
       if (res.data.result == 0) {
         options.value = res.data.list;
-        console.log(options.value);
-        if (!localStorage.getItem('teamID')) {
-          teamID.value = res.data.list[0].teamID;
-          localStorage.setItem('teamID', res.data.list[0].teamID);
-          router.push('/team/' + teamID.value + '/project');
-          activeKey.value = 'teamProject';
-        } else {
-          teamID.value = parseInt(localStorage.getItem('teamID'));
-          router.push('/team/' + teamID.value + '/project');
-          activeKey.value = 'teamProject';
-        }
       } else {
         window.$message.error(res.data.message);
+      }
+    })
+    .then(() => {
+      console.log(route.params.teamID);
+      if (!route.params.teamID) {
+        let tempTeamID = options.value[0].teamID;
+        curTeamID.value = tempTeamID;
+        router.push({ name: 'teamProject', params: { teamID: tempTeamID } });
+        activeKey.value = 'teamProject';
+      } else {
+        console.log(options.value);
+        curTeamID.value = parseInt(route.params.teamID);
       }
     })
     .catch(() => {
@@ -131,12 +120,19 @@ const getTeams = () => {
     });
 };
 
-const handleUpdate = (value) => {
-  localStorage.setItem('teamID', value);
-  if (router.currentRoute.value.name == 'teamProject') {
+const handleSelectUpdate = (value) => {
+  if (route.name == 'teamProject') {
     window.open('/team/' + value + '/project', '_self');
   } else {
-    window.open('/team/' + value, '_self');
+    window.open('/team/' + value + '/', '_self');
+  }
+};
+const jumpTo = () => {};
+const handleMenuUpdate = (value) => {
+  if (value == 'teamProject') {
+    router.push({ name: 'teamProject', params: { teamID: curTeamID.value } });
+  } else {
+    router.push({ name: 'teamDetail', params: { teamID: curTeamID.value } });
   }
 };
 onMounted(() => {
