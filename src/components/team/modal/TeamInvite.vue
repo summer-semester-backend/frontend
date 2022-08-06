@@ -10,6 +10,7 @@
   >
     <n-divider style="margin: 15px auto" />
     <n-space>
+      链接（7天内有效）
       <n-input v-model:value="code" type="text" placeholder="" style="width: 375px" :disabled="true" />
     </n-space>
   </n-modal>
@@ -21,7 +22,7 @@ import { ref } from 'vue';
 import { useRoute } from 'vue-router';
 
 const route = useRoute();
-const code = ref('123456');
+const code = ref('');
 const show = ref(false);
 
 const handlePositiveClick = async () => {
