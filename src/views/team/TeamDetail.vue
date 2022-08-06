@@ -71,7 +71,7 @@ const handleReload = () => {
 .container {
   height: 100%;
   width: 100%;
-  padding: 20px 20px;
+  padding: 15px 60px 30px 60px;
   box-sizing: border-box;
 }
 </style>

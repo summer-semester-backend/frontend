@@ -50,11 +50,7 @@
             </n-layout> -->
       </n-layout>
     </n-space>
-    <TeamAdd
-      :show="isCreateModalShow"
-      @update:team-created="handleUpdateTeamCreated"
-      @close="isCreateModalShow = false"
-    />
+    <TeamAdd :isCreateModalShow="isCreateModalShow" @refresh="getTeams()" @close="isCreateModalShow = false" />
   </div>
 </template>
 

@@ -35,7 +35,7 @@ const handleLogin = () => {
       localStorage.setItem('userID', res.data.userID);
       signIn(res.data.token);
       window.$message.info('登录成功');
-      router.push({ name: 'project' });
+      router.push({ name: 'ProjectDesktop' });
     }
   });
 };

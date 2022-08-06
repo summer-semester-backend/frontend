@@ -1,16 +1,16 @@
 <template>
   <div class="toolbox">
-    <div class="toolbox-title toolbox-title-drag-handle">
-      <div>工具箱</div>
+    <div class="toolbox-title" @click="expanded = !expanded" style="cursor: pointer">
+      <n-text class="text-light-50">工具箱</n-text>
       <div style="flex-grow: 1; pointer-events: none"></div>
-      <div @click="expanded = !expanded" style="cursor: pointer">
+      <div>
         <EditorIcon v-show="expanded" size="16px" icon="keyboard_arrow_down" color="white" />
         <EditorIcon v-show="!expanded" size="16px" icon="keyboard_arrow_right" color="white" />
       </div>
     </div>
     <div class="toolbox-content">
       <n-config-provider :theme="darkTheme">
-        <n-card v-if="expanded" class="card">
+        <n-card v-if="expanded" :bordered="false" class="card">
           <n-collapse>
             <n-collapse-item title="图形">
               <n-grid :x-gap="8" :y-gap="8" :cols="4">
@@ -66,20 +66,6 @@ const basic = computed(() => {
 });
 </script>
 
-<style>
-.toolbox-title-drag-handle {
-  cursor: move;
-}
-.toolbox-content {
-  cursor: auto;
-  background-color: #18181c;
-}
-
-.card :deep(.n-card) {
-  background-color: #18181c;
-}
-</style>
-
 <style scoped>
 .toolbox {
   background-color: #18181c;
@@ -110,8 +96,8 @@ const basic = computed(() => {
   color: #ddd;
   padding: 8px 8px 2px 8px;
   text-align: center;
-  font-size: 11px;
-  line-height: 1;
+  font-size: 15px;
+  line-height: 2;
   letter-spacing: 1px;
 }
 

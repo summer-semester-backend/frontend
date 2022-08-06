@@ -664,12 +664,12 @@ export const buttonModel: ObjectInspectorModel = {
               editorFullsize: true,
               editorOptions: {
                 items: [
-                  // { name: 'default', text: 'default' },
-                  // { name: 'tertiary', text: 'tertiary' },
-                  // { name: 'primary', text: 'primary' },
-                  { name: 'info', text: 'info' },
-                  { name: 'warning', text: 'warning' },
-                  { name: 'error', text: 'error' },
+                  { name: 'default', text: 'default' },
+                  { name: 'tertiary', text: 'tertiary' },
+                  { name: 'primary', text: 'primary' },
+                  // { name: 'info', text: 'info' },
+                  // { name: 'warning', text: 'warning' },
+                  // { name: 'error', text: 'error' },
                 ],
               },
             },
