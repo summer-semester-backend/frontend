@@ -276,6 +276,10 @@ export function isItem(e: DiagramElement | undefined | null): e is Item {
   return e !== null && e != undefined && 'x' in e;
 }
 
+export function isPage(e: DiagramElement | undefined | null): e is Item {
+  return e?.isPage == true;
+}
+
 export function isConnection(e: DiagramElement | undefined | null): e is ItemConnection {
   return e !== null && e != undefined && 'from' in e;
 }
@@ -346,6 +350,6 @@ export interface RadioItem extends Item {
 }
 
 export interface PageItem extends Item {
-  containedIDs: Array<number>;
+  containedIDs: Array<string>;
   pageName: string;
 }

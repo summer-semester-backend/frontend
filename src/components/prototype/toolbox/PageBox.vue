@@ -11,7 +11,7 @@
     <div class="pagebox-content">
       <n-config-provider :theme="darkTheme">
         <n-card v-if="expanded" :bordered="false" class="card">
-          <n-menu :options="pageOptions" class="w-full"></n-menu>
+          <n-menu :options="pageOptions" class="w-full" @update-value="handleUpdateValue"></n-menu>
           <n-button class="w-full" @click="emits('page-create', newPageName)">
             <template #icon>
               <n-icon><Add /></n-icon>
@@ -25,22 +25,31 @@
 
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
-import { darkTheme } from 'naive-ui';
+import { darkTheme, MenuOption } from 'naive-ui';
 import { Add } from '@vicons/ionicons5';
-import { EditorTool, PageItem } from '../diagram-editor/types';
+import { PageItem } from '../diagram-editor/types';
 interface PageBoxEvents {
-  (e: 'page-selected', toolType: EditorTool): void;
+  (e: 'page-selected', pageItem: PageItem): void;
   (e: 'page-create', pageName: string): void;
 }
 const props = defineProps<{ pages: Array<PageItem> }>();
 const pageOptions = ref<Array<{ key: string; label: string }>>([]);
+const pagesMap = new Map<string, PageItem>();
 const newPageName = computed(() => '页面' + (pageOptions.value.length + 1));
 const expanded = ref(true);
 const emits = defineEmits<PageBoxEvents>();
+const handleUpdateValue = (key: string, option: MenuOption) => {
+  var selectedPage = pagesMap.get(key);
+  if (selectedPage !== undefined) {
+    emits('page-selected', selectedPage);
+  }
+};
 watch(
   () => props.pages,
   (newPage: Array<PageItem>) => {
+    pagesMap.clear();
     pageOptions.value = newPage.map((ele) => {
+      pagesMap.set(ele.id, ele);
       return {
         key: ele.id,
         label: ele.pageName,

@@ -7,7 +7,7 @@
 <script setup lang="ts">
 import { onBeforeMount, ref } from 'vue';
 import DiagramEditor from '@/components/prototype/diagram-editor/DiagramEditor.vue';
-import { createConnection, createItem } from '@/components/prototype/diagram-editor/helpers';
+import { createConnection, createItem, createPageItem } from '@/components/prototype/diagram-editor/helpers';
 import { ConnectionStyle, ConnectionType, type DiagramElement } from '@/components/prototype/diagram-editor/types';
 
 const elements = ref<DiagramElement[]>([]);
@@ -18,45 +18,7 @@ onBeforeMount(() => {
     elements.value = JSON.parse(string) as DiagramElement[];
   } else {
     elements.value = [
-      createItem({
-        id: 'a1',
-        title: 'Angelo',
-        x: 100,
-        y: 150,
-        w: 100,
-        h: 80,
-        backgroundColor: '#ff0000',
-        textColor: '#ffffff',
-      }),
-      createItem({
-        id: 'a2',
-        title: 'Mario',
-        x: 600,
-        y: 130,
-        w: 90,
-        h: 90,
-        backgroundColor: '#00ff00',
-        textColor: '#333333',
-      }),
-      createItem({
-        id: 'a3',
-        title: 'Luca',
-        x: 300,
-        y: 400,
-        w: 200,
-        h: 70,
-        backgroundColor: '#0000ff',
-        textColor: '#f7ff2d',
-      }),
-
-      createConnection('a1', 'a2'),
-      createConnection('a1', 'a3', { type: ConnectionType.CURVE, style: ConnectionStyle.DOTTED }),
-      createConnection('a2', 'a3', {
-        type: ConnectionType.CURVE,
-        style: ConnectionStyle.DASHED,
-        backgroundColor: '#ff0000',
-        thick: 5,
-      }),
+      // createPageItem()
     ];
   }
 });
