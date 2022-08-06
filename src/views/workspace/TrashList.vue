@@ -95,7 +95,9 @@ const columns = ref([
                 } else if (res.data.result == 2) {
                   window.$message.error(res.data.message);
                 }
-              });
+              }).catch((err) => {
+                  console.log(err);
+                })
             },
           },
           {
