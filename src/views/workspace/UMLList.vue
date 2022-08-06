@@ -10,57 +10,38 @@
   </ToolBar>
   <n-data-table :columns="columns" :data="files" :pagination="pagination" :bordered="false" />
 
-  <n-modal v-model:show="showModel">
-    <n-card
-      style="width: 600px"
-      title="新建文件"
-      :bordered="false"
-      size="huge"
-      role="dialog"
-      aria-modal="true"
-      header-style="text-align:center"
-    >
-      <template #default>
-        <n-form ref="formRef" label-placement="left" require-mark-placement="left">
-          <n-form-item label="&emsp;文件名：" path="email">
-            <n-input v-model:value="fileNameRef" placeholder="请输入" clearable style="width: 350px" />
-          </n-form-item>
-        </n-form>
-      </template>
-      <template #footer>
-        <n-space justify="center" :size="50">
-          <n-button type="info" @click="create">确定</n-button>
-          <n-button type="default" @click="closeModel">取消</n-button>
-        </n-space>
-      </template>
-    </n-card>
+  <n-modal
+    v-model:show="showModel"
+    preset="dialog"
+    title="新建文件"
+    size="medium"
+    positive-text="确认"
+    negative-text="取消"
+    @positive-click="create"
+    @negative-click="closeModel"
+  >
+    <n-divider style="margin: 15px auto" />
+    <n-space>
+      <n-input v-model:value="fileNameRef" placeholder="请输入文件名" clearable style="width: 350px" />
+    </n-space>
   </n-modal>
 
-  <n-modal v-model:show="showModelEdit">
-    <n-card
-      style="width: 600px"
-      title="更改文件名"
-      :bordered="false"
-      size="huge"
-      role="dialog"
-      aria-modal="true"
-      header-style="text-align:center"
-    >
-      <template #default>
-        <n-form ref="formRef" label-placement="left" require-mark-placement="left">
-          <n-form-item label="&emsp;文件名：" path="email">
-            <n-input v-model:value="fileNameRef" placeholder="请输入" clearable style="width: 350px" />
-          </n-form-item>
-        </n-form>
-      </template>
-      <template #footer>
-        <n-space justify="center" :size="50">
-          <n-button type="info" @click="editFileName">确定</n-button>
-          <n-button type="default" @click="closeModelEdit">取消</n-button>
-        </n-space>
-      </template>
-    </n-card>
+  <n-modal
+    v-model:show="showModelEdit"
+    preset="dialog"
+    title="更改文件名"
+    size="medium"
+    positive-text="确认"
+    negative-text="取消"
+    @positive-click="editFileName"
+    @negative-click="closeModelEdit"
+  >
+    <n-divider style="margin: 15px auto" />
+    <n-space>
+      <n-input v-model:value="fileNameRef" placeholder="请输入文件名" clearable style="width: 350px" />
+    </n-space>
   </n-modal>
+
 </template>
 
 <script setup lang="ts">

@@ -29,6 +29,11 @@ const routes: RouteRecordRaw[] = [
     component: () => import('../views/prototype/WorkSpace.vue'),
   },
   {
+    path: '/attendTeam/:code',
+    name: 'AttendTeam',
+    component: () => import('../views/team/AttendTeam.vue'),
+  },
+  {
     path: '/team',
     name: 'team',
     component: () => import('../views/team/Index.vue'),

@@ -184,6 +184,7 @@ export function registerDefaultItemTypes() {
   const defaults = {
     id: '',
     title: '',
+    isPage: false,
 
     x: 100,
     y: 100,
@@ -250,6 +251,7 @@ export function registerDefaultItemTypes() {
       component: type,
       style: ConnectionStyle.SOLID,
       thick: 3,
+      backgroundColor: 'gray',
     },
     lineModel
   );
@@ -417,6 +419,21 @@ export function registerDefaultItemTypes() {
       color: undefined,
     },
     buttonModel
+  );
+
+  type = 'Page';
+  registerItemType(
+    {
+      ...defaults,
+      z: -10000,
+      component: type,
+      isPage: true,
+      title: 'page',
+      w: 1080,
+      h: 720,
+      containedIDs: [],
+    },
+    shapeModel
   );
 } // func
 

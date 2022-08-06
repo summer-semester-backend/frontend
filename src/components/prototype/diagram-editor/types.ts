@@ -24,6 +24,7 @@ export interface DiagramElement {
   id: string; // The unique element ID
   title: string; // The element title / label
   z: number; // The element z-index
+  isPage: boolean; // whether used as page
 
   backgroundColor: string; // The element background color (item background, connection stroke color)
   textColor: string; // The element text color (text inside the element, etc.)
@@ -140,6 +141,9 @@ export enum EditorTool {
   INPUT = 'input',
   RADIO = 'radio',
   BUTTON = 'button',
+
+  // Container
+  PAGE = 'page',
 }
 
 export enum ToolBoxGroup {
@@ -255,8 +259,11 @@ export const toolDefinitions: ToolDefinition[] = [
     itemType: 'Star',
     iconComponent: StarOutline,
   },
+  // Icon
   { type: EditorTool.ICON, title: 'Icon', group: ToolBoxGroup.ICON, icon: 'portrait', itemType: 'Icon' },
-  { type: EditorTool.WIDGET, title: 'Widgets', group: ToolBoxGroup.CONTAINER, icon: 'view_in_ar' },
+  // Page
+  { type: EditorTool.PAGE, title: '页面', group: ToolBoxGroup.CONTAINER, icon: 'rectangle', itemType: 'Page' },
+  // { type: EditorTool.WIDGET, title: 'Widgets', group: ToolBoxGroup.CONTAINER, icon: 'view_in_ar' },
 ];
 
 export function getToolDefinition(toolType: EditorTool): ToolDefinition {
@@ -336,4 +343,9 @@ export interface RadioItem extends Item {
   checked: boolean;
   disabled: boolean;
   value: string;
+}
+
+export interface PageItem extends Item {
+  containedIDs: Array<number>;
+  pageName: string;
 }
