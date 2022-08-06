@@ -146,7 +146,7 @@ function handleDeleteManager(rowData: any) {
   deleteTeamManager({ teamID: route.params.teamID as string, userID: rowData.userID }).then((res) => {
     if (res.data.result == 0) {
       window.$message.info(res.data.message);
-      tableData.value[rowData.key].identity = '普通成员';
+      tableData.value[rowData.key].identity = '组员';
       tableData.value[rowData.key].isManager = false;
     }
   });
@@ -161,13 +161,13 @@ function reload() {
           if (userID == item.userID && item.authority > 0) {
             isManager.value = true;
           }
-          var identity = '普通成员';
+          var identity = '组员';
           if (item.authority == 2) {
             identity = '团队创建人';
           } else if (item.authority == 1) {
             identity = '管理员';
           } else if (item.authority == 0) {
-            identity = '普通成员';
+            identity = '组员';
           }
           return {
             ...item,
