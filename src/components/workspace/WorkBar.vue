@@ -2,13 +2,12 @@
   <div id="workBar">
     <div id="barBox">
       <div id="leftOptions">
-        <n-icon style="z-index: 2" size="25" @click="$router.back()">
+        <n-icon style="z-index: 2" size="25" @click="$router.push({ path: '/project/desktop' })">
           <KeyboardArrowLeftOutlined />
         </n-icon>
         <n-image
           object-fit="cover"
-          width="50"
-          style="border-radius: 10px"
+          style="border-radius: 10px; width: 50px; height: 50px"
           :src="currentProject.projImage"
           preview-disabled
         />
@@ -16,9 +15,6 @@
           <div class="topData">
             <div class="topTest">
               {{ currentProject.projName }}
-              <n-icon size="16">
-                <CaretDown />
-              </n-icon>
             </div>
             <n-icon size="20" color="#bfbfbf">
               <InformationCircleOutline />
@@ -35,7 +31,7 @@
               <n-tab name="doc" :tab="renderDoc" />
               <n-tab name="prototype" :tab="renderPrototype" />
               <n-tab name="uml" :tab="renderUml" />
-              <!-- <n-tab name="recycleBin" :tab="renderRecycleBin" /> -->
+              <n-tab name="recycleBin" :tab="renderRecycleBin" />
               <!-- <n-tab name="prototype"> 原型 </n-tab>
               <n-tab name="uml"> UML图 </n-tab>
               <n-tab name="recycleBin"> 回收站 </n-tab> -->
@@ -52,14 +48,13 @@
 import { KeyboardArrowLeftOutlined } from '@vicons/material';
 import { CaretDown, InformationCircleOutline } from '@vicons/ionicons5';
 import { ref, h, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
 import { readFile } from '@/api/file';
-import { useProjStore } from '@/store/proj';
 const router = useRouter();
-const { getProjID } = useProjStore();
+const route = useRoute();
 const currentProject = ref({
-  projName: '项目名称',
-  projImage: 'https://07akioni.oss-cn-beijing.aliyuncs.com/07akioni.jpeg',
+  projName: '',
+  projImage: '',
 });
 
 const tabValue = ref('doc');
@@ -69,8 +64,8 @@ const renderPrototype = () => h('div', { style: 'font-size:14px;' }, '原型');
 const renderUml = () => h('div', { style: 'font-size:14px;' }, 'UML图');
 const renderRecycleBin = () => h('div', { style: 'font-size:14px;' }, '回收站');
 
-const getProjInfo = () => {
-  readFile({ fileID: getProjID(), teamID: -1 }).then((res) => {
+const getProjInfo = (id: number | null) => {
+  readFile({ fileID: id, teamID: -1 }).then((res) => {
     if (res.data.result == 0) {
       currentProject.value.projImage = res.data.fileImage;
       currentProject.value.projName = res.data.fileName;
@@ -80,10 +75,11 @@ const getProjInfo = () => {
 
 const handleUpdateTab = (value: string) => {
   tabValue.value = value;
-  router.push(`/workspace/${value}`);
+  const projID = parseInt(route.params.ProjID.toString());
+  router.push(`/workspace/${projID}/${value}`);
 };
 onMounted(() => {
-  getProjInfo();
+  getProjInfo(parseInt(route.params.ProjID.toString()));
 });
 </script>
 

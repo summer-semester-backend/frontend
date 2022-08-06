@@ -4,7 +4,7 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/',
     name: 'default',
-    redirect: 'project',
+    redirect: 'login',
   },
   {
     path: '/project',
@@ -75,14 +75,10 @@ const routes: RouteRecordRaw[] = [
     ],
   },
   {
-    path: '/workspace',
+    path: '/workspace/:ProjID',
     name: 'workspace',
     component: () => import('../views/workspace/WorkspaceOverview.vue'),
     children: [
-      {
-        path: '',
-        redirect: '/workspace/doc',
-      },
       {
         path: 'doc',
         name: 'DocumentList',
@@ -122,7 +118,8 @@ const router = createRouter({
   routes,
 });
 
-router.beforeEach((to, from) => {
+router.beforeEach((to, from, next) => {
+  //登录鉴权
   if (to.meta.requiresAuth && !localStorage.getItem('token')) {
     window.$message.warning('您还没有登录，请先登录');
     return {
@@ -130,6 +127,7 @@ router.beforeEach((to, from) => {
       query: { redirect: to.fullPath },
     };
   }
+  next();
 });
 
 export default router;

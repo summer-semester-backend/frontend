@@ -5,6 +5,7 @@
         <TeamSetting />
       </template>
     </Header>
+    <!-- <div style="width: 100%; height: 30px"></div> -->
     <Header title="成员信息">
       <template #toolbar>
         <n-button v-if="!isInputShow" @click="showInput" quaternary circle>
@@ -69,9 +70,9 @@ const handleReload = () => {
 
 <style scoped>
 .container {
-  height: 100%;
+  /* height: 100%; */
   width: 100%;
-  padding: 20px 20px;
+  padding: 35px 60px 60px 60px;
   box-sizing: border-box;
 }
 </style>

@@ -24,6 +24,7 @@ declare module 'vue' {
     Image: typeof import('./src/components/prototype/diagram-editor/blocks/Image.vue')['default']
     Input: typeof import('./src/components/prototype/diagram-editor/blocks/Input.vue')['default']
     KeyboardHelp: typeof import('./src/components/prototype/diagram-editor/components/KeyboardHelp.vue')['default']
+    LeftSideBar: typeof import('./src/components/prototype/diagram-editor/LeftSideBar.vue')['default']
     Line: typeof import('./src/components/prototype/diagram-editor/blocks/Line.vue')['default']
     Loading: typeof import('./src/components/editor/loading.vue')['default']
     MemberList: typeof import('./src/components/team/MemberList.vue')['default']

@@ -6,13 +6,16 @@
           <n-form-item label="团队名称" path="teamname">
             <n-input placeholder="请输入团队名称" v-model:value="data.teamname" />
           </n-form-item>
-          <n-form-item label="团队ID" path="id">
-            {{ route.params.teamID }}
-          </n-form-item>
         </n-grid-item>
         <n-grid-item span="24">
           <n-form-item label="团队简介" path="summary">
-            <n-input type="textarea" placeholder="请输入团队简介" v-model:value="data.summary" />
+            <n-input
+              type="textarea"
+              placeholder="请输入团队简介"
+              v-model:value="data.summary"
+              maxlength="200"
+              show-count
+            />
           </n-form-item>
         </n-grid-item>
       </n-grid>
@@ -86,14 +89,14 @@ function clickConfilmUpdate() {
 function handleQuitClick() {
   leaveTeam({ teamID: route.params.teamID as string }).then((res) => {
     if (res.data.result == 0) {
-      router.push({ path: 'project' });
+      window.open('/team', '_self');
     }
   });
 }
 function handleDeleteClick() {
   deleteTeam({ teamID: route.params.teamID as string }).then((res) => {
     if (res.data.result == 0) {
-      router.push({ name: 'project' });
+      window.open('/team', '_self');
     }
   });
 }

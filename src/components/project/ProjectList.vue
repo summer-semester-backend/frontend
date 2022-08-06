@@ -23,12 +23,12 @@
         <div id="my-box">
           <n-grid :x-gap="48" :y-gap="24" :cols="5">
             <n-gi v-for="(item, index) in dataFilter.slice((page - 1) * pageSize, page * pageSize)" :key="index">
-              <n-tooltip :delay="500" placement="bottom-start" @update:show="handleUpdateShow(item.fileID)">
+              <n-tooltip :delay="500" placement="bottom-start">
                 <template #trigger>
                   <n-card
                     :segmented="{
                       content: true,
-                      footer: 'soft',
+                      footer: true,
                     }"
                     footer-style="padding: 0.5vw 0;"
                     hoverable
@@ -40,30 +40,33 @@
                           <n-button circle type="error" size="small" @click.stop="handleDelete(item.fileID)">
                             <n-icon size="20"><trash-outline /></n-icon
                           ></n-button>
-                          <n-button circle type="info" size="small" @click.stop="handleEdit(item.fileID)">
+                          <n-button circle type="info" size="small" @click.stop="handleEdit(item)">
                             <n-icon size="20"><create-outline /></n-icon
                           ></n-button>
                         </n-space>
                       </div>
                       <n-image
-                        style="border-radius: 8px 8px 0 0; height: 8vw"
+                        style="border-radius: 8px 8px 0 0; height: 8vw; width: 100%"
                         :src="item.fileImage"
                         object-fit="cover"
                         preview-disabled
                       ></n-image>
                     </template>
                     <template #footer>
-                      <n-ellipsis style="background-color: #fff; font-size: 1rem; font-weight: 500">
+                      <n-ellipsis
+                        :tooltip="false"
+                        style="background-color: #fff; font-size: 1rem; font-weight: 500; margin: 0 24px"
+                      >
                         {{ item.fileName }}
                       </n-ellipsis>
                     </template>
                   </n-card>
                 </template>
                 <template #default style="color: white">
-                  <div>项目名称：{{ currentProject.fileName }}</div>
-                  <div>所属团队：{{ currentProject.teamName }}</div>
-                  <div>创建者：{{ currentProject.userName }}</div>
-                  <div>创建时间：{{ currentProject.createTime }}</div>
+                  <div>项目名称：{{ item.fileName }}</div>
+                  <div>所属团队：{{ item.teamName }}</div>
+                  <div>创建者：{{ item.userName }}</div>
+                  <div>创建时间：{{ item.createTime.slice(0, 10) }}</div>
                 </template>
               </n-tooltip>
             </n-gi>
@@ -121,13 +124,14 @@ import { Add, Search, EllipsisHorizontal, TrashOutline, ArchiveOutline, CreateOu
 import { deleteFile, editFile, readFile } from '@/api/file';
 import { NIcon, NInput } from 'naive-ui';
 import { useRouter } from 'vue-router';
-import { useProjStore } from '@/store/proj';
 interface Project {
   fileID: number;
   fileName: string;
   fileImage: string;
   createTime: string;
   lastVisitTime: string;
+  teamName: string;
+  userName: string;
 }
 type Props = {
   projects: Project[];
@@ -138,10 +142,12 @@ const props = withDefaults(defineProps<Props>(), {
   projects: () => [
     {
       fileID: 2,
-      fileName: '敏捷开发',
-      fileImage: '/resource/image/project1.jpeg',
-      createTime: '2020-01-01',
-      lastVisitTime: '2020-01-01',
+      fileName: '',
+      fileImage: '',
+      createTime: '',
+      lastVisitTime: '',
+      teamName: '',
+      userName: '',
     },
   ],
   teamId: null,
@@ -160,13 +166,6 @@ const isManage = ref(false); //是否进入删除状态
 const input = ref(''); //搜索关键字
 const newFileName = ref(''); //新命名项目名称
 const router = useRouter();
-const { setProjID } = useProjStore();
-const currentProject = ref({
-  fileName: '项目名称',
-  teamName: '团队名称',
-  userName: '创建者',
-  createTime: '1970-1-1',
-}); //当前项目信息
 //操作列表
 const operates = ref([
   {
@@ -242,13 +241,14 @@ const handleDelete = (fileID: number) => {
 };
 
 //修改项目名称
-const handleEdit = (fileID: number) => {
+const handleEdit = (item: any) => {
   window.$dialog.info({
     title: '修改项目名称',
     content: () => {
       return h(NInput, {
         style: 'width: 100%;',
         placeholder: '请输入项目名称',
+        value: item.fileName,
         onInput: (e: any) => {
           newFileName.value = e;
           console.log(newFileName.value);
@@ -265,35 +265,27 @@ const handleEdit = (fileID: number) => {
     maskClosable: false,
     onPositiveClick: () => {
       if (newFileName.value.length > 0) {
-        editFile({ fileID: fileID, fileName: newFileName.value, fileImage: null, fatherID: null, data: null }).then(
-          (res) => {
-            if (res.data.result == 0) {
-              window.$message.success('修改成功');
-              emits('refresh');
-            } else if (res.data.result == 1) {
-              window.$message.warning(res.data.message);
-            } else if (res.data.result == 2) {
-              window.$message.error(res.data.message);
-            }
+        editFile({
+          fileID: item.fileID,
+          fileName: newFileName.value,
+          fileImage: null,
+          fatherID: null,
+          data: null,
+        }).then((res) => {
+          if (res.data.result == 0) {
+            window.$message.success('修改成功');
+            emits('refresh');
+          } else if (res.data.result == 1) {
+            window.$message.warning(res.data.message);
+          } else if (res.data.result == 2) {
+            window.$message.error(res.data.message);
           }
-        );
+        });
       } else {
         window.$message.warning('请输入项目名称');
       }
     },
     onNegativeClick: () => {},
-  });
-};
-
-//显示项目信息
-const handleUpdateShow = (fileID: number) => {
-  readFile({ fileID: fileID, teamID: -1 }).then((res) => {
-    if (res.data.result == 0) {
-      currentProject.value.fileName = res.data?.fileName;
-      currentProject.value.createTime = res.data?.createTime.slice(0, 10);
-      currentProject.value.teamName = res.data?.teamName;
-      currentProject.value.userName = res.data?.userName;
-    }
   });
 };
 
@@ -330,9 +322,11 @@ const formatDate = (date: string) => {
 
 //跳转到指定项目
 const jumpToProj = (fileID: number) => {
-  setProjID(fileID);
   router.push({
-    path: '/workspace',
+    name: 'workspace',
+    params: {
+      ProjID: fileID,
+    },
   });
 };
 </script>
