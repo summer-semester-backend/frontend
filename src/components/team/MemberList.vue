@@ -163,7 +163,7 @@ function reload() {
           }
           var identity = '普通成员';
           if (item.authority == 2) {
-            identity = '项目创建人';
+            identity = '团队创建人';
           } else if (item.authority == 1) {
             identity = '管理员';
           } else if (item.authority == 0) {
