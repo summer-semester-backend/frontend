@@ -1,8 +1,7 @@
 <template>
   <div class="object-inspector">
-    <div class="inspector-title inspector-title-drag-handle">
+    <div class="inspector-title">
       <div>查看器</div>
-      <div style="flex-grow: 1; pointer-events: none"></div>
       <div @click="expanded = !expanded" style="cursor: pointer">
         <EditorIcon v-show="expanded" size="16px" icon="keyboard_arrow_down" color="white" />
         <EditorIcon v-show="!expanded" size="16px" icon="keyboard_arrow_right" color="white" />
@@ -34,12 +33,6 @@
         :object="object"
         @property-changed="(changedProperty, newValue) => emit('property-changed', changedProperty, newValue)"
       />
-
-      <!-- Debug -->
-      <!-- <div v-show="expanded">
-                <hr />
-                <pre style="color: #ddd;">{{ object }}</pre>
-            </div> -->
     </template>
   </div>
 </template>
@@ -96,12 +89,6 @@ function getTabSections() {
   return schema.tabs[currentTab.value].sections;
 }
 </script>
-
-<style>
-.inspector-title-drag-handle {
-  cursor: move;
-}
-</style>
 
 <style scoped>
 .object-inspector {

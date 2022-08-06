@@ -1,15 +1,7 @@
 <template>
   <div class="flex h-full">
-    <div class="basis-1/7 h-full">
-      <n-button text secondary @click="handleBackToWorkspace">
-        <template #icon>
-          <n-icon>
-            <chevron-back />
-          </n-icon>
-        </template>
-        返回项目
-      </n-button>
-      <ToolBox @tool-selected="handleToolBoxSelect"></ToolBox>
+    <div class="basis-1/7 h-full bg-[#18181c]">
+      <LeftSideBar @tool-selected="handleToolBoxSelect" />
     </div>
     <div class="basis-5/7 h-full">
       <div class="editor-container">
@@ -359,8 +351,6 @@
 </template>
 
 <script setup lang="ts">
-import { ChevronBack } from '@vicons/ionicons5';
-import { useRouter } from 'vue-router';
 import { onKeyStroke, useKeyModifier } from '@vueuse/core';
 import { computed, nextTick, onBeforeMount, onMounted, onUpdated, ref } from 'vue';
 import Guides from 'vue3-guides';
@@ -524,8 +514,6 @@ const origin: Frame = {
 
 // Track mouse position within the viewport coordinates
 const mouseCoords = ref<Position>({ x: 0, y: 0 });
-
-const router = useRouter();
 
 const handleToolBoxSelect = (selected: EditorTool) => {
   currentTool.value = selected;
@@ -1104,10 +1092,6 @@ function inlineEdit(item: Item) {
     inlineEditing.value = true;
   }
 }
-
-function handleBackToWorkspace() {
-  router.push({ name: 'PrototypeList' });
-}
 </script>
 
 <style>
@@ -1155,8 +1139,8 @@ function handleBackToWorkspace() {
   height: calc(100% - 30px);
   background-color: rgb(237, 237, 237);
   user-select: none;
-  background-image: linear-gradient(90deg, rgba(180, 180, 180, 0.15) 10%, rgba(0, 0, 0, 0) 10%),
-    linear-gradient(rgba(180, 180, 180, 0.15) 10%, rgba(0, 0, 0, 0) 10%);
+  background-image: linear-gradient(90deg, rgba(140, 140, 140, 0.15) 10%, rgba(0, 0, 0, 0) 10%),
+    linear-gradient(rgba(140, 140, 140, 0.15) 10%, rgba(0, 0, 0, 0) 10%);
   background-size: 10px 10px;
 }
 
