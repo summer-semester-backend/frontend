@@ -20,7 +20,6 @@ const isProtoPage = computed(() => {
 });
 backend.interceptors.response.use(
   (response) => {
-    console.log(response.data);
     if (response.data.result == 10) {
       window.$message.error('登录认证失败');
       signOut();
