@@ -102,14 +102,14 @@ const routes: RouteRecordRaw[] = [
     ],
   },
   {
+    path: '/doc/edit/:id',
+    name: 'editor',
+    component: () => import('../views/document/DocumentEditor.vue'),
+  },
+  {
     path: '/login',
     name: 'login',
     component: () => import('../views/login/LoginPage.vue'),
-  },
-  {
-    path: '/document/editor',
-    name: 'editor',
-    component: () => import('../views/document/DocumentEditor.vue'),
   },
 ];
 

@@ -80,6 +80,10 @@ const handleUpdateTab = (value: string) => {
 };
 onMounted(() => {
   getProjInfo(parseInt(route.params.ProjID.toString()));
+  if (route.fullPath.split('/').length == 4) {
+    tabValue.value = route.fullPath.split('/')[3];
+    console.log(tabValue.value);
+  }
 });
 </script>
 

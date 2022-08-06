@@ -9,13 +9,13 @@
       </n-icon> -->
     </div>
 
-    <n-input round placeholder="搜索">
+    <!--<n-input round placeholder="搜索">
       <template #suffix>
         <n-icon size="18">
           <FlashOutline />
         </n-icon>
       </template>
-    </n-input>
+    </n-input>-->
 
     <n-space vertical>
       <!-- <n-switch v-model:value="collapsed" /> -->

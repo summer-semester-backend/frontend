@@ -12,7 +12,7 @@
 </template>
 
 <script setup lang="ts">
-import { NButton, NIcon, NInput, NSpace } from 'naive-ui';
+import { NButton, NDivider, NIcon, NInput, NSpace } from 'naive-ui';
 import { h, ref, computed, onMounted } from 'vue';
 import { AddCircleOutline, Trash, ArrowRedo, CreateOutline, Create } from '@vicons/ionicons5';
 import { createFile, deleteFile, editFile } from '@/api/file';
@@ -88,12 +88,7 @@ const columns = ref([
             secondary: true,
             onClick(e) {
               console.log(row);
-              router.push({
-                name: 'editor',
-                params: {
-                  id: row.fileID,
-                },
-              });
+              window.open(`/doc/edit/${row.fileID}`, '_blank');
             },
           },
           {
@@ -164,15 +159,18 @@ const handleEdit = (item: any) => {
   window.$dialog.info({
     title: '修改文件名称',
     content: () => {
-      return h(NInput, {
-        style: 'width: 100%;',
-        placeholder: '请输入文件名称',
-        value: item.fileName,
-        onInput: (e: any) => {
-          console.log(e);
-          item.fileName = e;
-        },
-      });
+      return h('div', {}, [
+        h(NDivider, { style: 'margin-top: 10px;' }),
+        h(NInput, {
+          style: 'width: 100%;',
+          placeholder: '请输入文件名称',
+          value: item.fileName,
+          onInput: (e: any) => {
+            console.log(e);
+            item.fileName = e;
+          },
+        }),
+      ]);
     },
     icon: () => {
       return h(NIcon, {
@@ -211,13 +209,16 @@ const handleCreate = () => {
   window.$dialog.info({
     title: '新建文件',
     content: () => {
-      return h(NInput, {
-        style: 'width: 100%;',
-        placeholder: '请输入文件名称',
-        onInput: (e: any) => {
-          newFileName.value = e;
-        },
-      });
+      return h('div', {}, [
+        h(NDivider, { style: 'margin-top: 10px;' }),
+        h(NInput, {
+          style: 'width: 100%;',
+          placeholder: '请输入文件名称',
+          onInput: (e: any) => {
+            newFileName.value = e;
+          },
+        }),
+      ]);
     },
     icon: () => {
       return h(NIcon, {
