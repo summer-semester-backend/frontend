@@ -26,11 +26,16 @@
             list-type="image-card"
           >
             <n-upload-dragger>
-              <div style="margin-bottom: 12px">
+              <!-- <div style="margin-bottom: 12px">
                 <n-icon size="48" :depth="3">
-                  <archive-outline />
+                   <archive-outline />
+                  <Add/>
                 </n-icon>
-              </div>
+              </div> -->
+              <n-icon size="24" :depth="1">
+                <!-- <archive-outline /> -->
+                <AddSharp />
+              </n-icon>
             </n-upload-dragger>
           </n-upload>
         </n-form-item>
@@ -48,6 +53,7 @@
 <script setup lang="ts">
 import { ref, computed, reactive, defineProps, onMounted, watch } from 'vue';
 import type { FormInst, FormRules, FormItemRule, UploadFileInfo } from 'naive-ui';
+import { AddSharp } from '@vicons/ionicons5';
 import { createFile } from '@/api/file';
 import { teamList } from '@/api/team';
 //传参

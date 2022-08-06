@@ -132,6 +132,6 @@ onMounted(() => {
 
 .bottomData {
   font-size: 14px;
-  width: 200px;
+  width: 265px;
 }
 </style>
