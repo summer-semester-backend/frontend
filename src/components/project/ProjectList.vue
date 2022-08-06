@@ -250,8 +250,7 @@ const handleEdit = (item: any) => {
         placeholder: '请输入项目名称',
         value: item.fileName,
         onInput: (e: any) => {
-          newFileName.value = e;
-          console.log(newFileName.value);
+          item.fileName = e;
         },
       });
     },
@@ -264,10 +263,10 @@ const handleEdit = (item: any) => {
     negativeText: '取消',
     maskClosable: false,
     onPositiveClick: () => {
-      if (newFileName.value.length > 0) {
+      if (item.fileName.length > 0) {
         editFile({
           fileID: item.fileID,
-          fileName: newFileName.value,
+          fileName: item.fileName,
           fileImage: null,
           fatherID: null,
           data: null,
@@ -348,5 +347,8 @@ const jumpToProj = (fileID: number) => {
       }
     }
   }
+}
+.read-only {
+  pointer-events: none;
 }
 </style>

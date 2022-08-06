@@ -13,7 +13,7 @@ export function recentProjectList() {
 }
 
 export function binList(data: { fileID: number | null }) {
-  return backend.post('/file/binList');
+  return backend.post('/file/binList', data);
 }
 
 export function createFile(data: {
