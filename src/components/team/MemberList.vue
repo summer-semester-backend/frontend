@@ -146,7 +146,7 @@ function handleDeleteManager(rowData: any) {
   deleteTeamManager({ teamID: route.params.teamID as string, userID: rowData.userID }).then((res) => {
     if (res.data.result == 0) {
       window.$message.info(res.data.message);
-      tableData.value[rowData.key].identity = '组员';
+      tableData.value[rowData.key].identity = '普通成员';
       tableData.value[rowData.key].isManager = false;
     }
   });
