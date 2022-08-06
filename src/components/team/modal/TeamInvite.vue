@@ -2,37 +2,39 @@
   <n-modal
     v-model:show="show"
     preset="dialog"
-    title="添加成员"
+    title="通过链接邀请成员"
     size="medium"
-    positive-text="确认"
+    positive-text="复制"
     negative-text="取消"
     @positive-click="handlePositiveClick"
   >
     <n-divider style="margin: 15px auto" />
     <n-space>
-      <n-input v-model:value="userEmail" type="text" placeholder="请输入添加的成员邮箱" style="width: 375px" />
+      链接（7天内有效）
+      <n-input v-model:value="code" type="text" placeholder="" style="width: 375px" :disabled="true" />
     </n-space>
   </n-modal>
 </template>
 
 <script setup lang="ts">
 import { inviteTeamMember } from '@/api/team';
-
 import { ref } from 'vue';
 import { useRoute } from 'vue-router';
 
 const route = useRoute();
-const userEmail = ref('');
+const code = ref('');
 const show = ref(false);
 
-function handlePositiveClick() {
-  inviteTeamMember({ teamID: route.params.teamID as string, email: userEmail.value }).then((res) => {
+const handlePositiveClick = async () => {
+  navigator.clipboard.writeText(code.value);
+};
+
+function open() {
+  inviteTeamMember({ teamID: route.params.teamID as string }).then((res) => {
     if (res.data.result == 0) {
-      window.$message.info('邀请成功');
+      code.value = window.location.origin + '/attendTeam/' + res.data.inviteCode;
     }
   });
-}
-function open() {
   show.value = true;
 }
 

@@ -35,7 +35,7 @@
                     @click="jumpToProj(item.fileID)"
                   >
                     <template #cover>
-                      <div v-if="isManage" style="position: absolute; top: 5px; right: 5px">
+                      <div v-if="isManage" style="position: absolute; top: 5px; right: 5px; z-index: 2">
                         <n-space>
                           <n-button circle type="error" size="small" @click.stop="handleDelete(item.fileID)">
                             <n-icon size="20"><trash-outline /></n-icon
@@ -51,6 +51,12 @@
                         object-fit="cover"
                         preview-disabled
                       ></n-image>
+                      <div
+                        class="item-mask"
+                        style=""
+                        @click.stop=""
+                        :style="{ opacity: isManage ? '0.2' : '0', 'z-index': isManage ? '1' : '-1' }"
+                      ></div>
                     </template>
                     <template #footer>
                       <n-ellipsis
@@ -71,7 +77,7 @@
               </n-tooltip>
             </n-gi>
             <!--添加项目卡片-->
-            <n-gi v-if="page == parseInt((dataFilter.length / pageSize + 1).toString())">
+            <n-gi>
               <n-card
                 :segmented="{
                   footer: 'soft',
@@ -117,6 +123,14 @@
     @close="isCreateModalShow = false"
     @refresh="refresh"
   />
+  <!--编辑项目-->
+  <edit-modal
+    :isEditModalShow="isEditModalShow"
+    :file-i-d="newFile.fileID"
+    :file-name="newFile.fileName"
+    @close="isEditModalShow = false"
+    @refresh="refresh"
+  />
 </template>
 <script setup lang="ts">
 import { ref, computed, reactive, defineProps, onMounted, h, watch } from 'vue';
@@ -151,7 +165,7 @@ const props = withDefaults(defineProps<Props>(), {
     },
   ],
   teamId: null,
-  pageSize: 10,
+  pageSize: 9,
 });
 
 //传递事件
@@ -161,10 +175,14 @@ const title = ref('我的项目'); //页面标题
 const isEmbedded = ref(true); //卡片是否灰色
 const isInputShow = ref(false); //是否显示搜索框
 const isCreateModalShow = ref(false); //是否显示创建项目弹窗
+const isEditModalShow = ref(false); //是否显示编辑项目弹窗
 const page = ref(1); //当前页
 const isManage = ref(false); //是否进入删除状态
 const input = ref(''); //搜索关键字
-const newFileName = ref(''); //新命名项目名称
+const newFile = ref({
+  fileName: '',
+  fileID: 0,
+}); //新命名项目名称
 const router = useRouter();
 //操作列表
 const operates = ref([
@@ -240,52 +258,9 @@ const handleDelete = (fileID: number) => {
   });
 };
 
-//修改项目名称
 const handleEdit = (item: any) => {
-  window.$dialog.info({
-    title: '修改项目名称',
-    content: () => {
-      return h(NInput, {
-        style: 'width: 100%;',
-        placeholder: '请输入项目名称',
-        value: item.fileName,
-        onInput: (e: any) => {
-          item.fileName = e;
-        },
-      });
-    },
-    icon: () => {
-      return h(NIcon, {
-        component: CreateOutline,
-      });
-    },
-    positiveText: '确定',
-    negativeText: '取消',
-    maskClosable: false,
-    onPositiveClick: () => {
-      if (item.fileName.length > 0) {
-        editFile({
-          fileID: item.fileID,
-          fileName: item.fileName,
-          fileImage: null,
-          fatherID: null,
-          data: null,
-        }).then((res) => {
-          if (res.data.result == 0) {
-            window.$message.success('修改成功');
-            emits('refresh');
-          } else if (res.data.result == 1) {
-            window.$message.warning(res.data.message);
-          } else if (res.data.result == 2) {
-            window.$message.error(res.data.message);
-          }
-        });
-      } else {
-        window.$message.warning('请输入项目名称');
-      }
-    },
-    onNegativeClick: () => {},
-  });
+  newFile.value = item;
+  isEditModalShow.value = true;
 };
 
 //刷新列表
@@ -348,7 +323,14 @@ const jumpToProj = (fileID: number) => {
     }
   }
 }
-.read-only {
-  pointer-events: none;
+.item-mask {
+  display: inline-block;
+  position: absolute;
+  background-color: #000000;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  transition: opacity 0.3s ease-in-out;
 }
 </style>
