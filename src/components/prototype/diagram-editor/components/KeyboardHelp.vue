@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <div class="title">Keyboard Shortcuts</div>
+    <div class="title">键盘快捷键</div>
     <div class="key" v-for="k in shortcuts" :style="{ 'margin-bottom': k[0] === '' ? '16px' : '2px' }">
       <div class="key-shortcut">{{ k[0] }}</div>
       <div class="key-help">{{ k[1] }}</div>
@@ -10,29 +10,27 @@
 
 <script setup lang="ts">
 const shortcuts = [
-  ['CMD+C', 'Copy the selected item'],
-  ['CMD+X', 'Cut the selected item'],
-  ['CMD+V', 'Paste the last copied / cut item'],
+  ['CMD+C', '复制选中实体'],
+  ['CMD+X', '剪切选中实体'],
+  ['CMD+V', '粘贴'],
   ['', ''],
-  ['CMD+Z', 'Undo'],
-  ['SHIFT+CMD+Z', 'Redo'],
+  ['CMD+Z', '撤销'],
+  ['SHIFT+CMD+Z', '重做'],
   ['', ''],
-  ['S', 'Selection tool'],
-  ['C', 'Connection tool'],
-  ['T', 'Text tool'],
-  ['R', 'Rectangle tool'],
-  ['I', 'Show / Hide inspector'],
-  ['K', 'Show / Hide keyboard shortcuts'],
+  ['S', '选中'],
+  ['C', '连接'],
+  // ['I', 'Show / Hide inspector'],
+  ['K', '显示 / 收起 快捷键提示面板'],
   ['', ''],
-  ['Backspace / Delete', 'Delete selected item / connection'],
-  ['Arrows', 'Move selected item by 1 pixel'],
-  ['SHIFT+Arrows', 'Move selected item by 10 pixels'],
+  ['Backspace / Delete', '删除选中实体/连接'],
+  ['方向键', '按1px移动物体'],
+  ['SHIFT+方向键', '按10px移动物体'],
   ['', ''],
-  ['SHIFT', 'While resizing keep the aspect ratio. In rotation will rotate by 45 deg'],
-  ['ESC', 'Cancel operation during connection creation'],
-  ['SHIFT+Mouse drag', 'Pan canvas area'],
-  ['CTRL+Mouse wheel', 'Zoom in / out'],
-  ['Double Click', 'Edit item text'],
+  ['SHIFT', '调整大小时，保持纵横比，旋转时将旋转45度'],
+  ['ESC', '在连接创建期间取消操作'],
+  ['SHIFT+拖动鼠标', '拖动画板'],
+  ['CTRL+滚动鼠标滚轮', '放大/缩小'],
+  ['左键双击', '编辑实体文字'],
 ];
 
 // Replace 'CMD' with 'CTRL' is user is using not a Mac
