@@ -19,6 +19,7 @@ onMounted(() => {
     .catch((err) => {
       localStorage.setItem('inviteLink', route.params.code as string);
       console.log(err);
+      router.push({ name: 'ProjectDesktop' });
     });
 });
 </script>
