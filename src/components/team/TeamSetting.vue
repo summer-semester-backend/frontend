@@ -89,14 +89,14 @@ function clickConfilmUpdate() {
 function handleQuitClick() {
   leaveTeam({ teamID: route.params.teamID as string }).then((res) => {
     if (res.data.result == 0) {
-      router.push({ path: 'project' });
+      window.open('/team', '_self');
     }
   });
 }
 function handleDeleteClick() {
   deleteTeam({ teamID: route.params.teamID as string }).then((res) => {
     if (res.data.result == 0) {
-      router.push({ name: 'project' });
+      window.open('/team', '_self');
     }
   });
 }

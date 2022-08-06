@@ -29,16 +29,17 @@ import { h, ref, computed, onMounted } from 'vue';
 import { Refresh, Trash, Search, EllipsisHorizontal } from '@vicons/ionicons5';
 import { binList, recoverFile, deleteFile, clearBin } from '@/api/file';
 import { ToolBar } from './components';
-import { useProjStore } from '@/store/proj';
-type Project = {
+import { useRoute } from 'vue-router';
+type Trash = {
   fileID: number;
   fileName: string;
-  teamName: string;
+  fileType: number;
   abandonTime: string;
 };
-const { getProjID } = useProjStore();
 const isInputShow = ref(false); //是否显示搜索框
 const input = ref(''); //搜索关键字
+const projID = ref();
+const route = useRoute();
 const options = ref([
   {
     label: '清空回收站',
@@ -47,24 +48,34 @@ const options = ref([
 ]);
 const columns = ref([
   {
-    title: '项目名称',
+    title: '文件名称',
     key: 'fileName',
-    sorter: (row1: Project, row2: Project) => (row1.fileName > row2.fileName ? 1 : -1),
   },
   {
-    title: '所属团队',
+    title: '文件类型',
     key: 'teamName',
-    sorter: (row1: Project, row2: Project) => (row1.teamName > row2.teamName ? 1 : -1),
+    render: (row: Trash) =>
+      h('span', () => {
+        switch (row.fileType) {
+          case 12:
+            return 'UML图';
+          case 13:
+            return '原型图';
+          case 14:
+            return '文档';
+        }
+      }),
   },
   {
     title: '删除时间',
     key: 'abandonTime',
-    sorter: (row1: Project, row2: Project) => (row1.abandonTime > row2.abandonTime ? 1 : -1),
+    sorter: (row1: Trash, row2: Trash) => (row1.abandonTime > row2.abandonTime ? 1 : -1),
+    render: (row: Trash) => h('span', row.abandonTime?.slice(0, 10)),
   },
   {
     title: '操作',
     key: 'actions',
-    render(row: Project) {
+    render(row: Trash) {
       return h(NSpace, [
         h(
           NButton,
@@ -78,7 +89,7 @@ const columns = ref([
               recoverFile({ fileID: row.fileID }).then((res) => {
                 if (res.data.result == 0) {
                   window.$message.success(res.data.message);
-                  getProjectList();
+                  getProjectList(projID.value);
                 } else if (res.data.result == 1) {
                   window.$message.warning(res.data.message);
                 } else if (res.data.result == 2) {
@@ -104,7 +115,7 @@ const columns = ref([
               deleteFile({ fileID: row.fileID }).then((res) => {
                 if (res.data.result == 0) {
                   window.$message.success(res.data.message);
-                  getProjectList();
+                  getProjectList(projID.value);
                 } else if (res.data.result == 1) {
                   window.$message.warning(res.data.message);
                 } else if (res.data.result == 2) {
@@ -151,7 +162,7 @@ const handleSelect = (key: string | number) => {
     clearBin().then((res) => {
       if (res.data.result == 0) {
         window.$message.success(res.data.message);
-        getProjectList();
+        getProjectList(projID.value);
       } else if (res.data.result == 1) {
         window.$message.warning(res.data.message);
       } else if (res.data.result == 2) {
@@ -161,8 +172,8 @@ const handleSelect = (key: string | number) => {
   }
 };
 
-const getProjectList = () => {
-  binList({ fileID: getProjID() })
+const getProjectList = (id: number) => {
+  binList({ fileID: id })
     .then((res) => {
       trashs.value = res.data.list;
     })
@@ -171,7 +182,8 @@ const getProjectList = () => {
     });
 };
 onMounted(() => {
-  getProjectList();
+  projID.value = parseInt(route.params.ProjID.toString());
+  getProjectList(projID.value);
 });
 
 //搜索

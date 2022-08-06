@@ -18,7 +18,6 @@ import { AddCircleOutline, Trash, ArrowRedo } from '@vicons/ionicons5';
 import { readFile } from '@/api/file';
 import { useRoute, useRouter } from 'vue-router';
 import { ToolBar } from './components';
-import { useProjStore } from '@/store/proj';
 interface File {
   fileID: number;
   fileName: string;
@@ -26,7 +25,7 @@ interface File {
   lastEditTime: string;
 }
 const router = useRouter();
-const { getProjID } = useProjStore();
+const route = useRoute();
 const projID = ref<number | null>(null);
 const pagination = ref({
   current: 1,
@@ -37,19 +36,18 @@ const handleProto = () => {
 };
 const columns = ref([
   {
-    title: '项目名称',
+    title: '文件名称',
     key: 'fileName',
-    sorter: (row1: File, row2: File) => (row1.fileName > row2.fileName ? 1 : -1),
   },
   {
     title: '创建者',
-    key: 'teamName',
-    sorter: (row1: File, row2: File) => (row1.userName > row2.userName ? 1 : -1),
+    key: 'userName',
   },
   {
     title: '最近更新',
-    key: 'abandonTime',
+    key: 'lastEditTime',
     sorter: (row1: File, row2: File) => (row1.lastEditTime > row2.lastEditTime ? 1 : -1),
+    render: (row: File) => h('span', row.lastEditTime?.slice(0, 10)),
   },
   {
     title: '操作',
@@ -115,8 +113,8 @@ const getFileList = (id: number | null) => {
   });
 };
 onMounted(() => {
-  projID.value = getProjID();
-  getFileList(getProjID());
+  projID.value = parseInt(route.params.ProjID.toString());
+  getFileList(projID.value);
 });
 </script>
 

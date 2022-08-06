@@ -161,13 +161,13 @@ function reload() {
           if (userID == item.userID && item.authority > 0) {
             isManager.value = true;
           }
-          var identity = '普通成员';
+          var identity = '组员';
           if (item.authority == 2) {
-            identity = '项目创建人';
+            identity = '团队创建人';
           } else if (item.authority == 1) {
             identity = '管理员';
           } else if (item.authority == 0) {
-            identity = '普通成员';
+            identity = '组员';
           }
           return {
             ...item,
