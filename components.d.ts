@@ -34,6 +34,8 @@ declare module 'vue' {
     ObjectInspectorProperty: typeof import('./src/components/prototype/inspector/ObjectInspectorProperty.vue')['default']
     ObjectInspectorSection: typeof import('./src/components/prototype/inspector/ObjectInspectorSection.vue')['default']
     ObjectInspectorTab: typeof import('./src/components/prototype/inspector/ObjectInspectorTab.vue')['default']
+    PageBox: typeof import('./src/components/prototype/toolbox/PageBox.vue')['default']
+    PageBoxItem: typeof import('./src/components/prototype/toolbox/PageBoxItem.vue')['default']
     PasswordChange: typeof import('./src/components/user/PasswordChange.vue')['default']
     PersonInfo: typeof import('./src/components/user/PersonInfo.vue')['default']
     ProjectBar: typeof import('./src/components/project/ProjectBar.vue')['default']
