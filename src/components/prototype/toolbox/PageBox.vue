@@ -11,7 +11,12 @@
     <div class="pagebox-content">
       <n-config-provider :theme="darkTheme">
         <n-card v-if="expanded" :bordered="false" class="card">
-          <PageBoxItem v-for="(p, i) in pages"> </PageBoxItem>
+          <n-menu :options="pageOptions" class="w-full"></n-menu>
+          <n-button class="w-full" @click="emits('page-create', newPageName)">
+            <template #icon>
+              <n-icon><Add /></n-icon>
+            </template>
+          </n-button>
         </n-card>
       </n-config-provider>
     </div>
@@ -19,16 +24,34 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { darkTheme } from 'naive-ui';
-import { EditorTool, Item } from '../diagram-editor/types';
+import { Add } from '@vicons/ionicons5';
+import { EditorTool, PageItem } from '../diagram-editor/types';
 interface PageBoxEvents {
   (e: 'page-selected', toolType: EditorTool): void;
+  (e: 'page-create', pageName: string): void;
 }
-interface PageItem extends Item {}
-const pages = ref<Array<PageItem>>([]);
+const props = defineProps<{ pages: Array<PageItem> }>();
+const pageOptions = ref<Array<{ key: string; label: string }>>([]);
+const newPageName = computed(() => '页面' + (pageOptions.value.length + 1));
 const expanded = ref(true);
 const emits = defineEmits<PageBoxEvents>();
+watch(
+  () => props.pages,
+  (newPage: Array<PageItem>) => {
+    pageOptions.value = newPage.map((ele) => {
+      return {
+        key: ele.id,
+        label: ele.pageName,
+      };
+    });
+  },
+  {
+    immediate: true,
+    deep: true,
+  }
+);
 </script>
 
 <style scoped>

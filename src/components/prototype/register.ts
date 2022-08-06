@@ -11,8 +11,8 @@ import Triangle from './diagram-editor/blocks/Triangle.vue';
 // Custom
 import Input from './diagram-editor/blocks/Input.vue';
 import Radio from './diagram-editor/blocks/Radio.vue';
-
 import Button from './diagram-editor/blocks/Button.vue';
+import Page from './diagram-editor/blocks/Page.vue';
 export function setupPrototypeComponents(app: App) {
   app.component('Text', Text);
   app.component('Line', Line);
@@ -25,6 +25,6 @@ export function setupPrototypeComponents(app: App) {
   app.component('Input', Input);
   app.component('Radio', Radio);
   app.component('Button', Button);
-
+  app.component('Page', Page);
   app.component('Connection', Connection);
 }

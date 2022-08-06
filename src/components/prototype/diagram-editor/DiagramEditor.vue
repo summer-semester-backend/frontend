@@ -1,7 +1,18 @@
 <template>
   <div class="flex h-full">
     <div class="basis-1/7 h-full bg-[#18181c]">
-      <LeftSideBar @tool-selected="handleToolBoxSelect" />
+      <div class="m-2">
+        <n-button size="large" text text-color="white" secondary @click="handleBackToWorkspace">
+          <template #icon>
+            <n-icon>
+              <chevron-back />
+            </n-icon>
+          </template>
+          返回项目
+        </n-button>
+        <PageBox :pages="pages" @page-create="addPage" />
+        <ToolBox @tool-selected="handleToolBoxSelect" />
+      </div>
     </div>
     <div class="basis-5/7 h-full">
       <div class="editor-container">
@@ -351,6 +362,7 @@
 </template>
 
 <script setup lang="ts">
+import { ChevronBack } from '@vicons/ionicons5';
 import { onKeyStroke, useKeyModifier } from '@vueuse/core';
 import { computed, nextTick, onBeforeMount, onMounted, onUpdated, ref } from 'vue';
 import Guides from 'vue3-guides';
@@ -391,6 +403,7 @@ import {
   isItem,
   Item as _Item,
   ItemConnection,
+  PageItem,
   Position,
 } from './types';
 
@@ -403,6 +416,7 @@ import KeyboardHelp from './components/KeyboardHelp.vue';
 import { DefaultZoomManager, IZoomManager } from './ZoomManager';
 import * as htmlToImage from 'html-to-image';
 import FileSaver, { saveAs } from 'file-saver';
+import { useRouter } from 'vue-router';
 export type Item = _Item & { hover?: boolean };
 
 // The component props and events
@@ -442,6 +456,8 @@ onMounted(() => {
   vGuides.value.resize();
 
   viewer.value.scrollCenter();
+
+  pages.value = loadElements.value.filter((ele) => ele.isPage == true) as PageItem[];
 });
 
 onBeforeMount(() => {
@@ -493,6 +509,8 @@ const creatingConnection = computed<boolean>(() => currentTool.value === EditorT
 
 const items = computed(() => loadElements.value.filter((e) => isItem(e)) as Item[]);
 const connections = computed(() => loadElements.value.filter((e) => isConnection(e)) as ItemConnection[]);
+const pages = ref<Array<PageItem>>([]);
+const currentPage = ref<PageItem | null>(null);
 
 const itemToPaste = ref(null as Item | null);
 const inlineEditing = ref(false);
@@ -514,6 +532,11 @@ const origin: Frame = {
 
 // Track mouse position within the viewport coordinates
 const mouseCoords = ref<Position>({ x: 0, y: 0 });
+
+const router = useRouter();
+function handleBackToWorkspace() {
+  router.back();
+}
 
 const handleToolBoxSelect = (selected: EditorTool) => {
   currentTool.value = selected;
@@ -788,6 +811,27 @@ function bringToFront(): void {
 function saveProto(): void {
   localStorage.setItem('proto', JSON.stringify(elements as Item[]));
   window.$message.info('已保存');
+}
+
+function addPage(newPageName: string): void {
+  // TODO: page ID and save proto
+  saveProto();
+  // Clicking the canvas with other tools => create a new item of related type
+  const toolDef = getToolDefinition(EditorTool.PAGE);
+  const properties = getItemBlueprint(toolDef.itemType!)[0];
+  const w = properties.w;
+  const newItem = deepCloneItem({
+    ...properties,
+    id: getUniqueId(),
+    x: 200 + pages.value.length * (w + 200),
+    y: 200,
+    pageName: newPageName,
+  });
+
+  historyManager.value.execute(new AddItemCommand(loadElements.value, newItem));
+  currentPage.value = newItem;
+  pages.value.push(currentPage.value as PageItem);
+  emit('add-item', newItem);
 }
 
 /** Delete current selected item / connection */
