@@ -1,20 +1,10 @@
 <template>
-  <n-modal v-model:show="isCreateModalShow" preset="dialog" :show-icon="false" @close="handleCancleClick">
-    <template #header> 创建项目 </template>
+  <n-modal v-model:show="isEditModalShow" preset="dialog" :show-icon="false" @close="handleCancleClick">
+    <template #header> 修改项目信息 </template>
     <template #default>
       <n-form ref="formRef" :rules="rules" :model="projModel" label-placement="left">
         <n-form-item label="项目名称" path="fileName">
           <n-input v-model:value="projModel.fileName" placeholder=""></n-input>
-        </n-form-item>
-        <n-form-item label="所属团队" path="teamID">
-          <n-select
-            v-model:value="projModel.teamID"
-            value-field="teamID"
-            label-field="teamName"
-            :options="teams"
-            placeholder="请选择"
-            :disabled="teamId != null"
-          />
         </n-form-item>
         <n-form-item label="上传封面&nbsp;&nbsp;">
           <n-upload
@@ -26,14 +16,7 @@
             list-type="image-card"
           >
             <n-upload-dragger>
-              <!-- <div style="margin-bottom: 12px">
-                <n-icon size="48" :depth="3">
-                   <archive-outline />
-                  <Add/>
-                </n-icon>
-              </div> -->
               <n-icon size="24" :depth="1">
-                <!-- <archive-outline /> -->
                 <AddSharp />
               </n-icon>
             </n-upload-dragger>
@@ -54,29 +37,24 @@
 import { ref, computed, reactive, defineProps, onMounted, watch } from 'vue';
 import type { FormInst, FormRules, FormItemRule, UploadFileInfo } from 'naive-ui';
 import { AddSharp } from '@vicons/ionicons5';
-import { createFile } from '@/api/file';
+import { editFile } from '@/api/file';
 import { teamList } from '@/api/team';
-//传参
-const props = withDefaults(defineProps<{ teamId?: number | null; isCreateModalShow?: boolean }>(), {
-  teamId: null,
-  isCreateModalShow: false,
+const projModel = ref({
+  fileImage: '',
+  fileName: '',
+  fileID: 0,
+  fatherID: null,
+  data: null,
 });
+//传参
+const props = withDefaults(defineProps<{ isEditModalShow?: boolean; fileID: number | null; fileName: string }>(), {
+  isEditModalShow: false,
+  fileID: null,
+  fileName: '',
+});
+const fileImage = ref<string | null>(null);
 //传递事件
 const emits = defineEmits(['close', 'refresh']);
-
-const projModel = ref<{
-  teamID: number | null;
-  fileName: string;
-  fileType: number;
-  fileImage: string;
-  fatherID: number;
-}>({
-  teamID: null,
-  fileName: '',
-  fileType: 1,
-  fileImage: '',
-  fatherID: -1,
-});
 const formRef = ref<FormInst>();
 //团队列表
 const teams = ref([
@@ -97,18 +75,12 @@ const rules = ref<FormRules>({
       validator(rule: FormItemRule, value: string) {
         if (!value || value == '') {
           return new Error('请输入项目名称');
-        } else if (value.length > 10) {
+        } else if (value.length > 50) {
           return new Error('不超过10个字');
         }
         return true;
       },
       trigger: ['input', 'blur'],
-    },
-  ],
-  teamID: [
-    {
-      required: true,
-      message: '请选择团队',
     },
   ],
 });
@@ -123,13 +95,12 @@ const handleUploadFinish = ({ file, event }: { file: UploadFileInfo; event?: Pro
 const handleConfirmClick = () => {
   formRef.value?.validate((errors) => {
     if (!errors) {
-      createFile(projModel.value)
+      editFile(projModel.value)
         .then((res) => {
           if (res.data.result == 0) {
-            window.$message.success('创建成功');
+            window.$message.success('修改成功');
             projModel.value.fileName = '';
             projModel.value.fileImage = '';
-            projModel.value.teamID = null;
             emits('close');
             emits('refresh');
           } else if (res.data.result == 1) {
@@ -149,41 +120,21 @@ const handleConfirmClick = () => {
 const handleCancleClick = () => {
   projModel.value.fileName = '';
   projModel.value.fileImage = '';
-  projModel.value.teamID = null;
   emits('close');
 };
 
-//获取团队列表
-const getTeamList = () => {
-  teamList()
-    .then((res) => {
-      if (res.data.result == 0) {
-        teams.value = res.data.list;
-      } else if (res.data.result == 1) {
-        window.$message.warning(res.data.message);
-      } else if (res.data.result == 2) {
-        window.$message.error(res.data.message);
-      }
-    })
-    .catch((err) => {
-      console.log(err);
-    });
-};
-
-onMounted(() => {
-  getTeamList();
-  if (props.teamId != null) {
-    projModel.value.teamID = props.teamId;
+const fatherFileID = computed(() => {
+  if (props.fileID == null) {
+    return null;
+  } else {
+    return props.fileID;
   }
 });
 
-const fatherTeamID = computed(() => {
-  return props.teamId;
-});
-
-watch(fatherTeamID, (val) => {
+watch(fatherFileID, (val) => {
   if (val != null) {
-    projModel.value.teamID = props.teamId;
+    projModel.value.fileID = props.fileID || -1;
+    projModel.value.fileName = props.fileName;
   }
 });
 </script>

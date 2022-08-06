@@ -25,6 +25,7 @@ import {
   Position,
   TextHAlign,
   TextVAlign,
+  PageItem,
 } from './types';
 
 import { StyleValue } from 'vue';
@@ -76,6 +77,24 @@ export function getItemStyle(item: Item): StyleValue {
 
 export function getItemById(items: Item[], id: string): Item | undefined {
   return items.find((n) => n.id == id);
+}
+
+export function createPageItem(): PageItem {
+  return {
+    ...createItem({
+      id: 'id_page0',
+      isPage: true,
+      x: 200,
+      y: 200,
+      w: 1080,
+      h: 720,
+      z: -10000,
+    }),
+    title: 'page',
+    component: 'Page',
+    containedIDs: [],
+    pageName: '首页',
+  };
 }
 
 export function createItem(item?: DeepPartial<Item>): Item {
@@ -184,6 +203,7 @@ export function registerDefaultItemTypes() {
   const defaults = {
     id: '',
     title: '',
+    isPage: false,
 
     x: 100,
     y: 100,
@@ -250,6 +270,7 @@ export function registerDefaultItemTypes() {
       component: type,
       style: ConnectionStyle.SOLID,
       thick: 3,
+      backgroundColor: 'gray',
     },
     lineModel
   );
@@ -417,6 +438,21 @@ export function registerDefaultItemTypes() {
       color: undefined,
     },
     buttonModel
+  );
+
+  type = 'Page';
+  registerItemType(
+    {
+      ...defaults,
+      z: -10000,
+      component: type,
+      isPage: true,
+      title: 'page',
+      w: 1080,
+      h: 720,
+      containedIDs: [],
+    },
+    shapeModel
   );
 } // func
 

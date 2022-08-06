@@ -1,7 +1,7 @@
 <template>
   <div id="TeamProject">
     <div id="teamContent">
-      <ProjectList :projects="projects" :team-id="teamID" :page-size="20" @refresh="getProjectList(teamID)" />
+      <ProjectList :projects="projects" :team-id="teamID" :page-size="19" @refresh="getProjectList(teamID)" />
     </div>
   </div>
 </template>

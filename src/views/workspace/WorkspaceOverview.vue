@@ -1,7 +1,7 @@
 <template>
   <div id="workspace">
     <WorkBar id="workBar"></WorkBar>
-    <div style="margin: 20px 60px">
+    <div style="padding: 20px 60px">
       <router-view></router-view>
     </div>
   </div>
@@ -14,11 +14,12 @@ import { useRoute, useRouter } from 'vue-router';
 const route = useRoute();
 const router = useRouter();
 onMounted(() => {
-  if (route.params.ProjID) {
-    router.push({ name: 'DocumentList', params: { ProjID: route.params.ProjID } });
-  } else {
+  if (!route.params.ProjID) {
     window.$message.error('项目不存在');
     router.back();
+  }
+  if (route.fullPath.split('/').length === 3) {
+    router.push(`/workspace/${route.params.ProjID}/doc`);
   }
 });
 </script>

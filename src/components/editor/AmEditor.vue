@@ -1,7 +1,11 @@
 <template>
-  <div>
+  <div style="background-color: #f5f5f5">
     <AmToolbar v-if="engine" :engine="engine" :items="toolbarItems" />
-    <div style="margin: 40px 200px" ref="container"></div>
+    <n-scrollbar style="max-height: calc(100vh - 105px); width: 100%">
+      <div style="height: auto; background-color: white; margin: 40px 200px">
+        <div style="padding: 40px 40px; min-height: 150vh" ref="container"></div>
+      </div>
+    </n-scrollbar>
   </div>
 </template>
 <script setup lang="ts">
@@ -12,7 +16,7 @@ import type { GroupItemProps } from '@aomao/toolbar-vue';
 import { onMounted, ref, onUnmounted } from 'vue';
 import { OTClient } from './ot';
 import { cards, plugins, pluginConfig } from './config';
-import { useRoute } from 'vue-router';
+import { onBeforeRouteLeave, useRoute } from 'vue-router';
 import { getUserInfo } from '@/api/user';
 const container = ref<HTMLDivElement | null>(null);
 const engine = ref<EngineInterface | null>(null);
@@ -46,7 +50,11 @@ const initEditor = () => {
 
     // 协同编辑
     const ot = new OTClient(engineInstance);
-    ot.connect(`ws://43.138.77.8:8088${'?uid=' + currentMember.value.nickname}`, fileID.value, '');
+    ot.connect(
+      `ws://43.138.77.8:8088${'?uid=' + currentMember.value.userID + '&uname=' + currentMember.value.nickname}`,
+      fileID.value,
+      ''
+    );
     ot.on('ready', (member) => {
       if (member) {
         localStorage.setItem('member', JSON.stringify(member));
@@ -74,5 +82,9 @@ onMounted(() => {
 });
 onUnmounted(() => {
   if (engine.value) engine.value.destroy();
+});
+onBeforeRouteLeave((to, from, next) => {
+  if (engine.value) engine.value.destroy();
+  next();
 });
 </script>

@@ -1,7 +1,23 @@
 <template>
   <div class="flex h-full">
     <div class="basis-1/7 h-full bg-[#18181c]">
-      <LeftSideBar @tool-selected="handleToolBoxSelect" />
+      <div class="m-2">
+        <n-button size="large" text text-color="white" secondary @click="handleBackToWorkspace">
+          <template #icon>
+            <n-icon>
+              <chevron-back />
+            </n-icon>
+          </template>
+          返回项目
+        </n-button>
+        <PageBox
+          @page-create="handleCreatePage"
+          @page-selected="handleSelectPage"
+          :pages="pages"
+          :selected-page="currentPage?.id as string"
+        />
+        <ToolBox @tool-selected="handleToolBoxSelect" />
+      </div>
     </div>
     <div class="basis-5/7 h-full">
       <div class="editor-container">
@@ -164,7 +180,13 @@
             <!-- Manage drag / resize / rotate / rounding of selected item -->
             <Moveable
               ref="moveable"
-              :target="isItem(selectedItem) ? [`[data-item-id='${selectedItem.id}']`] : []"
+              :target="
+                isItem(selectedItem)
+                  ? isPage(selectedItem)
+                    ? currentPageTargets
+                    : [`[data-item-id='${selectedItem.id}']`]
+                  : []
+              "
               :zoom="1 / zoomFactor"
               :origin="false"
               :stopPropagation="true"
@@ -206,6 +228,9 @@
               @dragStart="onDragStart"
               @drag="onDrag"
               @dragEnd="onDragEnd"
+              @dragGroupStart="onDragGroupStart"
+              @dragGroup="onDragGroup"
+              @dragGroupEnd="onDragGroupEnd"
               @resizeStart="onResizeStart"
               @resize="onResize"
               @resizeEnd="onResizeEnd"
@@ -235,7 +260,7 @@
             @toolSelected="selectCurrentTool"
           />
           <div class="toolbar-separator"></div>
-          <ZoomToolbar :zoomManager="zoomManager" @zoomChanged="onZoomChanged" />
+          <ZoomToolbar ref="zoomToolbar" :zoomManager="zoomManager" @zoomChanged="onZoomChanged" />
           <div class="toolbar-separator"></div>
           <div v-if="editable" class="toolbar">
             <button class="toolbar-item" @click="undo" :disabled="!historyManager.canUndo()" title="Undo">
@@ -351,8 +376,9 @@
 </template>
 
 <script setup lang="ts">
+import { ChevronBack } from '@vicons/ionicons5';
 import { onKeyStroke, useKeyModifier } from '@vueuse/core';
-import { computed, nextTick, onBeforeMount, onMounted, onUpdated, ref } from 'vue';
+import { computed, nextTick, onBeforeMount, onMounted, ref } from 'vue';
 import Guides from 'vue3-guides';
 import { VueInfiniteViewer } from 'vue3-infinite-viewer';
 import Moveable from 'vue3-moveable';
@@ -389,8 +415,10 @@ import {
   getToolDefinition,
   isConnection,
   isItem,
+  isPage,
   Item as _Item,
   ItemConnection,
+  PageItem,
   Position,
 } from './types';
 
@@ -403,6 +431,8 @@ import KeyboardHelp from './components/KeyboardHelp.vue';
 import { DefaultZoomManager, IZoomManager } from './ZoomManager';
 import * as htmlToImage from 'html-to-image';
 import FileSaver, { saveAs } from 'file-saver';
+import { useRouter } from 'vue-router';
+import ZoomToolbarVue from './components/ZoomToolbar.vue';
 export type Item = _Item & { hover?: boolean };
 
 // The component props and events
@@ -442,14 +472,37 @@ onMounted(() => {
   vGuides.value.resize();
 
   viewer.value.scrollCenter();
+
+  pages.value = loadElements.value.filter((ele) => ele.isPage == true) as PageItem[];
+  originGroup = Array<Frame>(loadElements.value.length)
+    .fill({
+      x: 0,
+      y: 0,
+      w: 0,
+      h: 0,
+      z: 0,
+      r: 0,
+      borderRadius: 0,
+      opacity: 1,
+      clipType: ClipType.NONE,
+      clipStyle: '',
+    })
+    .map((item: Frame) => ({
+      x: 0,
+      y: 0,
+      w: 0,
+      h: 0,
+      z: 0,
+      r: 0,
+      borderRadius: 0,
+      opacity: 1,
+      clipType: ClipType.NONE,
+      clipStyle: '',
+    }));
 });
 
 onBeforeMount(() => {
   loadElements.value = elements;
-});
-
-onUpdated(() => {
-  //console.log('DiagramEditor updated')
 });
 
 // Set the handlers to manage keyboard shortcuts
@@ -464,6 +517,7 @@ const viewer = ref();
 const viewport = ref<HTMLDivElement>();
 const moveable = ref();
 const moveableInspector = ref();
+const zoomToolbar = ref<InstanceType<typeof ZoomToolbarVue> | null>(null);
 
 const hGuides = ref();
 const vGuides = ref();
@@ -477,6 +531,8 @@ const showKeyboard = ref(false); // Show or hide all the guides
 
 const loadElements = ref<Array<DiagramElement>>([]);
 const selectedItem = ref<DiagramElement | null>(null);
+const selectedPageItems = ref<Array<Item>>([]);
+const currentPageTargets = ref<Array<string>>([]);
 
 const selectedItemActive = computed(() => {
   if (!selectedItem.value) return false;
@@ -493,6 +549,8 @@ const creatingConnection = computed<boolean>(() => currentTool.value === EditorT
 
 const items = computed(() => loadElements.value.filter((e) => isItem(e)) as Item[]);
 const connections = computed(() => loadElements.value.filter((e) => isConnection(e)) as ItemConnection[]);
+const pages = ref<Array<PageItem>>([]);
+const currentPage = ref<PageItem | null>(null);
 
 const itemToPaste = ref(null as Item | null);
 const inlineEditing = ref(false);
@@ -512,8 +570,15 @@ const origin: Frame = {
   clipStyle: '',
 };
 
+let originGroup: Frame[] = [];
+
 // Track mouse position within the viewport coordinates
 const mouseCoords = ref<Position>({ x: 0, y: 0 });
+
+const router = useRouter();
+function handleBackToWorkspace() {
+  router.back();
+}
 
 const handleToolBoxSelect = (selected: EditorTool) => {
   currentTool.value = selected;
@@ -535,7 +600,7 @@ function saveToImage() {
 
 function onDragOver(e: any) {
   if (!viewport.value) return;
-  console.log('onDragOver', e.srcElement, e.offsetX, e.offsetY, e);
+  // console.log('onDragOver', e.srcElement, e.offsetX, e.offsetY, e);
   e.preventDefault();
   // Mouse position
   const rect = viewport.value.getBoundingClientRect();
@@ -568,19 +633,33 @@ function onMouseLeave(item: Item, e: MouseEvent) {
 function selectItem(item: Item | ItemConnection, e?: MouseEvent): void {
   // Item already selected?
   if (item.id === selectedItem.value?.id) return;
+  if (item.isPage == false) {
+    selectNone();
+    nextTick(() => {
+      selectedItem.value = item;
+      if (e)
+        nextTick(() => {
+          moveable.value?.dragStart(e);
+        });
 
-  console.log('selectItem', item, e);
+      if (moveableInspector.value) moveableInspector.value.updateRect();
+    });
+  } else {
+    selectNone();
+    // handleSelectPage(selectedItem.value as PageItem);
+    // console.log('page selected');
 
-  selectNone();
-  nextTick(() => {
-    selectedItem.value = item;
-    if (e)
+    nextTick(() => {
+      selectedItem.value = item;
+      selectedPageItems.value = loadElements.value.filter((elem) => {
+        return (item as PageItem).containedIDs.includes(`[data-item-id='${elem.id}']`);
+      }) as Item[];
       nextTick(() => {
-        moveable.value?.dragStart(e);
+        selectPage(item as PageItem);
       });
-
-    if (moveableInspector.value) moveableInspector.value.updateRect();
-  });
+      if (moveableInspector.value) moveableInspector.value.updateRect();
+    });
+  }
 }
 
 function selectNone(): void {
@@ -612,19 +691,32 @@ function onDragStart(e: any): void {
     return;
   }
 
-  console.log('onDragStart', e);
-
   origin.x = selectedItem.value.x;
   origin.y = selectedItem.value.y;
 }
 
+function onDragGroupStart(e: { events: any }): void {
+  e.events.forEach((ev: any, i: number) => {
+    originGroup[i].x = selectedPageItems.value[i].x;
+    originGroup[i].y = selectedPageItems.value[i].y;
+  });
+}
+
 function onDrag(e: any): void {
   if (!isItem(selectedItem.value)) return;
-
-  // console.log('ondrag', e);
   selectedItem.value.x = Math.floor(e.beforeTranslate[0]);
   selectedItem.value.y = Math.floor(e.beforeTranslate[1]);
   e.target.style.transform = e.transform;
+}
+
+function onDragGroup(e: { events: any }): void {
+  if (!isItem(selectedItem.value)) return;
+
+  e.events.forEach((e: any, i: number) => {
+    selectedPageItems.value[i].x = Math.floor(e.beforeTranslate[0]);
+    selectedPageItems.value[i].y = Math.floor(e.beforeTranslate[1]);
+    e.target.style.transform = e.transform;
+  });
 }
 
 function onDragEnd(e: any): void {
@@ -636,6 +728,18 @@ function onDragEnd(e: any): void {
   historyManager.value.execute(
     new MoveCommand(selectedItem.value, [origin.x, origin.y], [selectedItem.value.x, selectedItem.value.y])
   );
+}
+
+function onDragGroupEnd(e: { events: any }): void {
+  if (!isItem(selectedItem.value)) return;
+
+  selectedPageItems.value.forEach((pageItem, i: number) => {
+    //console.log('ondragend', pageItem.x, pageItem.y);
+    historyManager.value.execute(
+      new MoveCommand(pageItem, [originGroup[i].x, originGroup[i].y], [pageItem.x, pageItem.y])
+    );
+  });
+  selectNone();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -715,7 +819,7 @@ function onRoundEnd(e: any): void {
 // ---------------------------------------------------------------------------------------------------------------------
 function onClipStart(e: any): void {
   if (!isItem(selectedItem.value)) return;
-  console.log('onClipStart', e);
+  // console.log('onClipStart', e);
 
   origin.clipType = e.clipType;
   origin.clipStyle = e.clipStyle;
@@ -738,7 +842,7 @@ function onClip(e: any): void {
 }
 
 function onClipEnd(e: any): void {
-  console.log('onClipEnd', e);
+  // console.log('onClipEnd', e);
 
   if (isItem(selectedItem.value))
     historyManager.value.execute(
@@ -790,6 +894,32 @@ function saveProto(): void {
   window.$message.info('已保存');
 }
 
+function handleCreatePage(newPageName: string) {
+  addPage(newPageName);
+  focusPage(currentPage.value as PageItem);
+}
+
+function addPage(newPageName: string): void {
+  // TODO: page ID and save proto
+  saveProto();
+  // Clicking the canvas with other tools => create a new item of related type
+  const toolDef = getToolDefinition(EditorTool.PAGE);
+  const properties = getItemBlueprint(toolDef.itemType!)[0];
+  const w = properties.w;
+  const newItem = deepCloneItem({
+    ...properties,
+    id: getUniqueId(),
+    x: 200 + pages.value.length * (w + 200),
+    y: 200,
+    pageName: newPageName,
+  });
+
+  historyManager.value.execute(new AddItemCommand(loadElements.value, newItem, newItem as PageItem));
+  currentPage.value = newItem;
+  pages.value.push(currentPage.value as PageItem);
+  emit('add-item', newItem);
+}
+
 /** Delete current selected item / connection */
 function deleteItem() {
   if (isItem(selectedItem.value)) {
@@ -837,13 +967,13 @@ function redo() {
 
 /** Select the current tool to use (selection, connection, text, image, ...) */
 function selectCurrentTool(tool: EditorTool): void {
-  console.log('selectCurrentTool', tool);
+  // console.log('selectCurrentTool', tool);
 
   currentTool.value = tool;
   selectNone();
 
   if (tool == EditorTool.CONNECTION) {
-    console.log('Creating connection');
+    // console.log('Creating connection');
     nextTick(() => {
       connectionInfo.startItem = null;
       connectionInfo.endItem = null;
@@ -862,8 +992,10 @@ function onCanvasClick(e: any): void {
 
   // Current tool is 'select' => clicking the canvas unselect all
   if (currentTool.value === EditorTool.SELECT) {
-    console.log('Unselecting all');
-    selectNone();
+    if (!selectedItem.value?.isPage) {
+      console.log('Unselecting all');
+      selectNone();
+    }
     return;
   }
 
@@ -882,9 +1014,8 @@ function onCanvasClick(e: any): void {
     x: mouseCoords.value.x,
     y: mouseCoords.value.y,
   });
-
   console.log('creating new item', toolDef, toolDef.itemType, newItem);
-  historyManager.value.execute(new AddItemCommand(loadElements.value, newItem));
+  historyManager.value.execute(new AddItemCommand(loadElements.value, newItem, currentPage.value));
   emit('add-item', newItem);
   currentTool.value = EditorTool.SELECT;
 }
@@ -932,6 +1063,26 @@ function onZoomChanged(newZoomFactor: number, scrollViewerToCenter?: boolean) {
   zoomFactor.value = newZoomFactor;
 
   if (scrollViewerToCenter === true) nextTick(() => viewer.value?.scrollCenter());
+}
+
+/** Handle scroll to page */
+function handleSelectPage(page: PageItem) {
+  selectPage(page);
+  focusPage(page);
+}
+
+function focusPage(page: PageItem) {
+  window.$message.info('聚焦' + page.pageName);
+  const left = page.x - 200;
+  const top = page.y - 200;
+  viewer.value?.scrollTo(left, top);
+  zoomToolbar.value?.zoomReset();
+  console.log('page info', currentPage.value, currentPageTargets.value);
+}
+
+function selectPage(page: PageItem) {
+  currentPage.value = page;
+  currentPageTargets.value = page.containedIDs;
 }
 
 /** Setup all the keyboard shortcuts */
@@ -1064,7 +1215,7 @@ function pasteItem() {
   newItem.x += 20;
   newItem.y += 20;
 
-  historyManager.value.execute(new AddItemCommand(loadElements.value, newItem));
+  historyManager.value.execute(new AddItemCommand(loadElements.value, newItem, currentPage.value));
   itemToPaste.value = newItem;
   nextTick(() => selectItem(newItem));
 

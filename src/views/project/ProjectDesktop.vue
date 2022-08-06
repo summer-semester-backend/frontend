@@ -1,7 +1,7 @@
 <template>
   <!-- <work-space /> -->
   <RecentProject />
-  <ProjectList :projects="projects" :team-id="null" @refresh="getProjectList" :page-size="10" />
+  <ProjectList :projects="projects" :team-id="null" @refresh="getProjectList" :page-size="9" />
 </template>
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';

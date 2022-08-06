@@ -1,18 +1,21 @@
-import { DiagramElement, Item } from '../types';
+import { DiagramElement, Item, PageItem } from '../types';
 
 import Command from './Command';
 
 export default class AddItemCommand implements Command {
-  constructor(private elements: DiagramElement[], private elementToAdd: Item) {
+  constructor(private elements: DiagramElement[], private elementToAdd: Item, private targetPage: PageItem | null) {
     this.elementToAdd = { ...elementToAdd };
+    this.targetPage = targetPage;
   }
 
   do(): void {
     this.elements.push(this.elementToAdd);
+    this.targetPage?.containedIDs.push(`[data-item-id='${this.elementToAdd.id}']`);
   }
 
   undo(): void {
     this.deleteElement(this.elementToAdd);
+    this.targetPage?.containedIDs.splice(this.targetPage?.containedIDs.indexOf(this.elementToAdd.id), 1);
   }
 
   deleteElement(el: DiagramElement) {

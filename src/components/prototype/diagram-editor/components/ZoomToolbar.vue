@@ -42,6 +42,8 @@ function zoomOut() {
   const newZoom = zoomManager.zoomOut();
   if (oldZoom !== newZoom) emit('zoom-changed', newZoom, false);
 }
+
+defineExpose({ zoomReset });
 </script>
 
 <style scoped>
