@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <div class="title">Keyboard Shortcuts</div>
+    <div class="title">键盘快捷键</div>
     <div class="key" v-for="k in shortcuts" :style="{ 'margin-bottom': k[0] === '' ? '16px' : '2px' }">
       <div class="key-shortcut">{{ k[0] }}</div>
       <div class="key-help">{{ k[1] }}</div>
@@ -10,12 +10,12 @@
 
 <script setup lang="ts">
 const shortcuts = [
-  ['CMD+C', 'Copy the selected item'],
-  ['CMD+X', 'Cut the selected item'],
-  ['CMD+V', 'Paste the last copied / cut item'],
+  ['CMD+C', '复制选中实体'],
+  ['CMD+X', '剪切选中实体'],
+  ['CMD+V', '粘贴'],
   ['', ''],
-  ['CMD+Z', 'Undo'],
-  ['SHIFT+CMD+Z', 'Redo'],
+  ['CMD+Z', '撤销'],
+  ['SHIFT+CMD+Z', '重做'],
   ['', ''],
   ['S', 'Selection tool'],
   ['C', 'Connection tool'],
@@ -30,7 +30,7 @@ const shortcuts = [
   ['', ''],
   ['SHIFT', 'While resizing keep the aspect ratio. In rotation will rotate by 45 deg'],
   ['ESC', 'Cancel operation during connection creation'],
-  ['SHIFT+Mouse drag', 'Pan canvas area'],
+  ['SHIFT+Mouse drag', '拖动画板'],
   ['CTRL+Mouse wheel', 'Zoom in / out'],
   ['Double Click', 'Edit item text'],
 ];
