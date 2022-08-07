@@ -45,6 +45,7 @@
   @handleClickOpen="handleClickOpen"
   @handleClickDelete="handleClickDelete"
   @handleClickEdit="handleClickEdit"
+  @handleClickCopy="handleClickCopy"
   @openModel="openModel"
   >
     <template #icon>
@@ -62,7 +63,6 @@
     negative-text="取消"
     @positive-click="create"
     @negative-click="closeModel"
-    @openModel="openModel"
   >
     <n-divider style="margin: 15px auto" />
     <n-space>
@@ -86,6 +86,24 @@
       <n-input v-model:value="fileNameRef" placeholder="请输入文件名" clearable style="width: 350px" />
     </n-space>
   </n-modal>
+
+  <!-- 复制弹窗 -->
+  <n-modal
+    v-model:show="showModelCopy"
+    preset="dialog"
+    title="复制文件"
+    size="medium"
+    positive-text="确认"
+    negative-text="取消"
+    @positive-click="copy"
+    @negative-click="closeModelCopy"
+  >
+    <n-divider style="margin: 15px auto" />
+    <n-space>
+      <n-input v-model:value="fileNameRef" placeholder="请输入文件名" clearable style="width: 350px" />
+    </n-space>
+  </n-modal>
+
 </template>
 
 <script setup lang="ts">
@@ -93,7 +111,7 @@ import { NButton, NIcon, NSpace, useDialog } from 'naive-ui';
 import { h, ref, computed, onMounted } from 'vue';
 import { Add,AddCircleOutline, Trash, ArrowRedo, Create ,GridOutline,List} from '@vicons/ionicons5';
 import { UnorderedListOutlined,EditOutlined,FileImageFilled} from '@vicons/antd';
-import { readFile, createFile, editFile, deleteFile } from '@/api/file';
+import { readFile, createFile, editFile, deleteFile ,copyFile} from '@/api/file';
 import { useRoute } from 'vue-router';
 import { ToolBar } from './components';
 import { useMessage } from 'naive-ui';
@@ -159,6 +177,17 @@ const closeModelEdit = () => {
   showModelEdit.value = false;
   fileNameRef.value = '';
 };
+//复制
+const showModelCopy = ref(false);
+const openModelCopy  = () => {
+  fileNameRef.value = fileOnOpen.value?.fileName + "-副本";
+  showModelCopy.value = true;
+};
+const closeModelCopy = () => {
+  showModelCopy.value = false;
+  fileNameRef.value = '';
+};
+
 
 const route = useRoute();
 const message = useMessage();
@@ -241,6 +270,22 @@ const columns = ref([
             icon: h(NIcon, { component: Create }),
           }
         ),
+        h(
+          NButton,
+          {
+            type: 'info',
+            size: 'small',
+            strong: true,
+            secondary: true,
+            onClick(e) {
+              handleClickCopy(row);
+            },
+          },
+          {
+            default: '复制',
+            icon: h(NIcon, { component: Create }),
+          }
+        ),
       ]);
     },
   },
@@ -261,6 +306,10 @@ const handleClickEdit = (file) => {
   fileOnOpen.value = file;
   fileNameRef.value = fileOnOpen.value.fileName;
   openModelEdit();
+};
+const handleClickCopy = (file) => {
+  fileOnOpen.value = file;
+  openModelCopy();
 };
 
 const handleClickDelete = (file) => {
@@ -311,7 +360,6 @@ const create = () => {
         window.$message.success('创建成功');
         closeModel();
       } else if (res.data.result == 1) {
-        console.log('this is warning');
         window.$message.warning(res.data.message);
       } else if (res.data.result == 2) {
         window.$message.error(res.data.message);
@@ -321,7 +369,6 @@ const create = () => {
       console.log(err);
     })
     .finally(() => {
-      console.log('end');
       getFileList(projID.value);
     });
 };
@@ -395,6 +442,28 @@ const deleFlie = (fileID: number) => {
     });
 };
 
+const copy = () => {
+  if (fileNameRef.value == null || fileNameRef.value == '')
+  {
+    message.warning('文件名不能为空!');
+    return;
+  }
+  copyFile({fileID: fileOnOpen.value?.fileID ,fatherID: projID.value ,teamID: null, newName: fileNameRef.value})
+    .then((res) => {
+      if (res.data.result == 0) {
+        window.$message.success('复制成功');
+        getFileList(projID.value);
+      } else if (res.data.result == 1) {
+        window.$message.warning(res.data.message);
+      } else if (res.data.result == 2) {
+        window.$message.error(res.data.message);
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+}
+
 onMounted(() => {
   projID.value = parseInt(route.params.ProjID.toString());
   getFileList(projID.value);
@@ -416,6 +485,7 @@ window.addEventListener('drawioImageCreated', (evt: any) => {
       data: null,
     };
     if (fileEdit.fileID == null || fileEdit.fileName == null) return;
+    console.log(fileOnOpen.value);
     edit(fileEdit);
     // console.log(imageContent);
     // svgDom.innerHTML = imageContent;
