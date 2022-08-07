@@ -361,7 +361,7 @@
     </div>
     <div class="flex flex-col basis-1/7 bg-[#494949] h-full">
       <n-config-provider :theme="darkTheme" :theme-overrides="prototypeWorkspaceConfig">
-        <SyncEditMembers class="mx-auto" :sync-manager="syncManager" />
+        <SyncEditMembers v-if="isSyncManagerInitialized" />
         <ObjectInspector
           :schema="selectedItem ? getItemBlueprint(selectedItem.component)[1] : null"
           :object="selectedItem"
@@ -430,12 +430,11 @@ import FileSaver, { saveAs } from 'file-saver';
 import { useRoute } from 'vue-router';
 import ZoomToolbarVue from './components/ZoomToolbar.vue';
 import { editFile, readFile } from '@/api/file';
-import { SyncManager } from './synchronous/SyncManager';
+import { createSyncManager, syncManager, isSyncManagerInitialized } from './synchronous/SyncManager';
 import { wsurl } from '@/api/utils/request';
 import { darkTheme } from 'naive-ui';
 import { prototypeWorkspaceConfig } from '@/config/color';
 export type Item = _Item & { hover?: boolean };
-
 // The component props and events
 // ------------------------------------------------------------------------------------------------------------------------
 export interface DiagramEditorProps {
@@ -546,8 +545,6 @@ const origin: Frame = {
 };
 
 let originGroup: Frame[];
-
-let syncManager: SyncManager;
 
 // Track mouse position within the viewport coordinates
 const mouseCoords = ref<Position>({ x: 0, y: 0 });
@@ -923,7 +920,7 @@ function loadProto() {
           clipType: ClipType.NONE,
           clipStyle: '',
         }));
-      syncManager = new SyncManager(wsurl, loadElements.value);
+      createSyncManager(wsurl, loadElements.value);
     });
 }
 

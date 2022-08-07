@@ -1,4 +1,5 @@
 import { Message } from 'postcss';
+import { ref } from 'vue';
 import { DiagramElement } from '../types';
 
 export enum OperationType {
@@ -18,11 +19,11 @@ export type AddItemFunc = (userID: number, elements: DiagramElement) => any;
 export type MoveFunc = (targetID: string, x: number, y: number) => any;
 
 export class SyncManager {
-  registerFuncs: Array<RegisterFunc> = [];
-  leaveFuncs: Array<RegisterFunc> = [];
-  moveFuncs: Array<MoveFunc> = [];
-  addItemFuncs: Array<AddItemFunc> = [];
-  websocket: WebSocket;
+  private registerFuncs: Array<RegisterFunc> = [];
+  private leaveFuncs: Array<RegisterFunc> = [];
+  private moveFuncs: Array<MoveFunc> = [];
+  private addItemFuncs: Array<AddItemFunc> = [];
+  private websocket: WebSocket;
   constructor(private url: string, private elements: DiagramElement[]) {
     this.url = url;
     this.elements = elements;
@@ -47,7 +48,7 @@ export class SyncManager {
     };
   }
 
-  registerResgiterFunc(func: RegisterFunc) {
+  registerRegisterFunc(func: RegisterFunc) {
     this.registerFuncs.push(func);
   }
 
@@ -65,12 +66,14 @@ export class SyncManager {
 
   registerOpen(userID: number, fileID: number): void {
     this.websocket.onopen = (ev: Event) => {
+      window.$message.info('同步开启');
       this.sendMessage(OperationType.REGISTER, { fileID, userID });
     };
   }
 
   registerClose(userID: number, fileID: number): void {
     this.websocket.onclose = (ev: Event) => {
+      window.$message.info('同步结束');
       this.sendMessage(OperationType.LEAVE, { fileID, userID });
     };
   }
@@ -79,3 +82,13 @@ export class SyncManager {
     this.websocket.send(JSON.stringify({ type, ...message }));
   }
 }
+
+let syncManager: SyncManager;
+let isSyncManagerInitialized = ref(false);
+function createSyncManager(url: string, elements: DiagramElement[]) {
+  syncManager = new SyncManager(url, elements);
+  console.log('SyncManager created');
+  isSyncManagerInitialized.value = true;
+}
+
+export { syncManager, createSyncManager, isSyncManagerInitialized };
