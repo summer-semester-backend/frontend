@@ -62,6 +62,7 @@ import {
   NPageHeader,
   NPagination,
   NAvatar,
+  NAvatarGroup,
   NAnchor,
   NAnchorLink,
   NH1,
@@ -86,6 +87,7 @@ export default function setupNaiveUI(app: App) {
   const naive = create({
     components: [
       NAvatar,
+      NAvatarGroup,
       NBadge,
       NBackTop,
       NBreadcrumb,

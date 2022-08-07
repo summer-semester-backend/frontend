@@ -9,16 +9,14 @@
       </div>
     </div>
     <div class="pagebox-content">
-      <n-config-provider :theme="darkTheme">
-        <n-card v-if="expanded" :bordered="false" class="card">
-          <n-menu :options="pageOptions" class="w-full" @update-value="handleUpdateValue" v-model:value="page"></n-menu>
-          <n-button class="w-full" @click="emits('page-create', newPageName)">
-            <template #icon>
-              <n-icon><Add /></n-icon>
-            </template>
-          </n-button>
-        </n-card>
-      </n-config-provider>
+      <n-card v-if="expanded" :bordered="false" class="card">
+        <n-menu :options="pageOptions" class="w-full" @update-value="handleUpdateValue" v-model:value="page"></n-menu>
+        <n-button class="w-full" @click="emits('page-create', newPageName)">
+          <template #icon>
+            <n-icon><Add /></n-icon>
+          </template>
+        </n-button>
+      </n-card>
     </div>
   </div>
 </template>

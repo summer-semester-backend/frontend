@@ -1,14 +1,16 @@
 <template>
   <div class="flex h-full">
-    <div class="basis-1/7 h-full bg-[#18181c]">
+    <div class="basis-1/7 h-full bg-[#494949]">
       <div class="m-2">
-        <PageBox
-          @page-create="handleCreatePage"
-          @page-selected="handleSelectPage"
-          :pages="pages"
-          :selected-page="currentPage?.id as string"
-        />
-        <ToolBox @tool-selected="handleToolBoxSelect" />
+        <n-config-provider :theme="darkTheme" :theme-overrides="prototypeWorkspaceConfig">
+          <PageBox
+            @page-create="handleCreatePage"
+            @page-selected="handleSelectPage"
+            :pages="pages"
+            :selected-page="currentPage?.id as string"
+          />
+          <ToolBox @tool-selected="handleToolBoxSelect" />
+        </n-config-provider>
       </div>
     </div>
     <div class="basis-5/7 h-full">
@@ -357,12 +359,15 @@
       </div>
       <!-- editor-container -->
     </div>
-    <div class="basis-1/7 h-full">
-      <ObjectInspector
-        :schema="selectedItem ? getItemBlueprint(selectedItem.component)[1] : null"
-        :object="selectedItem"
-        @property-changed="onPropertyChange"
-      />
+    <div class="flex flex-col basis-1/7 bg-[#494949] h-full">
+      <n-config-provider :theme="darkTheme" :theme-overrides="prototypeWorkspaceConfig">
+        <SyncEditMembers class="mx-auto" :sync-manager="syncManager" />
+        <ObjectInspector
+          :schema="selectedItem ? getItemBlueprint(selectedItem.component)[1] : null"
+          :object="selectedItem"
+          @property-changed="onPropertyChange"
+        />
+      </n-config-provider>
     </div>
   </div>
 </template>
@@ -427,6 +432,8 @@ import ZoomToolbarVue from './components/ZoomToolbar.vue';
 import { editFile, readFile } from '@/api/file';
 import { SyncManager } from './synchronous/SyncManager';
 import { wsurl } from '@/api/utils/request';
+import { darkTheme } from 'naive-ui';
+import { prototypeWorkspaceConfig } from '@/config/color';
 export type Item = _Item & { hover?: boolean };
 
 // The component props and events

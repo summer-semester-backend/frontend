@@ -9,38 +9,36 @@
       </div>
     </div>
     <div class="toolbox-content">
-      <n-config-provider :theme="darkTheme">
-        <n-card v-if="expanded" :bordered="false" class="card">
-          <n-collapse>
-            <n-collapse-item title="图形">
-              <n-grid :x-gap="8" :y-gap="8" :cols="4">
-                <n-gi v-for="t in shapes">
-                  <ToolBoxItem
-                    :tool-name="t.title"
-                    :icon="t.iconComponent"
-                    draggable="true"
-                    @drag.stop=""
-                    @mousedown="emits('tool-selected', t.type as EditorTool)"
-                  ></ToolBoxItem>
-                </n-gi>
-              </n-grid>
-            </n-collapse-item>
-            <n-collapse-item title="基本">
-              <n-grid :x-gap="8" :y-gap="8" :cols="4">
-                <n-gi v-for="t in basic">
-                  <ToolBoxItem
-                    :tool-name="t.title"
-                    :icon="t.iconComponent"
-                    draggable="true"
-                    @drag.stop=""
-                    @mousedown="emits('tool-selected', t.type as EditorTool)"
-                  ></ToolBoxItem>
-                </n-gi>
-              </n-grid>
-            </n-collapse-item>
-          </n-collapse>
-        </n-card>
-      </n-config-provider>
+      <n-card v-if="expanded" :bordered="false" class="card">
+        <n-collapse>
+          <n-collapse-item title="图形">
+            <n-grid :x-gap="8" :y-gap="8" :cols="4">
+              <n-gi v-for="t in shapes">
+                <ToolBoxItem
+                  :tool-name="t.title"
+                  :icon="t.iconComponent"
+                  draggable="true"
+                  @drag.stop=""
+                  @mousedown="emits('tool-selected', t.type as EditorTool)"
+                ></ToolBoxItem>
+              </n-gi>
+            </n-grid>
+          </n-collapse-item>
+          <n-collapse-item title="基本">
+            <n-grid :x-gap="8" :y-gap="8" :cols="4">
+              <n-gi v-for="t in basic">
+                <ToolBoxItem
+                  :tool-name="t.title"
+                  :icon="t.iconComponent"
+                  draggable="true"
+                  @drag.stop=""
+                  @mousedown="emits('tool-selected', t.type as EditorTool)"
+                ></ToolBoxItem>
+              </n-gi>
+            </n-grid>
+          </n-collapse-item>
+        </n-collapse>
+      </n-card>
     </div>
   </div>
 </template>
@@ -68,7 +66,6 @@ const basic = computed(() => {
 
 <style scoped>
 .toolbox {
-  background-color: #18181c;
   height: 100%;
   overflow-x: hidden;
   overflow-y: auto;
