@@ -953,6 +953,12 @@ function addPage(newPageName: string): void {
 /** Delete current selected item / connection */
 function deleteItem() {
   if (isItem(selectedItem.value)) {
+    if (isPage(selectedItem.value)) {
+      console.log('before delete', pages.value, selectedItem.value?.id);
+      var index = pages.value.findIndex((ele) => ele.id == selectedItem.value?.id);
+      pages.value.splice(index, 1);
+      console.log('after delete', pages.value, selectedItem.value?.id);
+    }
     historyManager.value.execute(new DeleteCommand(loadElements.value, selectedItem.value));
     emit('delete-item', selectedItem.value);
     selectNone();
