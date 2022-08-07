@@ -9,6 +9,7 @@ import {
   inputModel,
   radioModel,
   buttonModel,
+  pageModel,
 } from './item-properties';
 import {
   ClipType,
@@ -452,7 +453,7 @@ export function registerDefaultItemTypes() {
       h: 720,
       containedIDs: [],
     },
-    shapeModel
+    pageModel
   );
 } // func
 

@@ -270,9 +270,9 @@ export const imageModel: ObjectInspectorModel = {
         {
           // Style
           name: 'style',
-          title: '来源于样式',
+          title: '图片属性',
           properties: [
-            { name: 'url', label: 'URL', type: PropertyType.TEXT, editorFullsize: true },
+            { name: 'url', label: '图片', type: PropertyType.UPLOAD, editorFullsize: true },
             separator$,
             {
               name: 'clipType',
@@ -683,5 +683,44 @@ export const buttonModel: ObjectInspectorModel = {
         },
       ],
     },
+  ],
+};
+
+export const pageModel: ObjectInspectorModel = {
+  tabs: [
+    {
+      title: '样式',
+      sections: [
+        {
+          name: 'properties',
+          title: '页面属性',
+          properties: [{ name: 'pageName', label: '页面名称', type: PropertyType.TEXT, editorFullsize: true }],
+        },
+        {
+          // Style
+          name: 'style',
+          title: '文本与样式',
+          properties: [
+            fontSize$,
+            textHAlign$,
+            textVAlign$,
+            separator$,
+            backColor$,
+            textColor$,
+            opacity$,
+            locked$,
+            shadow$,
+          ],
+        },
+        borderSection$,
+        {
+          // Position & size
+          name: 'pos_size',
+          title: '位置与大小',
+          properties: [x$, y$, w$, h$, separator$, rotate$],
+        },
+      ], // sections
+    },
+    otherTab,
   ],
 };

@@ -16,9 +16,7 @@
     </n-layout-header>
     <n-layout-footer class="mb-2" position="absolute">
       <n-space vertical>
-        <n-icon class="flex m-auto cursor-pointer my-2" size="20">
-          <question-circle-outlined class="text-gray-600 hover:text-gray-800"></question-circle-outlined>
-        </n-icon>
+        <n-avatar round size="large" class="flex m-auto" :src="avatar"></n-avatar>
         <n-button class="flex m-auto" :bordered="false" @click="handleLogout"> 登出</n-button>
       </n-space>
     </n-layout-footer>
@@ -26,28 +24,28 @@
 </template>
 
 <script setup lang="tsx">
-import { ref } from 'vue';
-import { QuestionCircleOutlined } from '@vicons/antd';
-import { People, SettingsOutline, PersonCircleOutline } from '@vicons/ionicons5';
+import { onMounted, ref } from 'vue';
+import { People, PersonCircleOutline } from '@vicons/ionicons5';
 import { ProjectOutlined } from '@vicons/antd';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '@/store/auth';
+import { getUserInfo } from '@/api/user';
 
-const topValue = ref<string | null>(null);
-const bottomValue = ref<string | null>(null);
+const avatar = ref('');
 const router = useRouter();
 const { signOut } = useAuthStore();
-function handleTopUpdate(key: string) {
-  bottomValue.value = null;
-  topValue.value = key;
-}
-function handleBottomUpdate(key: string) {
-  topValue.value = null;
-  bottomValue.value = key;
-}
 
 const handleLogout = () => {
   router.push({ name: 'login' });
   signOut();
 };
+
+onMounted(() => {
+  getUserInfo({ userID: localStorage.getItem('userID') as string }).then((res) => {
+    if (res.data.result == 0) {
+      avatar.value = res.data.data.avatar;
+      localStorage.setItem('avatar', res.data.data.avatar);
+    }
+  });
+});
 </script>

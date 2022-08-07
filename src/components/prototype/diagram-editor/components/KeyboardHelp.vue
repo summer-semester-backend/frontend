@@ -16,9 +16,10 @@ const shortcuts = [
   ['', ''],
   ['CMD+Z', '撤销'],
   ['SHIFT+CMD+Z', '重做'],
+  ['CMD+S', '保存'],
   ['', ''],
-  ['S', '选中'],
-  ['C', '连接'],
+  ['C', '选中'],
+  ['L', '连接'],
   // ['I', 'Show / Hide inspector'],
   ['K', '显示 / 收起 快捷键提示面板'],
   ['', ''],
@@ -40,14 +41,13 @@ if (!isMac) for (let k of shortcuts) k[0] = k[0].replace('CMD', 'CTRL');
 
 <style scoped>
 .container {
-  background-color: #18181c;
+  background-color: #333333;
 
-  color: #18181c;
+  color: #333333;
   width: 700px;
   height: auto;
   max-height: 80%;
   padding: 16px 24px;
-  box-shadow: 3px 3px 5px #bbb;
   overflow-x: hidden;
   overflow-y: auto;
 }
