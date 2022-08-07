@@ -78,8 +78,8 @@ export class SyncManager {
     };
   }
 
-  sendMessage(type: OperationType, message: object) {
-    this.websocket.send(JSON.stringify({ type, ...message }));
+  sendMessage(operation: OperationType, message: object) {
+    this.websocket.send(JSON.stringify({ operation, ...message }));
   }
 }
 

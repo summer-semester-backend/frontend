@@ -1,6 +1,6 @@
 <template>
   <div class="flex h-full">
-    <div class="basis-1/7 h-full bg-[#494949]">
+    <div class="basis-1/7 min-w-50 h-full bg-[#494949]">
       <div class="m-2">
         <n-config-provider :theme="darkTheme" :theme-overrides="prototypeWorkspaceConfig">
           <PageBox
@@ -359,7 +359,7 @@
       </div>
       <!-- editor-container -->
     </div>
-    <div class="flex flex-col basis-1/7 bg-[#494949] h-full">
+    <div class="flex flex-col basis-1/7 min-w-50 bg-[#494949] h-full">
       <n-config-provider :theme="darkTheme" :theme-overrides="prototypeWorkspaceConfig">
         <SyncEditMembers v-if="isSyncManagerInitialized" />
         <ObjectInspector
@@ -430,7 +430,7 @@ import FileSaver, { saveAs } from 'file-saver';
 import { useRoute } from 'vue-router';
 import ZoomToolbarVue from './components/ZoomToolbar.vue';
 import { editFile, readFile } from '@/api/file';
-import { createSyncManager, syncManager, isSyncManagerInitialized } from './synchronous/SyncManager';
+import { createSyncManager, syncManager, isSyncManagerInitialized, OperationType } from './synchronous/SyncManager';
 import { wsurl } from '@/api/utils/request';
 import { darkTheme } from 'naive-ui';
 import { prototypeWorkspaceConfig } from '@/config/color';
@@ -681,6 +681,7 @@ function onDrag(e: any): void {
     selectedItem.value.x = Math.floor(e.beforeTranslate[0]);
     selectedItem.value.y = Math.floor(e.beforeTranslate[1]);
     e.target.style.transform = e.transform;
+    syncManager.sendMessage(OperationType.MOVE, { x: selectedItem.value.x, y: selectedItem.value.y });
   }
 }
 
@@ -721,6 +722,18 @@ function onDragGroupEnd(e: { events: any }): void {
         new MoveCommand(pageItem, [originGroup[i].x, originGroup[i].y], [pageItem.x, pageItem.y])
       );
     }
+  });
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// Handle Move Sync
+// ---------------------------------------------------------------------------------------------------------------------
+
+function handleMoveSync() {
+  syncManager.registerMoveFunc((targetID: string, x: number, y: number) => {
+    var element = loadElements.value.find((elem) => elem.id == targetID);
+    (element as Item).x = x;
+    (element as Item).y = y;
   });
 }
 
@@ -921,26 +934,35 @@ function loadProto() {
           clipStyle: '',
         }));
       createSyncManager(wsurl, loadElements.value);
+      handleMoveSync();
     });
 }
 
-function handleCreatePage(newPageName: string) {
-  addPage(newPageName);
+function handleCreatePage(newPageName: string, pageResolution: string) {
+  addPage(newPageName, pageResolution);
   focusPage(currentPage.value as PageItem);
 }
 
-function addPage(newPageName: string): void {
+function addPage(newPageName: string, pageResolution: string): void {
   // TODO: page ID and save proto
   saveProto();
   // Clicking the canvas with other tools => create a new item of related type
   const toolDef = getToolDefinition(EditorTool.PAGE);
   const properties = getItemBlueprint(toolDef.itemType!)[0];
-  const w = properties.w;
+  const wh = pageResolution.split('x');
+  const w = parseInt(wh[0]);
+  const h = parseInt(wh[1]);
+  let accWidth = 0;
+  pages.value.forEach((page) => {
+    accWidth += page.w + 200;
+  });
   const newItem = deepCloneItem({
     ...properties,
     id: getUniqueId(),
-    x: 200 + pages.value.length * (w + 200),
+    x: 200 + accWidth,
     y: 200,
+    w: w,
+    h: h,
     pageName: newPageName,
   });
 
@@ -954,10 +976,10 @@ function addPage(newPageName: string): void {
 function deleteItem() {
   if (isItem(selectedItem.value)) {
     if (isPage(selectedItem.value)) {
-      console.log('before delete', pages.value, selectedItem.value?.id);
       var index = pages.value.findIndex((ele) => ele.id == selectedItem.value?.id);
       pages.value.splice(index, 1);
-      console.log('after delete', pages.value, selectedItem.value?.id);
+      currentPage.value = null;
+      currentPageTargets.value = [];
     }
     historyManager.value.execute(new DeleteCommand(loadElements.value, selectedItem.value));
     emit('delete-item', selectedItem.value);
@@ -1118,8 +1140,8 @@ function handleSelectPage(page: PageItem) {
 
 function focusPage(page: PageItem) {
   window.$message.info('聚焦' + page.pageName);
-  const left = page.x - 200;
-  const top = page.y - 200;
+  const left = page.x - 100;
+  const top = page.y - 100;
   viewer.value?.scrollTo(left, top);
   zoomToolbar.value?.zoomReset();
   console.log('page info', currentPage.value, currentPageTargets.value);
@@ -1193,8 +1215,14 @@ function setupKeyboardHandlers() {
     nextTick(() => moveable.value?.updateRect());
   });
 
+  onKey(['s'], (e: KeyboardEvent) => {
+    if (isVirtualCtrl(e)) {
+      saveProto();
+    }
+  });
+
   // Shortcuts to tools selection
-  onKey(['s'], (e: KeyboardEvent) => selectCurrentTool(EditorTool.SELECT)); // S = Select tool
+  // onKey(['s'], (e: KeyboardEvent) => selectCurrentTool(EditorTool.SELECT)); // S = Select tool
   onKey(['t'], (e: KeyboardEvent) => selectCurrentTool(EditorTool.TEXT)); // T = Text tool
   onKey(['i'], (e: KeyboardEvent) => (showInspector.value = !showInspector.value)); // I = Show/hide inspector
   onKey(['k'], (e: KeyboardEvent) => (showKeyboard.value = !showKeyboard.value)); // K = Show/Hide keyboard help
@@ -1205,7 +1233,7 @@ function setupKeyboardHandlers() {
   );
 
   // C = Connection tool, CMD+C = Copy
-  onKey(['c'], (e: KeyboardEvent) => (isVirtualCtrl(e) ? copyItem() : selectCurrentTool(EditorTool.CONNECTION)));
+  onKey(['l'], (e: KeyboardEvent) => (isVirtualCtrl(e) ? copyItem() : selectCurrentTool(EditorTool.CONNECTION)));
 
   // CMD+X = Cut, CMD+V = Cut
   onKey(['x'], (e: KeyboardEvent) => {

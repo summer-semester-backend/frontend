@@ -11,27 +11,118 @@
     <div class="pagebox-content">
       <n-card v-if="expanded" :bordered="false" class="card">
         <n-menu :options="pageOptions" class="w-full" @update-value="handleUpdateValue" v-model:value="page"></n-menu>
-        <n-button class="w-full" @click="emits('page-create', newPageName)">
-          <template #icon>
-            <n-icon><Add /></n-icon>
-          </template>
-        </n-button>
+        <n-button-group class="w-full ml-2 my-1 h-10">
+          <n-button class="w-5/7 h-full" @click="emits('page-create', newPageName, currentResolution)">
+            <template #icon>
+              <n-icon><Add /></n-icon>
+            </template>
+            {{ currentResolution }}
+          </n-button>
+          <n-button class="w-22/100 h-full">
+            <n-dropdown trigger="click" :options="resolutionOptions" @select="handleSelectResolution">
+              <n-icon><ChevronDownOutline /></n-icon>
+            </n-dropdown>
+          </n-button>
+        </n-button-group>
       </n-card>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue';
-import { darkTheme, MenuOption } from 'naive-ui';
-import { Add } from '@vicons/ionicons5';
+import { Component, computed, ref, watch, h } from 'vue';
+import { MenuOption, NIcon } from 'naive-ui';
+import { Add, ChevronDownOutline, PhonePortraitOutline, TabletPortraitOutline, LaptopOutline } from '@vicons/ionicons5';
 import { PageItem } from '../diagram-editor/types';
 interface PageBoxEvents {
   (e: 'page-selected', pageItem: PageItem): void;
-  (e: 'page-create', pageName: string): void;
+  (e: 'page-create', pageName: string, pageResolution: string): void;
 }
 const props = defineProps<{ pages: Array<PageItem>; selectedPage: string }>();
 const pageOptions = ref<Array<{ key: string; label: string }>>([]);
+const renderIcon = (icon: Component) => {
+  return () => {
+    return h(NIcon, null, {
+      default: () => h(icon),
+    });
+  };
+};
+const currentResolution = ref('1080x720');
+const resolutionOptions = [
+  {
+    label: '电脑',
+    key: 'key',
+    icon: renderIcon(LaptopOutline),
+    children: [
+      {
+        label: '1920x1080 px',
+        key: '1920x1080',
+      },
+      {
+        label: '1440x900 px',
+        key: '1440x900',
+      },
+      {
+        label: '1280x800 px',
+        key: '1280x800',
+      },
+      {
+        label: '1080x720 px',
+        key: '1080x720',
+      },
+      {
+        label: '1024x768 px',
+        key: '1024x768',
+      },
+    ],
+  },
+  {
+    label: '手机',
+    key: 'phone',
+    icon: renderIcon(PhonePortraitOutline),
+    children: [
+      {
+        label: '428x926 px',
+        key: '428x926',
+      },
+      {
+        label: '414x896 px',
+        key: '414x896',
+      },
+      {
+        label: '390x844 px',
+        key: '390x844',
+      },
+      {
+        label: '375x812 px',
+        key: '375x812',
+      },
+    ],
+  },
+  {
+    label: '平板',
+    key: 'tablet',
+    icon: renderIcon(TabletPortraitOutline),
+    children: [
+      {
+        label: '1024x1366 px',
+        key: '1024x1366',
+      },
+      {
+        label: '834x1112 px',
+        key: '834x1112',
+      },
+      {
+        label: '834x1194 px',
+        key: '834x1194',
+      },
+      {
+        label: '768x1024 px',
+        key: '768x1024',
+      },
+    ],
+  },
+];
 const pagesMap = new Map<string, PageItem>();
 const page = ref('');
 const newPageName = computed(() => '页面' + (pageOptions.value.length + 1));
@@ -42,6 +133,9 @@ const handleUpdateValue = (key: string, option: MenuOption) => {
   if (selectedPage !== undefined) {
     emits('page-selected', selectedPage);
   }
+};
+const handleSelectResolution = (key: string) => {
+  currentResolution.value = key;
 };
 watch(
   () => props.pages,
