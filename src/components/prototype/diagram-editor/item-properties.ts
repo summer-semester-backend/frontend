@@ -270,9 +270,9 @@ export const imageModel: ObjectInspectorModel = {
         {
           // Style
           name: 'style',
-          title: '来源于样式',
+          title: '图片属性',
           properties: [
-            { name: 'url', label: 'URL', type: PropertyType.TEXT, editorFullsize: true },
+            { name: 'url', label: '图片', type: PropertyType.UPLOAD, editorFullsize: true },
             separator$,
             {
               name: 'clipType',

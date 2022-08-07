@@ -65,6 +65,7 @@ declare module 'vue' {
     ToolsToolbar: typeof import('./src/components/prototype/diagram-editor/components/ToolsToolbar.vue')['default']
     Triangle: typeof import('./src/components/prototype/diagram-editor/blocks/Triangle.vue')['default']
     UploadButton: typeof import('./src/components/common/UploadButton.vue')['default']
+    UploadEditor: typeof import('./src/components/prototype/inspector/property-editors/UploadEditor.vue')['default']
     UserBar: typeof import('./src/components/user/UserBar.vue')['default']
     Vditor: typeof import('./src/components/document/Vditor.vue')['default']
     WorkBar: typeof import('./src/components/workspace/WorkBar.vue')['default']
