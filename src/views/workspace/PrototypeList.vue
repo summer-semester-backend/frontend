@@ -137,10 +137,6 @@ const handleCreate = () => {
           if (res.data.result == 0) {
             window.$message.success('创建成功');
             getFileList(projID.value);
-          } else if (res.data.result == 1) {
-            window.$message.warning(res.data.message);
-          } else if (res.data.result == 2) {
-            window.$message.error(res.data.message);
           }
         });
       } else {

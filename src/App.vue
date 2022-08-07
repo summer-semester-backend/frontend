@@ -25,7 +25,11 @@ backend.interceptors.response.use(
       signOut();
       router.push({ name: 'login' });
     } else if (response.data.result != 0) {
-      window.$message.error(response.data.message);
+      if (response.data.result == 1) {
+        window.$message.warning(response.data.message);
+      } else if (response.data.result == 2) {
+        window.$message.error(response.data.message);
+      }
       return Promise.reject(response);
     } else return Promise.resolve(response);
   },

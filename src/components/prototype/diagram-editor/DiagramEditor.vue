@@ -368,7 +368,6 @@
 </template>
 
 <script setup lang="ts">
-import { ChevronBack } from '@vicons/ionicons5';
 import { onKeyStroke, useKeyModifier } from '@vueuse/core';
 import { computed, nextTick, onBeforeMount, onMounted, ref } from 'vue';
 import Guides from 'vue3-guides';
@@ -423,14 +422,14 @@ import KeyboardHelp from './components/KeyboardHelp.vue';
 import { DefaultZoomManager, IZoomManager } from './ZoomManager';
 import * as htmlToImage from 'html-to-image';
 import FileSaver, { saveAs } from 'file-saver';
-import { useRouter } from 'vue-router';
+import { useRoute } from 'vue-router';
 import ZoomToolbarVue from './components/ZoomToolbar.vue';
+import { editFile, readFile } from '@/api/file';
 export type Item = _Item & { hover?: boolean };
 
 // The component props and events
 // ------------------------------------------------------------------------------------------------------------------------
 export interface DiagramEditorProps {
-  elements: DiagramElement[];
   editable?: boolean;
   customWidgets?: boolean;
   viewportSize?: [number, number];
@@ -445,7 +444,7 @@ export interface DiagramEditorEvents {
 }
 
 // Define props
-const { elements, editable, viewportSize } = withDefaults(defineProps<DiagramEditorProps>(), {
+const { editable, viewportSize } = withDefaults(defineProps<DiagramEditorProps>(), {
   editable: true,
   customWidgets: false,
 });
@@ -465,36 +464,11 @@ onMounted(() => {
 
   viewer.value.scrollCenter();
 
-  pages.value = loadElements.value.filter((ele) => ele.isPage == true) as PageItem[];
-  originGroup = new Array<Frame>(loadElements.value.length)
-    .fill({
-      x: 0,
-      y: 0,
-      w: 0,
-      h: 0,
-      z: 0,
-      r: 0,
-      borderRadius: 0,
-      opacity: 1,
-      clipType: ClipType.NONE,
-      clipStyle: '',
-    })
-    .map(() => ({
-      x: 0,
-      y: 0,
-      w: 0,
-      h: 0,
-      z: 0,
-      r: 0,
-      borderRadius: 0,
-      opacity: 1,
-      clipType: ClipType.NONE,
-      clipStyle: '',
-    }));
+  // pages.value = loadElements.value.filter((ele) => ele.isPage == true) as PageItem[];
 });
 
 onBeforeMount(() => {
-  loadElements.value = elements;
+  loadProto();
 });
 
 // Set the handlers to manage keyboard shortcuts
@@ -567,7 +541,7 @@ let originGroup: Frame[] = [];
 // Track mouse position within the viewport coordinates
 const mouseCoords = ref<Position>({ x: 0, y: 0 });
 
-const router = useRouter();
+const route = useRoute();
 const handleToolBoxSelect = (selected: EditorTool) => {
   currentTool.value = selected;
 };
@@ -890,8 +864,55 @@ function bringToFront(): void {
 
 /** Save the scene into a json file */
 function saveProto(): void {
-  localStorage.setItem('proto', JSON.stringify(elements as Item[]));
-  window.$message.info('已保存');
+  var protoData = JSON.stringify(loadElements.value as Item[]);
+  // localStorage.setItem('proto', protoData);
+  var protoID = parseInt(route.params.protoID as string);
+  editFile({ fileID: protoID, data: protoData }).then((res) => {
+    window.$message.info('已保存');
+  });
+}
+
+function loadProto() {
+  var protoID = parseInt(route.params.protoID as string);
+  readFile({ fileID: protoID, teamID: null })
+    .then((res) => {
+      if (res.data.data != null) {
+        loadElements.value = JSON.parse(res.data.data) as DiagramElement[];
+      } else {
+        loadElements.value = [
+          // createPageItem()
+        ];
+      }
+    })
+    .finally(() => {
+      pages.value = loadElements.value.filter((ele) => ele.isPage == true) as PageItem[];
+      selectPage(pages.value[0]);
+      originGroup = Array<Frame>(loadElements.value.length)
+        .fill({
+          x: 0,
+          y: 0,
+          w: 0,
+          h: 0,
+          z: 0,
+          r: 0,
+          borderRadius: 0,
+          opacity: 1,
+          clipType: ClipType.NONE,
+          clipStyle: '',
+        })
+        .map((item: Frame) => ({
+          x: 0,
+          y: 0,
+          w: 0,
+          h: 0,
+          z: 0,
+          r: 0,
+          borderRadius: 0,
+          opacity: 1,
+          clipType: ClipType.NONE,
+          clipStyle: '',
+        }));
+    });
 }
 
 function handleCreatePage(newPageName: string) {
