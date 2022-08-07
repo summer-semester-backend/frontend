@@ -178,19 +178,27 @@ export const pluginConfig: { [key: string]: PluginOptions } = {
   },
   [Image.pluginName]: {
     onBeforeRender: (status: string, url: string) => {
-      if (url.startsWith('data:image/')) return url;
-      return url + `?token=12323`;
+      return url;
     },
   },
   [ImageUploader.pluginName]: {
     file: {
-      action: `${DOMAIN}/upload/image`,
-      headers: { Authorization: 213434 },
+      action: `http://43.138.77.8:8000/api/upload`,
+      crossOrigin: true,
+      withCredentials: true,
     },
     remote: {
-      action: `${DOMAIN}/upload/image`,
+      action: `http://43.138.77.8:8000/api/upload`,
+      crossOrigin: true,
+      withCredentials: true,
     },
     isRemote: (src: string) => src.indexOf(DOMAIN) < 0,
+    parse: (res: any) => {
+      console.log(res);
+      if (res.result == 0) {
+        return { result: true, data: res.url };
+      }
+    },
   },
   [FileUploader.pluginName]: {
     action: `${DOMAIN}/upload/file`,
