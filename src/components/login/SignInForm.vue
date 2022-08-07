@@ -16,7 +16,7 @@
 <script setup lang="ts">
 import { login } from '@/api/auth';
 import { useAuthStore } from '@/store/auth';
-import { reactive, defineEmits } from 'vue';
+import { reactive } from 'vue';
 import { useRouter } from 'vue-router';
 
 const emits = defineEmits(['forget']);

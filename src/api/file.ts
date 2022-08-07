@@ -36,9 +36,9 @@ export function recoverFile(data: { fileID: number }) {
 
 export function editFile(data: {
   fileID: number;
-  fileName: string | null;
-  fileImage: string | null;
-  fatherID: number | null;
+  fileName?: string | null;
+  fileImage?: string | null;
+  fatherID?: number | null;
   data: string | null;
 }) {
   return backend.post('/file/write', data);

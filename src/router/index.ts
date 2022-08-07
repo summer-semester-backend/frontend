@@ -24,9 +24,9 @@ const routes: RouteRecordRaw[] = [
     ],
   },
   {
-    path: '/prototype',
-    name: 'prototype',
-    component: () => import('../views/prototype/WorkSpace.vue'),
+    path: '/prototype/:protoID',
+    name: 'Prototype',
+    component: () => import('../views/prototype/ProtoWorkSpace.vue'),
   },
   {
     path: '/attendTeam/:code',
