@@ -1,6 +1,6 @@
 <template>
   <div class="flex h-full">
-    <div class="basis-1/7 min-w-50 h-full bg-[#494949]">
+    <div class="basis-1/7 min-w-60 h-full bg-[#494949]">
       <div class="m-2">
         <n-config-provider :theme="darkTheme" :theme-overrides="prototypeWorkspaceConfig">
           <PageBox
@@ -19,6 +19,7 @@
         <Guides
           v-show="guidesVisible"
           class="ruler ruler-horizontal"
+          className="custom-color"
           :showGuides="showGuides"
           @changeGuides="hGuideValues = $event.guides"
           type="horizontal"
@@ -32,6 +33,7 @@
         <Guides
           v-show="guidesVisible"
           class="ruler ruler-vertical"
+          className="custom-color"
           :showGuides="showGuides"
           @changeGuides="vGuideValues = $event.guides"
           type="vertical"
@@ -980,10 +982,20 @@ function deleteItem() {
       pages.value.splice(index, 1);
       currentPage.value = null;
       currentPageTargets.value = [];
+      var containedIDs = (selectedItem.value as PageItem).containedIDs;
+      console.log(containedIDs);
+      var deleteItems = loadElements.value.filter((ele) => {
+        return containedIDs.includes(`[data-item-id='${ele.id}']`);
+      });
+      console.log(deleteItems);
+      deleteItems.forEach((ele) => {
+        historyManager.value.execute(new DeleteCommand(loadElements.value, ele));
+      });
+    } else {
+      historyManager.value.execute(new DeleteCommand(loadElements.value, selectedItem.value));
+      emit('delete-item', selectedItem.value);
+      selectNone();
     }
-    historyManager.value.execute(new DeleteCommand(loadElements.value, selectedItem.value));
-    emit('delete-item', selectedItem.value);
-    selectNone();
   }
 
   if (isConnection(selectedItem.value)) {
@@ -1397,6 +1409,9 @@ function inlineEdit(item: Item) {
   width: 30px !important;
 }
 
+.custom-color .scena-guides .guide {
+  background-color: #494949;
+}
 .rulers-left-top-box {
   position: absolute;
   top: 0px;
