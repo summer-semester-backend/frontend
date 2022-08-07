@@ -536,7 +536,7 @@ const origin: Frame = {
   clipStyle: '',
 };
 
-let originGroup: Frame[] = [];
+let originGroup: Frame[];
 
 // Track mouse position within the viewport coordinates
 const mouseCoords = ref<Position>({ x: 0, y: 0 });
@@ -887,7 +887,7 @@ function loadProto() {
     .finally(() => {
       pages.value = loadElements.value.filter((ele) => ele.isPage == true) as PageItem[];
       selectPage(pages.value[0]);
-      originGroup = Array<Frame>(loadElements.value.length)
+      originGroup = new Array<Frame>(loadElements.value.length)
         .fill({
           x: 0,
           y: 0,
