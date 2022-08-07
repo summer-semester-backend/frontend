@@ -44,6 +44,10 @@ const handleBack = () => {
   }
 };
 
+defineExpose({
+  fileInfo,
+});
+
 watch(oriFileID, (val) => {
   console.log(val);
   if (val) {

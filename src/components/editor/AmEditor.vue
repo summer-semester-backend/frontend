@@ -17,6 +17,10 @@ import { onMounted, ref, onUnmounted } from 'vue';
 import { OTClient } from './ot';
 import { cards, plugins, pluginConfig } from './config';
 import { onBeforeRouteLeave, useRoute } from 'vue-router';
+import { html2md } from '../../plugins/html2md';
+import { asBlob } from 'html-docx-js-typescript';
+import { saveAs } from 'file-saver';
+import html2pdf from 'html2pdf.js';
 import { getUserInfo } from '@/api/user';
 const container = ref<HTMLDivElement | null>(null);
 const engine = ref<EngineInterface | null>(null);
@@ -36,6 +40,7 @@ const currentMember = ref({
   nickname: '',
   userID: '',
 });
+//初始化编辑器
 const initEditor = () => {
   if (container.value && fileID.value) {
     // 实例化引擎
@@ -65,6 +70,69 @@ const initEditor = () => {
     window.$message.error('文件打开失败，请退出重试');
   }
 };
+//导出md文件
+const exportMd = (title: string) => {
+  const html = engine.value?.getHtml();
+  const markdown = html2md(html || '');
+  const blob = new Blob([markdown], { type: 'text/plain;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = title + '.md';
+  a.click();
+};
+
+//导出pdf文件
+const exportPdf = (title: string) => {
+  const html = engine.value?.getHtml();
+  html2pdf(html, {
+    margin: 1,
+    filename: title,
+    image: { type: 'jpeg', quality: 0.98 },
+    enableLinks: true,
+    html2canvas: { dpi: 192, letterRendering: true, useCORS: true },
+    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+  });
+};
+
+//导出html文件
+const exportHtml = (title: string) => {
+  const html = engine.value?.getHtml();
+  const blob = new Blob([html || ''], { type: 'text/plain;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = title + '.html';
+  a.click();
+};
+
+//导出word文件
+const exportWord = async (title: string) => {
+  const html = engine.value?.getHtml();
+  //console.log(html);
+  let htmlStr = `
+          <!DOCTYPE html>
+          	<html xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office"
+              xmlns:w="urn:schemas-microsoft-com:office:word" xmlns:m="http://schemas.microsoft.com/office/2004/12/omml"
+              xmlns="http://www.w3.org/TR/REC-html40">
+          	<head>
+          	<meta charset="UTF-8">
+          <!--[if gte mso 9]><xml><w:WordDocument><w:View>Print</w:View><w:TrackMoves>false</w:TrackMoves><w:TrackFormatting/><w:ValidateAgainstSchemas/><w:SaveIfXMLInvalid>false</w:SaveIfXMLInvalid><w:IgnoreMixedContent>false</w:IgnoreMixedContent><w:AlwaysShowPlaceholderText>false</w:AlwaysShowPlaceholderText><w:DoNotPromoteQF/><w:LidThemeOther>EN-US</w:LidThemeOther><w:LidThemeAsian>ZH-CN</w:LidThemeAsian><w:LidThemeComplexScript>X-NONE</w:LidThemeComplexScript><w:Compatibility><w:BreakWrappedTables/><w:SnapToGridInCell/><w:WrapTextWithPunct/><w:UseAsianBreakRules/><w:DontGrowAutofit/><w:SplitPgBreakAndParaMark/><w:DontVertAlignCellWithSp/><w:DontBreakConstrainedForcedTables/><w:DontVertAlignInTxbx/><w:Word11KerningPairs/><w:CachedColBalance/><w:UseFELayout/></w:Compatibility><w:BrowserLevel>MicrosoftInternetExplorer4</w:BrowserLevel><m:mathPr><m:mathFont m:val="Cambria Math"/><m:brkBin m:val="before"/><m:brkBinSub m:val="--"/><m:smallFrac m:val="off"/><m:dispDef/><m:lMargin m:val="0"/> <m:rMargin m:val="0"/><m:defJc m:val="centerGroup"/><m:wrapIndent m:val="1440"/><m:intLim m:val="subSup"/><m:naryLim m:val="undOvr"/></m:mathPr></w:WordDocument></xml><![endif]-->
+          </head>
+            <body style="font-family:方正仿宋_GBK;mso-ascii-font-family:'Times New Roman'">
+              ${html}
+            </body>
+          </html>
+`;
+  const fileData = asBlob(htmlStr || '').then((data) => {
+    saveAs(data, title + '.docx');
+  });
+};
+
+defineExpose({
+  exportMd,
+  exportPdf,
+  exportHtml,
+  exportWord,
+});
 
 onMounted(() => {
   let useid = localStorage.getItem('userID') || '';
