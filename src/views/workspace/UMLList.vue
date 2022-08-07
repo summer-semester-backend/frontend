@@ -37,75 +37,21 @@
   <n-data-table v-if="showListRef" :columns="columns" :data="files" :pagination="pagination" :bordered="false" />
 
   <!-- 块状格式 -->
-  <n-grid v-if="!showListRef" :x-gap="30" :y-gap="20" :cols="6" style="width:85%">
-    <n-grid-item v-for="(item, index) in files">
-      <n-card
-        :segmented="{
-          content: true,
-          footer: true,
-        }"
-        footer-style="padding: 0.5vw 0;"
-        hoverable
-        @click="handleClickOpen(item)"
-      >
-        <template #cover>
-          <div v-show="editButtonRef" style="position: absolute; top: 5px; right: 5px">
-            <n-space>
-              <n-button circle type="error" size="small" @click.stop="handleClickDelete(item)">
-                <n-icon size="20"><Trash/></n-icon>
-              </n-button>
-              <n-button circle type="warning" size="small" @click.stop="handleClickEdit(item)">
-                <n-icon size="20"><Create/></n-icon>
-              </n-button>
-            </n-space>
-          </div>
-          
-          <div v-html="item.fileImage" style="padding:10px;border-radius: 8px; height: 8vw; width: 100%"></div>
-        </template>
-        <template #footer>
-          <n-space justify="center">
-            <n-ellipsis
-              :tooltip="false"
-              style="background-color: #fff; font-size: 1rem; font-weight: 500; margin: 0 24px"
-            >
-              {{ item.fileName }}
-            </n-ellipsis>
-          </n-space>
-
-        </template>
-      </n-card>
-    </n-grid-item>
-
-    <!-- 最后一块 -->
-    <n-grid-item>
-      <n-card
-        :segmented="{
-          content: true,
-          footer: true,
-        }"
-        footer-style="padding: 0.5vw ;"
-        hoverable
-        id="lastBlock"
-        @click="openModel"
-      >
-        <template #cover>
-          <div style="padding:10px;border-radius: 8px 8px 0 0; height: 8vw; width: 100%">
-          <n-space justify="center">
-            <n-icon style="margin-top: 2vw;" size="70">
-              <add />
-            </n-icon>
-          </n-space>
-
-          </div>
-        </template>
-        <template #footer>
-          <n-space justify="center">
-            <n-ellipsis style="background-color: #fff; font-size: 1rem; font-weight: 700; margin: 0 24px">新建</n-ellipsis>
-          </n-space>
-        </template>
-      </n-card>
-    </n-grid-item>
-  </n-grid>
+  <BlockModalData
+  v-if="!showListRef"
+  :files="files"
+  :paginationBlock="paginationBlock"
+  :editButtonRef="editButtonRef"
+  :fileType="12"
+  @handleClickOpen="handleClickOpen"
+  @handleClickDelete="handleClickDelete"
+  @handleClickEdit="handleClickEdit"
+  @openModel="openModel"
+  >
+    <template #icon>
+      <FileImageFilled color="#E26E0D"/>
+    </template>
+  </BlockModalData>
 
   <!-- 新建弹窗 -->
   <n-modal
@@ -117,6 +63,7 @@
     negative-text="取消"
     @positive-click="create"
     @negative-click="closeModel"
+    @openModel="openModel"
   >
     <n-divider style="margin: 15px auto" />
     <n-space>
@@ -147,7 +94,7 @@
 import { NButton, NIcon, NSpace, useDialog } from 'naive-ui';
 import { h, ref, computed, onMounted } from 'vue';
 import { Add,AddCircleOutline, Trash, ArrowRedo, Create ,GridOutline,List} from '@vicons/ionicons5';
-import { UnorderedListOutlined,EditOutlined} from '@vicons/antd';
+import { UnorderedListOutlined,EditOutlined,FileImageFilled} from '@vicons/antd';
 import { readFile, createFile, editFile, deleteFile } from '@/api/file';
 import { useRoute } from 'vue-router';
 import { ToolBar } from './components';
@@ -224,7 +171,11 @@ const dialog = useDialog();
 const projID = ref<number | null>(null);
 const pagination = ref({
   current: 1,
-  pageSize: 10,
+  pageSize: 9,
+});
+const paginationBlock = ref({
+  current: 1,
+  pageSize: 18,
 });
 
 const columns = ref([
@@ -300,17 +251,19 @@ const columns = ref([
   },
 ]);
 
-const files = ref([{}]);
-//当前操作的文件
+const files = ref<File[]>([]);
+//当前操作的文件(至少drawio需要这个)
 const fileOnOpen = ref<File | null>(null);
 
 const emits = defineEmits(['refresh']);
 const handleClickOpen = (file) => {
+    console.log("use open");
     fileOnOpen.value = file;
     // console.log(fileOnOpen.value.fileImage);
     openDeskWithFile(fileOnOpen.value.fileImage);
 }
 const handleClickEdit = (file) => {
+    console.log("use delete");
     fileOnOpen.value = file;
     fileNameRef.value = fileOnOpen.value.fileName;
     openModelEdit();
@@ -489,7 +442,9 @@ const openDesk = () => {
     message.loading('UML编辑器正在初始化……');
     return;
   }
-  openDrawio();
+  openDrawio().catch(() => {
+    message.loading('UML编辑器正在初始化……');
+  })
 };
 
 // 携带参数的打开
@@ -498,26 +453,12 @@ const openDeskWithFile = (svgStream: any) => {
     message.loading('UML编辑器正在初始化……');
     return;
   }
-  openDrawio(svgStream);
+  openDrawio(svgStream).catch(() => {
+    message.loading('UML编辑器正在初始化……');
+  })
 };
 </script>
 
-<style scoped>
-.n-card
-{
-  border-radius: 7px;
-  border: 1px solid #B2B3B3;
-  box-sizing: content-box;
-}
-.n-card:hover {
-  cursor: pointer;
-}
-</style>
+<style scoped></style>
 
-<style>
-svg
-{
-  height: 100%;
-  width: 100%;
-}
-</style>
+<style></style>
