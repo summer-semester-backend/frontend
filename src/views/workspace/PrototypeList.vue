@@ -1,7 +1,7 @@
 <template>
   <ToolBar title="原型">
     <template #toolbar>
-      <n-button text @click="handleProto">
+      <n-button text @click="handleCreate">
         <n-icon size="26" class="icon">
           <AddCircleOutline />
         </n-icon>
@@ -12,9 +12,10 @@
 </template>
 
 <script setup lang="ts">
-import { NButton, NIcon, NSpace } from 'naive-ui';
+import { NButton, NDivider, NIcon, NInput, NSpace } from 'naive-ui';
 import { h, ref, computed, onMounted } from 'vue';
-import { AddCircleOutline, Trash, ArrowRedo } from '@vicons/ionicons5';
+import { AddCircleOutline, Trash, ArrowRedo, CreateOutline, Create } from '@vicons/ionicons5';
+import { createFile, deleteFile, editFile } from '@/api/file';
 import { readFile } from '@/api/file';
 import { useRoute, useRouter } from 'vue-router';
 import { ToolBar } from './components';
@@ -31,8 +32,119 @@ const pagination = ref({
   current: 1,
   pageSize: 10,
 });
-const handleProto = () => {
-  router.push({ name: 'prototype' });
+const newFileName = ref('');
+const files = ref();
+//删除文件
+const deleFlie = (fileID: number) => {
+  deleteFile({ fileID: fileID })
+    .then((res) => {
+      if (res.data.result == 0) {
+        window.$message.success('删除成功');
+        getFileList(projID.value);
+      } else if (res.data.result == 1) {
+        window.$message.warning(res.data.message);
+      } else if (res.data.result == 2) {
+        window.$message.error(res.data.message);
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+};
+//修改项目名称
+const handleEdit = (item: any) => {
+  window.$dialog.info({
+    title: '修改文件名称',
+    content: () => {
+      return h('div', {}, [
+        h(NDivider, { style: 'margin-top: 10px;' }),
+        h(NInput, {
+          style: 'width: 100%;',
+          placeholder: '请输入文件名称',
+          value: item.fileName,
+          onInput: (e: any) => {
+            console.log(e);
+            item.fileName = e;
+          },
+        }),
+      ]);
+    },
+    icon: () => {
+      return h(NIcon, {
+        component: CreateOutline,
+      });
+    },
+    positiveText: '确定',
+    negativeText: '取消',
+    maskClosable: false,
+    onPositiveClick: () => {
+      if (item.fileName.length > 0) {
+        editFile({
+          fileID: item.fileID,
+          fileName: item.fileName,
+          fileImage: null,
+          fatherID: null,
+          data: null,
+        }).then((res) => {
+          if (res.data.result == 0) {
+            window.$message.success('修改成功');
+          } else if (res.data.result == 1) {
+            window.$message.warning(res.data.message);
+          } else if (res.data.result == 2) {
+            window.$message.error(res.data.message);
+          }
+        });
+      } else {
+        window.$message.warning('请输入文件名称');
+      }
+    },
+    onNegativeClick: () => {},
+  });
+};
+//新建文件
+const handleCreate = () => {
+  window.$dialog.info({
+    title: '新建文件',
+    content: () => {
+      return h('div', {}, [
+        h(NDivider, { style: 'margin-top: 10px;' }),
+        h(NInput, {
+          style: 'width: 100%;',
+          placeholder: '请输入文件名称',
+          onInput: (e: any) => {
+            newFileName.value = e;
+          },
+        }),
+      ]);
+    },
+    icon: () => {
+      return h(NIcon, {
+        component: CreateOutline,
+      });
+    },
+    positiveText: '确定',
+    negativeText: '取消',
+    maskClosable: false,
+    onPositiveClick: () => {
+      if (newFileName.value.length > 0) {
+        createFile({
+          teamID: null,
+          fileName: newFileName.value,
+          fileType: 13,
+          fileImage: '',
+          fatherID: projID.value,
+        }).then((res) => {
+          if (res.data.result == 0) {
+            window.$message.success('创建成功');
+            getFileList(projID.value);
+          }
+        });
+      } else {
+        window.$message.warning('请输入文件名称');
+      }
+    },
+    onNegativeClick: () => {},
+  });
 };
 const columns = ref([
   {
@@ -52,7 +164,7 @@ const columns = ref([
   {
     title: '操作',
     key: 'actions',
-    render() {
+    render(row: any) {
       return h(NSpace, [
         h(
           NButton,
@@ -61,6 +173,18 @@ const columns = ref([
             size: 'small',
             strong: true,
             secondary: true,
+            onClick(e) {
+              window.$dialog.warning({
+                title: '警告',
+                content: '你确定要删除这个文件吗？',
+                positiveText: '确定',
+                negativeText: '取消',
+                onPositiveClick: () => {
+                  deleFlie(row.fileID);
+                },
+                onNegativeClick: () => {},
+              });
+            },
           },
           {
             default: '删除',
@@ -74,6 +198,9 @@ const columns = ref([
             size: 'small',
             strong: true,
             secondary: true,
+            onClick(e) {
+              window.open(`/prototype/${row.fileID}`, '_blank');
+            },
           },
           {
             default: '打开',
@@ -84,8 +211,6 @@ const columns = ref([
     },
   },
 ]);
-
-const files = ref();
 const getFileList = (id: number | null) => {
   readFile({
     fileID: id,

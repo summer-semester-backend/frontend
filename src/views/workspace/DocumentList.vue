@@ -19,7 +19,6 @@ import { createFile, deleteFile, editFile } from '@/api/file';
 import { readFile } from '@/api/file';
 import { useRoute } from 'vue-router';
 import { ToolBar } from './components';
-import router from '@/router';
 interface File {
   fileID: number;
   fileName: string;
