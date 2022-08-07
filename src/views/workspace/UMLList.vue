@@ -37,18 +37,18 @@
 
   <!-- 块状格式 -->
   <BlockModalData
-  v-if="!showListRef"
-  :files="files"
-  :paginationBlock="paginationBlock"
-  :editButtonRef="editButtonRef"
-  :fileType="12"
-  @handleClickOpen="handleClickOpen"
-  @handleClickDelete="handleClickDelete"
-  @handleClickEdit="handleClickEdit"
-  @openModel="openModel"
+    v-if="!showListRef"
+    :files="files"
+    :paginationBlock="paginationBlock"
+    :editButtonRef="editButtonRef"
+    :fileType="12"
+    @handleClickOpen="handleClickOpen"
+    @handleClickDelete="handleClickDelete"
+    @handleClickEdit="handleClickEdit"
+    @openModel="openModel"
   >
     <template #icon>
-      <FileImageFilled color="#E26E0D"/>
+      <FileImageFilled color="#E26E0D" />
     </template>
   </BlockModalData>
 
@@ -91,8 +91,8 @@
 <script setup lang="ts">
 import { NButton, NIcon, NSpace, useDialog } from 'naive-ui';
 import { h, ref, computed, onMounted } from 'vue';
-import { Add,AddCircleOutline, Trash, ArrowRedo, Create ,GridOutline,List} from '@vicons/ionicons5';
-import { UnorderedListOutlined,EditOutlined,FileImageFilled} from '@vicons/antd';
+import { Add, AddCircleOutline, Trash, ArrowRedo, Create, GridOutline, List } from '@vicons/ionicons5';
+import { UnorderedListOutlined, EditOutlined, FileImageFilled } from '@vicons/antd';
 import { readFile, createFile, editFile, deleteFile } from '@/api/file';
 import { useRoute } from 'vue-router';
 import { ToolBar } from './components';
@@ -166,7 +166,7 @@ const dialog = useDialog();
 const projID = ref<number | null>(null);
 const pagination = ref({
   current: 1,
-  pageSize: 9,
+  pageSize: 8,
 });
 const paginationBlock = ref({
   current: 1,
@@ -252,7 +252,6 @@ const fileOnOpen = ref<File | null>(null);
 
 const emits = defineEmits(['refresh']);
 const handleClickOpen = (file) => {
-
   fileOnOpen.value = file;
   // console.log(fileOnOpen.value.fileImage);
   openDeskWithFile(fileOnOpen.value.fileImage);
@@ -438,7 +437,7 @@ const openDesk = () => {
   }
   openDrawio().catch(() => {
     message.loading('UML编辑器正在初始化……');
-  })
+  });
 };
 
 // 携带参数的打开
@@ -449,10 +448,9 @@ const openDeskWithFile = (svgStream: any) => {
   }
   openDrawio(svgStream).catch(() => {
     message.loading('UML编辑器正在初始化……');
-  })
+  });
 };
 </script>
-
 
 <style scoped></style>
 

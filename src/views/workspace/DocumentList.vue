@@ -30,7 +30,7 @@ const newFileName = ref('');
 const projID = ref<number | null>(null);
 const pagination = ref({
   current: 1,
-  pageSize: 10,
+  pageSize: 8,
 });
 //列表操作
 const columns = ref([

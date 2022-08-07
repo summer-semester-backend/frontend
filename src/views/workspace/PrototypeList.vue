@@ -30,7 +30,7 @@ const route = useRoute();
 const projID = ref<number | null>(null);
 const pagination = ref({
   current: 1,
-  pageSize: 10,
+  pageSize: 8,
 });
 const newFileName = ref('');
 const files = ref();

@@ -54,7 +54,7 @@ const columns = ref([
   {
     title: '文件类型',
     key: 'teamName',
-    render: (row: Trash) =>
+    render: (row: any) =>
       h(NText, {}, () => {
         switch (row.fileType) {
           case 12:
@@ -86,18 +86,20 @@ const columns = ref([
             secondary: true,
             onClick(e) {
               console.log(row);
-              recoverFile({ fileID: row.fileID }).then((res) => {
-                if (res.data.result == 0) {
-                  window.$message.success(res.data.message);
-                  getProjectList(projID.value);
-                } else if (res.data.result == 1) {
-                  window.$message.warning(res.data.message);
-                } else if (res.data.result == 2) {
-                  window.$message.error(res.data.message);
-                }
-              }).catch((err) => {
-                  console.log(err);
+              recoverFile({ fileID: row.fileID })
+                .then((res) => {
+                  if (res.data.result == 0) {
+                    window.$message.success(res.data.message);
+                    getProjectList(projID.value);
+                  } else if (res.data.result == 1) {
+                    window.$message.warning(res.data.message);
+                  } else if (res.data.result == 2) {
+                    window.$message.error(res.data.message);
+                  }
                 })
+                .catch((err) => {
+                  console.log(err);
+                });
             },
           },
           {
@@ -138,7 +140,7 @@ const columns = ref([
 const trashs = ref();
 const pagination = ref({
   current: 1,
-  pageSize: 10,
+  pageSize: 8,
 });
 
 //显示搜索
