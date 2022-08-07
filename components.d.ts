@@ -18,7 +18,6 @@ declare module 'vue' {
     Ellipse: typeof import('./src/components/prototype/diagram-editor/blocks/Ellipse.vue')['default']
     Empty: typeof import('./src/components/editor/Empty.vue')['default']
     FileHeader: typeof import('./src/components/document/FileHeader.vue')['default']
-    FileManageModal: typeof import('./src/components/workspace/FileManageModal.vue')['default']
     ForgetForm: typeof import('./src/components/login/ForgetForm.vue')['default']
     GlobalContent: typeof import('./src/components/common/GlobalContent.vue')['default']
     GlobalSidebar: typeof import('./src/components/common/GlobalSidebar.vue')['default']
