@@ -16,7 +16,7 @@ const isLoginPage = computed(() => {
   return route.name == 'login';
 });
 const isProtoPage = computed(() => {
-  return route.name == 'prototype';
+  return route.name == 'Prototype';
 });
 backend.interceptors.response.use(
   (response) => {

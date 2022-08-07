@@ -13,23 +13,22 @@
           </n-icon>
         </n-button>
         <n-button :disabled="showListRef" strong secondary type="info" small size="small" @click="changeButtonState">
-            <template #icon>
-              <n-icon size="20" class="icon">
-                <EditOutlined />
-              </n-icon>
-            </template>
-            {{buttonText}}
+          <template #icon>
+            <n-icon size="20" class="icon">
+              <EditOutlined />
+            </n-icon>
+          </template>
+          {{ buttonText }}
         </n-button>
         <n-button strong secondary type="info" small size="small" @click="openModel">
-            <template #icon>
-              <n-icon size="20" class="icon">
-                <AddCircleOutline />
-              </n-icon>
-            </template>
-            新建
+          <template #icon>
+            <n-icon size="20" class="icon">
+              <AddCircleOutline />
+            </n-icon>
+          </template>
+          新建
         </n-button>
       </n-space>
-
     </template>
   </ToolBar>
 
@@ -37,7 +36,7 @@
   <n-data-table v-if="showListRef" :columns="columns" :data="files" :pagination="pagination" :bordered="false" />
 
   <!-- 块状格式 -->
-  <n-grid v-if="!showListRef" :x-gap="30" :y-gap="20" :cols="6" style="width:85%">
+  <n-grid v-if="!showListRef" :x-gap="30" :y-gap="20" :cols="6" style="width: 85%">
     <n-grid-item v-for="(item, index) in files">
       <n-card
         :segmented="{
@@ -52,15 +51,15 @@
           <div v-show="editButtonRef" style="position: absolute; top: 5px; right: 5px">
             <n-space>
               <n-button circle type="error" size="small" @click.stop="handleClickDelete(item)">
-                <n-icon size="20"><Trash/></n-icon>
+                <n-icon size="20"><Trash /></n-icon>
               </n-button>
               <n-button circle type="warning" size="small" @click.stop="handleClickEdit(item)">
-                <n-icon size="20"><Create/></n-icon>
+                <n-icon size="20"><Create /></n-icon>
               </n-button>
             </n-space>
           </div>
-          
-          <div v-html="item.fileImage" style="padding:10px;border-radius: 8px; height: 8vw; width: 100%"></div>
+
+          <div v-html="item.fileImage" style="padding: 10px; border-radius: 8px; height: 8vw; width: 100%"></div>
         </template>
         <template #footer>
           <n-space justify="center">
@@ -71,7 +70,6 @@
               {{ item.fileName }}
             </n-ellipsis>
           </n-space>
-
         </template>
       </n-card>
     </n-grid-item>
@@ -89,18 +87,19 @@
         @click="openModel"
       >
         <template #cover>
-          <div style="padding:10px;border-radius: 8px 8px 0 0; height: 8vw; width: 100%">
-          <n-space justify="center">
-            <n-icon style="margin-top: 2vw;" size="70">
-              <add />
-            </n-icon>
-          </n-space>
-
+          <div style="padding: 10px; border-radius: 8px 8px 0 0; height: 8vw; width: 100%">
+            <n-space justify="center">
+              <n-icon style="margin-top: 2vw" size="70">
+                <add />
+              </n-icon>
+            </n-space>
           </div>
         </template>
         <template #footer>
           <n-space justify="center">
-            <n-ellipsis style="background-color: #fff; font-size: 1rem; font-weight: 700; margin: 0 24px">新建</n-ellipsis>
+            <n-ellipsis style="background-color: #fff; font-size: 1rem; font-weight: 700; margin: 0 24px"
+              >新建</n-ellipsis
+            >
           </n-space>
         </template>
       </n-card>
@@ -140,14 +139,13 @@
       <n-input v-model:value="fileNameRef" placeholder="请输入文件名" clearable style="width: 350px" />
     </n-space>
   </n-modal>
-
 </template>
 
 <script setup lang="ts">
 import { NButton, NIcon, NSpace, useDialog } from 'naive-ui';
 import { h, ref, computed, onMounted } from 'vue';
-import { Add,AddCircleOutline, Trash, ArrowRedo, Create ,GridOutline,List} from '@vicons/ionicons5';
-import { UnorderedListOutlined,EditOutlined} from '@vicons/antd';
+import { Add, AddCircleOutline, Trash, ArrowRedo, Create, GridOutline, List } from '@vicons/ionicons5';
+import { UnorderedListOutlined, EditOutlined } from '@vicons/antd';
 import { readFile, createFile, editFile, deleteFile } from '@/api/file';
 import { useRoute } from 'vue-router';
 import { ToolBar } from './components';
@@ -171,29 +169,26 @@ interface FileEdit {
 }
 
 //
-const buttonText = ref("编辑");
+const buttonText = ref('编辑');
 const editButtonRef = ref(false);
 const changeButtonState = () => {
-  if(editButtonRef.value == false)
-  {
+  if (editButtonRef.value == false) {
     editButtonRef.value = true;
-    buttonText.value = "取消编辑";
-  }
-  else
-  {
+    buttonText.value = '取消编辑';
+  } else {
     editButtonRef.value = false;
-    buttonText.value = "编辑";
+    buttonText.value = '编辑';
   }
-}
+};
 
 // 展示模式切换
 const showListRef = ref(false);
 const setListModel = () => {
   showListRef.value = true;
-}
+};
 const setBlockModel = () => {
   showListRef.value = false;
-}
+};
 
 // 新建或准备更改的名字
 const fileNameRef = ref<string>('');
@@ -306,17 +301,17 @@ const fileOnOpen = ref<File | null>(null);
 
 const emits = defineEmits(['refresh']);
 const handleClickOpen = (file) => {
-    fileOnOpen.value = file;
-    // console.log(fileOnOpen.value.fileImage);
-    openDeskWithFile(fileOnOpen.value.fileImage);
-}
+  fileOnOpen.value = file;
+  // console.log(fileOnOpen.value.fileImage);
+  openDeskWithFile(fileOnOpen.value.fileImage);
+};
 const handleClickEdit = (file) => {
-    fileOnOpen.value = file;
-    fileNameRef.value = fileOnOpen.value.fileName;
-    openModelEdit();
-}
+  fileOnOpen.value = file;
+  fileNameRef.value = fileOnOpen.value.fileName;
+  openModelEdit();
+};
 const handleClickDelete = (file) => {
-    dialog.warning({
+  dialog.warning({
     title: '警告',
     content: '你确定要删除这个文件吗？',
     positiveText: '确定',
@@ -326,8 +321,7 @@ const handleClickDelete = (file) => {
     },
     onNegativeClick: () => {},
   });
-}
-
+};
 
 const getFileList = (id: number | null) => {
   readFile({
@@ -335,20 +329,21 @@ const getFileList = (id: number | null) => {
     teamID: null,
   }).then((res) => {
     files.value = [];
-    res.data.sonList.forEach((item: any) => {
-      if (item.fileType === 12) {
-        files.value.push({
-          fileID: item.fileID,
-          fileName: item.fileName,
-          userName: item.userName,
-          lastEditTime: item.lastEditTime,
-          fileImage: item.fileImage,
-        });
-      }
-    }).finally(()=>{
+    res.data.sonList
+      .forEach((item: any) => {
+        if (item.fileType === 12) {
+          files.value.push({
+            fileID: item.fileID,
+            fileName: item.fileName,
+            userName: item.userName,
+            lastEditTime: item.lastEditTime,
+            fileImage: item.fileImage,
+          });
+        }
+      })
+      .finally(() => {
         emits('refresh');
-    })
-    
+      });
   });
 };
 
@@ -363,7 +358,7 @@ const create = () => {
         window.$message.success('创建成功');
         closeModel();
       } else if (res.data.result == 1) {
-        console.log("this is warning");
+        console.log('this is warning');
         window.$message.warning(res.data.message);
       } else if (res.data.result == 2) {
         window.$message.error(res.data.message);
@@ -373,10 +368,9 @@ const create = () => {
       console.log(err);
     })
     .finally(() => {
-      console.log("end");
+      console.log('end');
       getFileList(projID.value);
     });
-
 };
 
 const getFileInfo = (file: File) => {
@@ -410,9 +404,9 @@ const edit = (file: FileEdit) => {
     .catch((err) => {
       console.log(err);
     })
-    .finally(()=>{
+    .finally(() => {
       getFileList(projID.value);
-    })
+    });
 };
 
 const editFileName = () => {
@@ -503,10 +497,9 @@ const openDeskWithFile = (svgStream: any) => {
 </script>
 
 <style scoped>
-.n-card
-{
+.n-card {
   border-radius: 7px;
-  border: 1px solid #B2B3B3;
+  border: 1px solid #b2b3b3;
   box-sizing: content-box;
 }
 .n-card:hover {
@@ -515,8 +508,7 @@ const openDeskWithFile = (svgStream: any) => {
 </style>
 
 <style>
-svg
-{
+svg {
   height: 100%;
   width: 100%;
 }

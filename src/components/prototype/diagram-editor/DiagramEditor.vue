@@ -2,14 +2,6 @@
   <div class="flex h-full">
     <div class="basis-1/7 h-full bg-[#18181c]">
       <div class="m-2">
-        <n-button size="large" text text-color="white" secondary @click="handleBackToWorkspace">
-          <template #icon>
-            <n-icon>
-              <chevron-back />
-            </n-icon>
-          </template>
-          返回项目
-        </n-button>
         <PageBox
           @page-create="handleCreatePage"
           @page-selected="handleSelectPage"
@@ -576,10 +568,6 @@ let originGroup: Frame[] = [];
 const mouseCoords = ref<Position>({ x: 0, y: 0 });
 
 const router = useRouter();
-function handleBackToWorkspace() {
-  router.back();
-}
-
 const handleToolBoxSelect = (selected: EditorTool) => {
   currentTool.value = selected;
 };

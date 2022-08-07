@@ -24,8 +24,8 @@ const routes: RouteRecordRaw[] = [
     ],
   },
   {
-    path: '/prototype',
-    name: 'prototype',
+    path: '/prototype/:protoID',
+    name: 'Prototype',
     component: () => import('../views/prototype/WorkSpace.vue'),
   },
   {
