@@ -425,6 +425,8 @@ import FileSaver, { saveAs } from 'file-saver';
 import { useRoute } from 'vue-router';
 import ZoomToolbarVue from './components/ZoomToolbar.vue';
 import { editFile, readFile } from '@/api/file';
+import { SyncManager } from './synchronous/SyncManager';
+import { wsurl } from '@/api/utils/request';
 export type Item = _Item & { hover?: boolean };
 
 // The component props and events
@@ -537,6 +539,8 @@ const origin: Frame = {
 };
 
 let originGroup: Frame[];
+
+let syncManager: SyncManager;
 
 // Track mouse position within the viewport coordinates
 const mouseCoords = ref<Position>({ x: 0, y: 0 });
@@ -912,6 +916,7 @@ function loadProto() {
           clipType: ClipType.NONE,
           clipStyle: '',
         }));
+      syncManager = new SyncManager(wsurl, loadElements.value);
     });
 }
 
