@@ -2,14 +2,6 @@
   <div class="flex h-full">
     <div class="basis-1/7 h-full bg-[#18181c]">
       <div class="m-2">
-        <n-button size="large" text text-color="white" secondary @click="handleBackToWorkspace">
-          <template #icon>
-            <n-icon>
-              <chevron-back />
-            </n-icon>
-          </template>
-          返回项目
-        </n-button>
         <PageBox
           @page-create="handleCreatePage"
           @page-selected="handleSelectPage"
@@ -84,7 +76,7 @@
               :connection="c"
               :style="{ zIndex: c.z }"
               :selected="c.id === selectedItem?.id"
-              @selected="selectItem(c)"
+              @selected.stop="selectItem(c)"
             />
 
             <!-- Use to render a connection line during a new connection creation -->
@@ -108,9 +100,9 @@
               :style="getItemStyle(item)"
               @click.stop="!creatingConnection && editable && selectItem(item)"
               @dblclick.stop="!creatingConnection && editable && inlineEdit(item)"
-              @mousedown="!creatingConnection && editable && selectItem(item, $event)"
+              @mousedown.stop="!creatingConnection && editable && selectItem(item, $event)"
               @mouseover.stop="creatingConnection && onMouseOver(item, $event)"
-              @mouseleave.self="creatingConnection && onMouseLeave(item, $event)"
+              @mouseleave.stop="creatingConnection && onMouseLeave(item, $event)"
             >
               <component :is="item.component" :item="item" />
 
@@ -376,7 +368,6 @@
 </template>
 
 <script setup lang="ts">
-import { ChevronBack } from '@vicons/ionicons5';
 import { onKeyStroke, useKeyModifier } from '@vueuse/core';
 import { computed, nextTick, onBeforeMount, onMounted, ref } from 'vue';
 import Guides from 'vue3-guides';
@@ -431,14 +422,14 @@ import KeyboardHelp from './components/KeyboardHelp.vue';
 import { DefaultZoomManager, IZoomManager } from './ZoomManager';
 import * as htmlToImage from 'html-to-image';
 import FileSaver, { saveAs } from 'file-saver';
-import { useRouter } from 'vue-router';
+import { useRoute } from 'vue-router';
 import ZoomToolbarVue from './components/ZoomToolbar.vue';
+import { editFile, readFile } from '@/api/file';
 export type Item = _Item & { hover?: boolean };
 
 // The component props and events
 // ------------------------------------------------------------------------------------------------------------------------
 export interface DiagramEditorProps {
-  elements: DiagramElement[];
   editable?: boolean;
   customWidgets?: boolean;
   viewportSize?: [number, number];
@@ -453,7 +444,7 @@ export interface DiagramEditorEvents {
 }
 
 // Define props
-const { elements, editable, viewportSize } = withDefaults(defineProps<DiagramEditorProps>(), {
+const { editable, viewportSize } = withDefaults(defineProps<DiagramEditorProps>(), {
   editable: true,
   customWidgets: false,
 });
@@ -473,36 +464,11 @@ onMounted(() => {
 
   viewer.value.scrollCenter();
 
-  pages.value = loadElements.value.filter((ele) => ele.isPage == true) as PageItem[];
-  originGroup = Array<Frame>(loadElements.value.length)
-    .fill({
-      x: 0,
-      y: 0,
-      w: 0,
-      h: 0,
-      z: 0,
-      r: 0,
-      borderRadius: 0,
-      opacity: 1,
-      clipType: ClipType.NONE,
-      clipStyle: '',
-    })
-    .map((item: Frame) => ({
-      x: 0,
-      y: 0,
-      w: 0,
-      h: 0,
-      z: 0,
-      r: 0,
-      borderRadius: 0,
-      opacity: 1,
-      clipType: ClipType.NONE,
-      clipStyle: '',
-    }));
+  // pages.value = loadElements.value.filter((ele) => ele.isPage == true) as PageItem[];
 });
 
 onBeforeMount(() => {
-  loadElements.value = elements;
+  loadProto();
 });
 
 // Set the handlers to manage keyboard shortcuts
@@ -575,11 +541,7 @@ let originGroup: Frame[] = [];
 // Track mouse position within the viewport coordinates
 const mouseCoords = ref<Position>({ x: 0, y: 0 });
 
-const router = useRouter();
-function handleBackToWorkspace() {
-  router.back();
-}
-
+const route = useRoute();
 const handleToolBoxSelect = (selected: EditorTool) => {
   currentTool.value = selected;
 };
@@ -690,32 +652,39 @@ function onDragStart(e: any): void {
     e.stop();
     return;
   }
-
-  origin.x = selectedItem.value.x;
-  origin.y = selectedItem.value.y;
+  if (selectedItem.value != null) {
+    origin.x = selectedItem.value.x;
+    origin.y = selectedItem.value.y;
+  }
 }
 
 function onDragGroupStart(e: { events: any }): void {
   e.events.forEach((ev: any, i: number) => {
-    originGroup[i].x = selectedPageItems.value[i].x;
-    originGroup[i].y = selectedPageItems.value[i].y;
+    if (selectedPageItems.value[i] != null) {
+      originGroup[i].x = selectedPageItems.value[i].x;
+      originGroup[i].y = selectedPageItems.value[i].y;
+    }
   });
 }
 
 function onDrag(e: any): void {
   if (!isItem(selectedItem.value)) return;
-  selectedItem.value.x = Math.floor(e.beforeTranslate[0]);
-  selectedItem.value.y = Math.floor(e.beforeTranslate[1]);
-  e.target.style.transform = e.transform;
+  if (selectedItem.value != null) {
+    selectedItem.value.x = Math.floor(e.beforeTranslate[0]);
+    selectedItem.value.y = Math.floor(e.beforeTranslate[1]);
+    e.target.style.transform = e.transform;
+  }
 }
 
 function onDragGroup(e: { events: any }): void {
   if (!isItem(selectedItem.value)) return;
 
   e.events.forEach((e: any, i: number) => {
-    selectedPageItems.value[i].x = Math.floor(e.beforeTranslate[0]);
-    selectedPageItems.value[i].y = Math.floor(e.beforeTranslate[1]);
-    e.target.style.transform = e.transform;
+    if (selectedPageItems.value[i] != null) {
+      selectedPageItems.value[i].x = Math.floor(e.beforeTranslate[0]);
+      selectedPageItems.value[i].y = Math.floor(e.beforeTranslate[1]);
+      e.target.style.transform = e.transform;
+    }
   });
 }
 
@@ -724,22 +693,27 @@ function onDragEnd(e: any): void {
 
   // Item just cliked, no move ?
   if (origin.x === selectedItem.value.x && origin.y === selectedItem.value.y) return;
-
-  historyManager.value.execute(
-    new MoveCommand(selectedItem.value, [origin.x, origin.y], [selectedItem.value.x, selectedItem.value.y])
-  );
+  if (selectedItem.value.isPage) {
+    selectNone();
+  }
+  if (selectedItem.value != null) {
+    historyManager.value.execute(
+      new MoveCommand(selectedItem.value, [origin.x, origin.y], [selectedItem.value.x, selectedItem.value.y])
+    );
+  }
 }
 
 function onDragGroupEnd(e: { events: any }): void {
   if (!isItem(selectedItem.value)) return;
-
+  selectNone();
   selectedPageItems.value.forEach((pageItem, i: number) => {
     //console.log('ondragend', pageItem.x, pageItem.y);
-    historyManager.value.execute(
-      new MoveCommand(pageItem, [originGroup[i].x, originGroup[i].y], [pageItem.x, pageItem.y])
-    );
+    if (pageItem != null) {
+      historyManager.value.execute(
+        new MoveCommand(pageItem, [originGroup[i].x, originGroup[i].y], [pageItem.x, pageItem.y])
+      );
+    }
   });
-  selectNone();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -890,8 +864,55 @@ function bringToFront(): void {
 
 /** Save the scene into a json file */
 function saveProto(): void {
-  localStorage.setItem('proto', JSON.stringify(elements as Item[]));
-  window.$message.info('已保存');
+  var protoData = JSON.stringify(loadElements.value as Item[]);
+  // localStorage.setItem('proto', protoData);
+  var protoID = parseInt(route.params.protoID as string);
+  editFile({ fileID: protoID, data: protoData }).then((res) => {
+    window.$message.info('已保存');
+  });
+}
+
+function loadProto() {
+  var protoID = parseInt(route.params.protoID as string);
+  readFile({ fileID: protoID, teamID: null })
+    .then((res) => {
+      if (res.data.data != null) {
+        loadElements.value = JSON.parse(res.data.data) as DiagramElement[];
+      } else {
+        loadElements.value = [
+          // createPageItem()
+        ];
+      }
+    })
+    .finally(() => {
+      pages.value = loadElements.value.filter((ele) => ele.isPage == true) as PageItem[];
+      selectPage(pages.value[0]);
+      originGroup = Array<Frame>(loadElements.value.length)
+        .fill({
+          x: 0,
+          y: 0,
+          w: 0,
+          h: 0,
+          z: 0,
+          r: 0,
+          borderRadius: 0,
+          opacity: 1,
+          clipType: ClipType.NONE,
+          clipStyle: '',
+        })
+        .map((item: Frame) => ({
+          x: 0,
+          y: 0,
+          w: 0,
+          h: 0,
+          z: 0,
+          r: 0,
+          borderRadius: 0,
+          opacity: 1,
+          clipType: ClipType.NONE,
+          clipStyle: '',
+        }));
+    });
 }
 
 function handleCreatePage(newPageName: string) {
@@ -996,6 +1017,7 @@ function onCanvasClick(e: any): void {
       console.log('Unselecting all');
       selectNone();
     }
+    // selectNone();
     return;
   }
 
@@ -1067,8 +1089,16 @@ function onZoomChanged(newZoomFactor: number, scrollViewerToCenter?: boolean) {
 
 /** Handle scroll to page */
 function handleSelectPage(page: PageItem) {
+  selectNone();
   selectPage(page);
   focusPage(page);
+  nextTick(() => {
+    selectedItem.value = page;
+    selectedPageItems.value = loadElements.value.filter((elem) => {
+      return (page as PageItem).containedIDs.includes(`[data-item-id='${elem.id}']`);
+    }) as Item[];
+    if (moveableInspector.value) moveableInspector.value.updateRect();
+  });
 }
 
 function focusPage(page: PageItem) {
