@@ -1,11 +1,13 @@
 <template>
   <n-modal
     v-model:show="show"
+    id="copy"
     preset="dialog"
     title="通过链接邀请成员"
     size="medium"
     positive-text="复制"
     negative-text="取消"
+    :data-clipboard-text="code"
     @positive-click="handlePositiveClick"
   >
     <n-divider style="margin: 15px auto" />
@@ -20,31 +22,45 @@
 import { inviteTeamMember } from '@/api/team';
 import { ref } from 'vue';
 import { useRoute } from 'vue-router';
+import Clipboard from 'clipboard';
 
 const route = useRoute();
 const code = ref('');
 const show = ref(false);
 
-const handlePositiveClick = async () => {
-  if (navigator.clipboard && window.isSecureContext) {
-    // navigator clipboard 向剪贴板写文本
-    return navigator.clipboard.writeText(code.value);
-  } else {
-    // 创建text area
-    let textArea = document.createElement('textarea');
-    textArea.value = code.value;
-    // 使text area不在viewport，同时设置不可见
-    textArea.style.position = 'absolute';
-    textArea.style.opacity = '0';
-    textArea.style.left = '-999999px';
-    textArea.style.top = '-999999px';
-    document.body.appendChild(textArea);
-    textArea.focus();
-    textArea.select();
-    // 执行复制命令并移除文本框
-    document.execCommand('copy');
-    textArea.remove();
-  }
+const handlePositiveClick = () => {
+  var clipboard = new Clipboard('#copy');
+
+  clipboard.on('success', (e) => {
+    console.log('复制成功');
+    // 释放内存
+    clipboard.destroy();
+  });
+  clipboard.on('error', (e) => {
+    // 不支持复制
+    console.log('该浏览器不支持自动复制');
+    // 释放内存
+    clipboard.destroy();
+  });
+  // if (navigator.clipboard && window.isSecureContext) {
+  //   // navigator clipboard 向剪贴板写文本
+  //   return navigator.clipboard.writeText(code.value);
+  // } else {
+  //   // 创建text area
+  //   let textArea = document.createElement('textarea');
+  //   textArea.value = code.value;
+  //   // 使text area不在viewport，同时设置不可见
+  //   textArea.style.position = 'absolute';
+  //   textArea.style.opacity = '0';
+  //   textArea.style.left = '-999999px';
+  //   textArea.style.top = '-999999px';
+  //   document.body.appendChild(textArea);
+  //   textArea.focus();
+  //   textArea.select();
+  //   // 执行复制命令并移除文本框
+  //   document.execCommand('copy');
+  //   textArea.remove();
+  // }
   // navigator.clipboard.writeText(code.value);
 };
 
