@@ -683,7 +683,11 @@ function onDrag(e: any): void {
     selectedItem.value.x = Math.floor(e.beforeTranslate[0]);
     selectedItem.value.y = Math.floor(e.beforeTranslate[1]);
     e.target.style.transform = e.transform;
-    syncManager.sendMessage(OperationType.MOVE, { x: selectedItem.value.x, y: selectedItem.value.y });
+    syncManager.sendMessage(OperationType.MOVE, {
+      targetID: selectedItem.value.id,
+      x: selectedItem.value.x,
+      y: selectedItem.value.y,
+    });
   }
 }
 

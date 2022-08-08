@@ -43,6 +43,7 @@ onMounted(() => {
   syncManager.registerOpen(user, file);
   syncManager.registerClose(user, file);
   syncManager.registerRegisterFunc((userID: number, fileID: number) => {
+    window.$message.info('加入新用户!');
     getUserInfo({ userID: userID.toString() }).then((res) => {
       if (res.data.result == 0) {
         options.value.push({ name: res.data.data.username, src: res.data.data.avatar });
