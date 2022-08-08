@@ -810,6 +810,11 @@ function onDragGroup(e: { events: any }): void {
       selectedPageItems.value[i].x = Math.floor(e.beforeTranslate[0]);
       selectedPageItems.value[i].y = Math.floor(e.beforeTranslate[1]);
       e.target.style.transform = e.transform;
+      syncManager.sendMessage(OperationType.MOVE, {
+        targetID: selectedPageItems.value[i].id,
+        x: selectedPageItems.value[i].x,
+        y: selectedPageItems.value[i].y,
+      });
     }
   });
 }
@@ -849,22 +854,48 @@ function onDragGroupEnd(e: { events: any }): void {
 function handleSync() {
   syncManager.registerMoveFunc((targetID: string, x: number, y: number) => {
     var element = loadElements.value.find((elem) => elem.id == targetID);
-    (element as Item).x = x;
-    (element as Item).y = y;
+    if (element != null) {
+      (element as Item).x = x;
+      (element as Item).y = y;
+    }
   });
   syncManager.registerResizeFunc((targetID: string, x: number, y: number, w: number, h: number) => {
     var element = loadElements.value.find((elem) => elem.id == targetID);
-    (element as Item).x = x;
-    (element as Item).y = y;
-    (element as Item).w = w;
-    (element as Item).h = h;
+    if (element != null) {
+      (element as Item).x = x;
+      (element as Item).y = y;
+      (element as Item).w = w;
+      (element as Item).h = h;
+    }
   });
-  syncManager.registerAddItemFunc((element: DiagramElement) => {
-    historyManager.value.execute(new AddItemCommand(loadElements.value, element as Item, currentPage.value));
+  syncManager.registerAddItemFunc((element: DiagramElement, targetPageID: string) => {
+    if (element.isPage) {
+      var newPageName = (element as PageItem).pageName;
+      var resolution = (element as PageItem).w + 'x' + (element as PageItem).h;
+      addPage(newPageName, resolution);
+      focusPage(currentPage.value as PageItem);
+    } else {
+      var page = loadElements.value.find((elem) => elem.id == targetPageID) as PageItem;
+      historyManager.value.execute(new AddItemCommand(loadElements.value, element as Item, page));
+    }
   });
   syncManager.registerDeleteItemFunc((targetID: string) => {
     var element = loadElements.value.find((elem) => elem.id == targetID);
-    historyManager.value.execute(new DeleteCommand(loadElements.value, element as Item));
+    if (element?.isPage) {
+      var index = pages.value.findIndex((ele) => ele.id == targetID);
+      pages.value.splice(index, 1);
+      currentPage.value = null;
+      currentPageTargets.value = [];
+      var containedIDs = (selectedItem.value as PageItem).containedIDs;
+      var deleteItems = loadElements.value.filter((ele) => {
+        return containedIDs.includes(`[data-item-id='${ele.id}']`);
+      });
+      deleteItems.forEach((ele) => {
+        historyManager.value.execute(new DeleteCommand(loadElements.value, ele));
+      });
+    } else {
+      historyManager.value.execute(new DeleteCommand(loadElements.value, element as Item));
+    }
   });
 }
 
@@ -1080,6 +1111,7 @@ function loadProto() {
 function handleCreatePage(newPageName: string, pageResolution: string) {
   addPage(newPageName, pageResolution);
   focusPage(currentPage.value as PageItem);
+  syncManager.sendMessage(OperationType.ADD_ITEM, { element: currentPage.value });
 }
 
 function addPage(newPageName: string, pageResolution: string): void {
@@ -1126,6 +1158,7 @@ function deleteItem() {
       });
       console.log(deleteItems);
       deleteItems.forEach((ele) => {
+        syncManager.sendMessage(OperationType.DELETE_ITEM, { targetID: (ele as DiagramElement).id });
         historyManager.value.execute(new DeleteCommand(loadElements.value, ele));
       });
     } else {

@@ -5,9 +5,7 @@ export enum OperationType {
   REGISTER = 'register',
   LEAVE = 'leave',
   ADD_ITEM = 'add_item',
-  ADD_PAGE = 'add_page',
   DELETE_ITEM = 'del_item',
-  DELETE_PAGE = 'del_page',
   MOVE = 'move',
   RESIZE = 'resize',
   MODIFY = 'modify',
@@ -15,7 +13,7 @@ export enum OperationType {
 // handle recevie
 export type RegisterFunc = (userID: number, fileID: number) => any;
 export type LeaveFunc = (userID: number, fileID: number) => any;
-export type AddItemFunc = (element: DiagramElement) => any;
+export type AddItemFunc = (element: DiagramElement, targetPageID: string) => any;
 export type MoveFunc = (targetID: string, x: number, y: number) => any;
 export type ResizeFunc = (targetID: string, x: number, y: number, w: number, h: number) => any;
 export type ModifyFunc = (targetID: string, element: DiagramElement) => any;
@@ -64,7 +62,7 @@ export class SyncManager {
           break;
         case 'add_item':
           this.addItemFuncs.forEach((func) => {
-            func(message.element);
+            func(message.element, message.targetPageID);
           });
         case 'del_item':
           this.deleteItemFuncs.forEach((func) => {
