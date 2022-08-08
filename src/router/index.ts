@@ -131,6 +131,11 @@ const routes: RouteRecordRaw[] = [
     name: 'login',
     component: () => import('../views/login/LoginPage.vue'),
   },
+  {
+    path: '/:catchAll(.*)',
+    name: 'NoFound',
+    component: () => import('../views/common/noFound.vue'),
+  },
 ];
 
 const router = createRouter({

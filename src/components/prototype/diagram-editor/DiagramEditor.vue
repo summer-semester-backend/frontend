@@ -1,22 +1,25 @@
 <template>
   <div class="flex h-full">
-    <div class="basis-1/7 h-full bg-[#18181c]">
+    <div v-if="editable" class="min-w-60 h-full bg-[#494949]">
       <div class="m-2">
-        <PageBox
-          @page-create="handleCreatePage"
-          @page-selected="handleSelectPage"
-          :pages="pages"
-          :selected-page="currentPage?.id as string"
-        />
-        <ToolBox @tool-selected="handleToolBoxSelect" />
+        <n-config-provider :theme="darkTheme" :theme-overrides="prototypeWorkspaceConfig">
+          <PageBox
+            @page-create="handleCreatePage"
+            @page-selected="handleSelectPage"
+            :pages="pages"
+            :selected-page="currentPage?.id as string"
+          />
+          <ToolBox @tool-selected="handleToolBoxSelect" @icon-selected="handleIconSelected" />
+        </n-config-provider>
       </div>
     </div>
-    <div class="basis-5/7 h-full">
+    <div class="w-full h-full">
       <div class="editor-container">
         <!-- Rulers -->
         <Guides
           v-show="guidesVisible"
           class="ruler ruler-horizontal"
+          className="custom-color"
           :showGuides="showGuides"
           @changeGuides="hGuideValues = $event.guides"
           type="horizontal"
@@ -46,6 +49,17 @@
         <VueInfiniteViewer
           ref="viewer"
           class="viewer"
+          :class="{
+            'bg-dark-700': !editable,
+            'bg-[#ededed]': editable,
+            'top-30px': editable,
+            'left-30px': editable,
+            'w-[calc(100%-30px)]': editable,
+            'h-[calc(100%-30px)]': editable,
+            'w-[calc(100%)]': !editable,
+            'h-[calc(100%)]': !editable,
+          }"
+          id="tryText"
           :useMouseDrag="shiftPressed"
           :useWheelScroll="true"
           :zoom="zoomFactor"
@@ -60,6 +74,7 @@
         >
           <div
             ref="viewport"
+            id="tryText2"
             :class="{ viewport: true, 'viewport-area': viewportSize }"
             :style="{
               width: viewportSize ? viewportSize[0] + 'px' : '100%',
@@ -94,6 +109,7 @@
             <div
               v-for="(item, i) in items"
               class="item"
+              id="tryText3"
               :key="item.id"
               :data-item-id="item.id"
               :class="{ target: item.id === selectedItem?.id, locked: item.locked === true }"
@@ -104,7 +120,7 @@
               @mouseover.stop="creatingConnection && onMouseOver(item, $event)"
               @mouseleave.stop="creatingConnection && onMouseLeave(item, $event)"
             >
-              <component :is="item.component" :item="item" />
+              <component :is="item.component" :item="item" class="screenshot" />
 
               <!-- Item decorators (delete, locked, size info) -->
               <div
@@ -176,7 +192,7 @@
                 isItem(selectedItem)
                   ? isPage(selectedItem)
                     ? currentPageTargets
-                    : [`[data-item-id='${selectedItem.id}']`]
+                    : [`[data-item-id='${(selectedItem as DiagramElement).id}']`]
                   : []
               "
               :zoom="1 / zoomFactor"
@@ -252,7 +268,13 @@
             @toolSelected="selectCurrentTool"
           />
           <div class="toolbar-separator"></div>
-          <ZoomToolbar ref="zoomToolbar" :zoomManager="zoomManager" @zoomChanged="onZoomChanged" />
+          <ZoomToolbar
+            ref="zoomToolbar"
+            :editable="editable"
+            :zoomManager="zoomManager"
+            @zoomChanged="onZoomChanged"
+            @mode-changed="editable = !editable"
+          />
           <div class="toolbar-separator"></div>
           <div v-if="editable" class="toolbar">
             <button class="toolbar-item" @click="undo" :disabled="!historyManager.canUndo()" title="Undo">
@@ -357,12 +379,11 @@
       </div>
       <!-- editor-container -->
     </div>
-    <div class="basis-1/7 h-full">
-      <ObjectInspector
-        :schema="selectedItem ? getItemBlueprint(selectedItem.component)[1] : null"
-        :object="selectedItem"
-        @property-changed="onPropertyChange"
-      />
+    <div v-if="editable" class="flex flex-col w-90 bg-[#494949] h-full">
+      <n-config-provider :theme="darkTheme" :theme-overrides="prototypeWorkspaceConfig">
+        <SyncEditMembers v-if="isSyncManagerInitialized" />
+        <ObjectInspector :schema="objectInspectorSchema" :object="selectedItem" @property-changed="onPropertyChange" />
+      </n-config-provider>
     </div>
   </div>
 </template>
@@ -420,17 +441,19 @@ import ClipCommand from './commands/ClipCommand';
 import DeleteCommand from './commands/DeleteCommand';
 import KeyboardHelp from './components/KeyboardHelp.vue';
 import { DefaultZoomManager, IZoomManager } from './ZoomManager';
-import * as htmlToImage from 'html-to-image';
-import FileSaver, { saveAs } from 'file-saver';
 import { useRoute } from 'vue-router';
 import ZoomToolbarVue from './components/ZoomToolbar.vue';
 import { editFile, readFile } from '@/api/file';
+import html2canvas from 'html2canvas';
+import { createSyncManager, syncManager, isSyncManagerInitialized, OperationType } from './synchronous/SyncManager';
+import { wsurl } from '@/api/utils/request';
+import { darkTheme } from 'naive-ui';
+import { prototypeWorkspaceConfig } from '@/config/color';
+import { resolve } from 'path';
 export type Item = _Item & { hover?: boolean };
-
 // The component props and events
 // ------------------------------------------------------------------------------------------------------------------------
 export interface DiagramEditorProps {
-  editable?: boolean;
   customWidgets?: boolean;
   viewportSize?: [number, number];
 }
@@ -444,8 +467,7 @@ export interface DiagramEditorEvents {
 }
 
 // Define props
-const { editable, viewportSize } = withDefaults(defineProps<DiagramEditorProps>(), {
-  editable: true,
+const { viewportSize } = withDefaults(defineProps<DiagramEditorProps>(), {
   customWidgets: false,
 });
 
@@ -471,9 +493,12 @@ onBeforeMount(() => {
   loadProto();
 });
 
+// watch(()=>selectedItem.value)
+
 // Set the handlers to manage keyboard shortcuts
 setupKeyboardHandlers();
 
+const editable = ref(true);
 // The component state
 // ------------------------------------------------------------------------------------------------------------------------
 const zoomManager = ref<IZoomManager>(new DefaultZoomManager());
@@ -488,7 +513,7 @@ const zoomToolbar = ref<InstanceType<typeof ZoomToolbarVue> | null>(null);
 const hGuides = ref();
 const vGuides = ref();
 const showRulers = ref(true);
-const guidesVisible = computed(() => showRulers.value && editable);
+const guidesVisible = computed(() => showRulers.value && editable.value);
 const hGuideValues = ref<number[]>([]); // Horizontal guides added by the user
 const vGuideValues = ref<number[]>([]); // Vertical guides added by the user
 const showGuides = ref(true); // Show or hide all the guides
@@ -507,13 +532,20 @@ const selectedItemActive = computed(() => {
   return isItem(selectedItem.value) ? !selectedItem.value.locked === true : true;
 });
 
+const objectInspectorSchema = computed(() => {
+  return selectedItem.value ? getItemBlueprint(selectedItem.value.component)[1] : null;
+});
+
 const shiftPressed = useKeyModifier('Shift');
 const historyManager = ref(new HistoryManager());
 const currentTool = ref(EditorTool.SELECT);
+const currentIcon = ref('');
 
 const creatingConnection = computed<boolean>(() => currentTool.value === EditorTool.CONNECTION);
 
-const items = computed(() => loadElements.value.filter((e) => isItem(e)) as Item[]);
+const items = computed(() => {
+  return loadElements.value.filter((e) => isItem(e)) as Item[];
+});
 const connections = computed(() => loadElements.value.filter((e) => isConnection(e)) as ItemConnection[]);
 const pages = ref<Array<PageItem>>([]);
 const currentPage = ref<PageItem | null>(null);
@@ -536,7 +568,7 @@ const origin: Frame = {
   clipStyle: '',
 };
 
-let originGroup: Frame[] = [];
+let originGroup: Frame[];
 
 // Track mouse position within the viewport coordinates
 const mouseCoords = ref<Position>({ x: 0, y: 0 });
@@ -544,20 +576,111 @@ const mouseCoords = ref<Position>({ x: 0, y: 0 });
 const route = useRoute();
 const handleToolBoxSelect = (selected: EditorTool) => {
   currentTool.value = selected;
+  currentIcon.value = '';
 };
 
+const handleIconSelected = (icon: string) => {
+  currentTool.value = EditorTool.ICON;
+  currentIcon.value = icon;
+};
+var canvas2 = document.createElement('canvas');
+var ctx2 = canvas2.getContext('2d');
+function draw() {
+  let elems = Array.from(document.getElementsByClassName('screenshot') as HTMLCollectionOf<HTMLElement>);
+
+  var len = elems.length;
+  console.log('len:' + len);
+  canvas2.width = 1000;
+  canvas2.height = 800;
+  var index = 0;
+  elems.forEach((elem: any) => {
+    var canvas = document.createElement('canvas');
+    var context = canvas.getContext('2d');
+    if (context != null) {
+      context.fillStyle = 'rgba(255, 255, 255, 0)';
+    }
+    var width = elem.offsetWidth; //获取dom 宽度
+    var height = elem.offsetHeight; //获取dom 高度
+
+    canvas.width = width;
+    console.log('text' + canvas.width);
+    canvas.height = height;
+    var opts = {
+      scale: 1, // 添加的scale 参数
+      canvas: canvas, //自定义 canvas
+      logging: true, //日志开关
+      width: width, //dom 原始宽度
+      height: height, //dom 原始高度
+      useCORS: true,
+      withCredentials: true,
+      allowTaint: true,
+      backgroundColor: null,
+    };
+    html2canvas(elem, opts).then(function (canvas) {
+      if (ctx2 != null) {
+        ctx2.drawImage(canvas, 0, 0, canvas.width, canvas.height);
+        index++;
+        console.log(index);
+        if (index == len) {
+          let imgUrl = canvas2.toDataURL();
+          let a = document.createElement('a');
+          a.href = imgUrl;
+          // 利用浏览器下载器下载图片
+          a.setAttribute('download', '需要生成图片.png');
+          a.click();
+        }
+      }
+    });
+  });
+  return Promise.resolve(123);
+}
+
 function saveToImage() {
+  draw();
   let dom = document.createElement('div');
-  // let elems = Array.from(document.getElementsByClassName('screenshot') as HTMLCollectionOf<Element>);
   // elems.forEach((elem) => {
   //   var node = elem.cloneNode();
   //   dom.appendChild(node);
   // });
 
-  var canvas = document.getElementsByClassName('viewport-area')[0] as HTMLElement;
-  htmlToImage.toPng(canvas).then((canvas) => {
-    FileSaver.saveAs(canvas, 'test.png');
-  });
+  // var canvas = document.getElementsByClassName('viewport-area')[0] as HTMLElement;
+  // var canvas = document.getElementById('tryText') as HTMLElement;
+  // var canvas = dom as HTMLElement;
+  // htmlToImage.toPng(canvas).then((canvas) => {
+  //   FileSaver.saveAs(canvas, 'test.png');
+  // });
+
+  // const shareContent = document.getElementById('tryText2') as HTMLElement; //需要截图的包裹的（原生的）DOM 对象
+
+  // // const shareContent = dom;
+  // var width = shareContent.offsetWidth; //获取dom 宽度
+  // var height = shareContent.offsetHeight; //获取dom 高度
+  // var canvas = document.createElement('canvas'); //创建一个canvas节点
+  // var scale = 1; //定义任意放大倍数 支持小数
+  // canvas.width = width * 1; //定义canvas 宽度 * 缩放
+  // canvas.height = height * 1; //定义canvas高度 *缩放
+  // canvas.getContext('2d').scale(scale, scale); //获取context,设置scale
+  // var opts = {
+  //   scale: 1, // 添加的scale 参数
+  //   canvas: canvas, //自定义 canvas
+  //   logging: true, //日志开关
+  //   width: width, //dom 原始宽度
+  //   height: height, //dom 原始高度
+  //   useCORS: true,
+  //   withCredentials: true,
+  //   allowTaint: true,
+  // };
+  // html2canvas(shareContent, opts).then(function (canvas) {
+  //   //如果想要生成图片 引入canvas2Image.js 下载地址：
+  //   //https://github.com/hongru/canvas2image/blob/master/canvas2image.js
+  //   let imgUrl = canvas.toDataURL();
+  //   // 动态生成下载图片链接
+  //   let a = document.createElement('a');
+  //   a.href = imgUrl;
+  //   // 利用浏览器下载器下载图片
+  //   a.setAttribute('download', '需要生成图片.png');
+  //   a.click();
+  // });
 }
 
 function onDragOver(e: any) {
@@ -673,6 +796,11 @@ function onDrag(e: any): void {
     selectedItem.value.x = Math.floor(e.beforeTranslate[0]);
     selectedItem.value.y = Math.floor(e.beforeTranslate[1]);
     e.target.style.transform = e.transform;
+    syncManager.sendMessage(OperationType.MOVE, {
+      targetID: selectedItem.value.id,
+      x: selectedItem.value.x,
+      y: selectedItem.value.y,
+    });
   }
 }
 
@@ -684,6 +812,11 @@ function onDragGroup(e: { events: any }): void {
       selectedPageItems.value[i].x = Math.floor(e.beforeTranslate[0]);
       selectedPageItems.value[i].y = Math.floor(e.beforeTranslate[1]);
       e.target.style.transform = e.transform;
+      syncManager.sendMessage(OperationType.MOVE, {
+        targetID: selectedPageItems.value[i].id,
+        x: selectedPageItems.value[i].x,
+        y: selectedPageItems.value[i].y,
+      });
     }
   });
 }
@@ -717,6 +850,64 @@ function onDragGroupEnd(e: { events: any }): void {
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
+// Handle Move Sync
+// ---------------------------------------------------------------------------------------------------------------------
+
+function handleSync() {
+  syncManager.registerMoveFunc((targetID: string, x: number, y: number) => {
+    var element = loadElements.value.find((elem) => elem.id == targetID);
+    if (element != null) {
+      (element as Item).x = x;
+      (element as Item).y = y;
+    }
+  });
+  syncManager.registerResizeFunc((targetID: string, x: number, y: number, w: number, h: number) => {
+    var element = loadElements.value.find((elem) => elem.id == targetID);
+    if (element != null) {
+      (element as Item).x = x;
+      (element as Item).y = y;
+      (element as Item).w = w;
+      (element as Item).h = h;
+    }
+  });
+  syncManager.registerAddItemFunc((element: DiagramElement, targetPageID: string) => {
+    if (element.isPage) {
+      var newPageName = (element as PageItem).pageName;
+      var resolution = (element as PageItem).w + 'x' + (element as PageItem).h;
+      addPage(newPageName, resolution);
+      focusPage(currentPage.value as PageItem);
+    } else {
+      var page = loadElements.value.find((elem) => elem.id == targetPageID) as PageItem;
+      historyManager.value.execute(new AddItemCommand(loadElements.value, element as Item, page));
+    }
+  });
+  syncManager.registerDeleteItemFunc((targetID: string) => {
+    var element = loadElements.value.find((elem) => elem.id == targetID);
+    if (element?.isPage) {
+      var index = pages.value.findIndex((ele) => ele.id == targetID);
+      pages.value.splice(index, 1);
+      currentPage.value = null;
+      currentPageTargets.value = [];
+      var containedIDs = (selectedItem.value as PageItem).containedIDs;
+      var deleteItems = loadElements.value.filter((ele) => {
+        return containedIDs.includes(`[data-item-id='${ele.id}']`);
+      });
+      deleteItems.forEach((ele) => {
+        historyManager.value.execute(new DeleteCommand(loadElements.value, ele));
+      });
+    } else {
+      historyManager.value.execute(new DeleteCommand(loadElements.value, element as Item));
+    }
+  });
+  syncManager.registerModifyFunc((element: DiagramElement) => {
+    selectedItem.value = element;
+    var trueElementIndex = loadElements.value.findIndex((elem) => elem.id == element.id);
+    loadElements.value.splice(trueElementIndex, 1, element);
+    nextTick(() => moveable.value?.updateRect());
+  });
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
 // Resize item
 // ---------------------------------------------------------------------------------------------------------------------
 function onResizeStart(e: any): void {
@@ -736,6 +927,14 @@ function onResize(e: any): void {
   selectedItem.value.y = Math.floor(e.drag.beforeTranslate[1]);
   selectedItem.value.w = Math.floor(e.width);
   selectedItem.value.h = Math.floor(e.height);
+
+  syncManager.sendMessage(OperationType.RESIZE, {
+    targetID: selectedItem.value.id,
+    x: selectedItem.value.x,
+    y: selectedItem.value.y,
+    w: selectedItem.value.w,
+    h: selectedItem.value.h,
+  });
 
   e.target.style.transform = e.drag.transform;
   e.target.style.width = `${Math.floor(e.width)}px`;
@@ -887,7 +1086,7 @@ function loadProto() {
     .finally(() => {
       pages.value = loadElements.value.filter((ele) => ele.isPage == true) as PageItem[];
       selectPage(pages.value[0]);
-      originGroup = Array<Frame>(loadElements.value.length)
+      originGroup = new Array<Frame>(loadElements.value.length)
         .fill({
           x: 0,
           y: 0,
@@ -912,26 +1111,37 @@ function loadProto() {
           clipType: ClipType.NONE,
           clipStyle: '',
         }));
+      createSyncManager(wsurl, loadElements.value);
+      handleSync();
     });
 }
 
-function handleCreatePage(newPageName: string) {
-  addPage(newPageName);
+function handleCreatePage(newPageName: string, pageResolution: string) {
+  addPage(newPageName, pageResolution);
   focusPage(currentPage.value as PageItem);
+  syncManager.sendMessage(OperationType.ADD_ITEM, { element: currentPage.value });
 }
 
-function addPage(newPageName: string): void {
+function addPage(newPageName: string, pageResolution: string): void {
   // TODO: page ID and save proto
   saveProto();
   // Clicking the canvas with other tools => create a new item of related type
   const toolDef = getToolDefinition(EditorTool.PAGE);
   const properties = getItemBlueprint(toolDef.itemType!)[0];
-  const w = properties.w;
+  const wh = pageResolution.split('x');
+  const w = parseInt(wh[0]);
+  const h = parseInt(wh[1]);
+  let accWidth = 0;
+  pages.value.forEach((page) => {
+    accWidth += page.w + 200;
+  });
   const newItem = deepCloneItem({
     ...properties,
     id: getUniqueId(),
-    x: 200 + pages.value.length * (w + 200),
+    x: 200 + accWidth,
     y: 200,
+    w: w,
+    h: h,
     pageName: newPageName,
   });
 
@@ -944,9 +1154,27 @@ function addPage(newPageName: string): void {
 /** Delete current selected item / connection */
 function deleteItem() {
   if (isItem(selectedItem.value)) {
-    historyManager.value.execute(new DeleteCommand(loadElements.value, selectedItem.value));
-    emit('delete-item', selectedItem.value);
-    selectNone();
+    if (isPage(selectedItem.value)) {
+      var index = pages.value.findIndex((ele) => ele.id == selectedItem.value?.id);
+      pages.value.splice(index, 1);
+      currentPage.value = null;
+      currentPageTargets.value = [];
+      var containedIDs = (selectedItem.value as PageItem).containedIDs;
+      console.log(containedIDs);
+      var deleteItems = loadElements.value.filter((ele) => {
+        return containedIDs.includes(`[data-item-id='${ele.id}']`);
+      });
+      console.log(deleteItems);
+      deleteItems.forEach((ele) => {
+        syncManager.sendMessage(OperationType.DELETE_ITEM, { targetID: (ele as DiagramElement).id });
+        historyManager.value.execute(new DeleteCommand(loadElements.value, ele));
+      });
+    } else {
+      syncManager.sendMessage(OperationType.DELETE_ITEM, { targetID: (selectedItem.value as DiagramElement).id });
+      historyManager.value.execute(new DeleteCommand(loadElements.value, selectedItem.value));
+      emit('delete-item', selectedItem.value);
+      selectNone();
+    }
   }
 
   if (isConnection(selectedItem.value)) {
@@ -1035,9 +1263,11 @@ function onCanvasClick(e: any): void {
     id: getUniqueId(),
     x: mouseCoords.value.x,
     y: mouseCoords.value.y,
+    title: currentIcon.value,
   });
   console.log('creating new item', toolDef, toolDef.itemType, newItem);
   historyManager.value.execute(new AddItemCommand(loadElements.value, newItem, currentPage.value));
+  syncManager.sendMessage(OperationType.ADD_ITEM, { element: newItem, targetPageID: currentPage.value?.id });
   emit('add-item', newItem);
   currentTool.value = EditorTool.SELECT;
 }
@@ -1075,7 +1305,7 @@ function onPropertyChange(p: ObjectProperty, newValue: any) {
   //console.log('onPropertyChange', p, 'New value:', newValue);
   // TODO: create a history command for this change so the action is undoable (for that we need the 'oldValue' as well)
   // historyManager.value.execute(new PropertyChangeCommand(selectedItem.value, oldValue, newValue));
-
+  syncManager.sendMessage(OperationType.MODIFY, { element: selectedItem.value });
   nextTick(() => moveable.value?.updateRect());
 }
 
@@ -1103,8 +1333,8 @@ function handleSelectPage(page: PageItem) {
 
 function focusPage(page: PageItem) {
   window.$message.info('聚焦' + page.pageName);
-  const left = page.x - 200;
-  const top = page.y - 200;
+  const left = page.x - 100;
+  const top = page.y - 100;
   viewer.value?.scrollTo(left, top);
   zoomToolbar.value?.zoomReset();
   console.log('page info', currentPage.value, currentPageTargets.value);
@@ -1112,7 +1342,9 @@ function focusPage(page: PageItem) {
 
 function selectPage(page: PageItem) {
   currentPage.value = page;
-  currentPageTargets.value = page.containedIDs;
+  if (page != null) {
+    currentPageTargets.value = page.containedIDs;
+  }
 }
 
 /** Setup all the keyboard shortcuts */
@@ -1178,8 +1410,14 @@ function setupKeyboardHandlers() {
     nextTick(() => moveable.value?.updateRect());
   });
 
+  onKey(['s'], (e: KeyboardEvent) => {
+    if (isVirtualCtrl(e)) {
+      saveProto();
+    }
+  });
+
   // Shortcuts to tools selection
-  onKey(['s'], (e: KeyboardEvent) => selectCurrentTool(EditorTool.SELECT)); // S = Select tool
+  // onKey(['s'], (e: KeyboardEvent) => selectCurrentTool(EditorTool.SELECT)); // S = Select tool
   onKey(['t'], (e: KeyboardEvent) => selectCurrentTool(EditorTool.TEXT)); // T = Text tool
   onKey(['i'], (e: KeyboardEvent) => (showInspector.value = !showInspector.value)); // I = Show/hide inspector
   onKey(['k'], (e: KeyboardEvent) => (showKeyboard.value = !showKeyboard.value)); // K = Show/Hide keyboard help
@@ -1190,7 +1428,7 @@ function setupKeyboardHandlers() {
   );
 
   // C = Connection tool, CMD+C = Copy
-  onKey(['c'], (e: KeyboardEvent) => (isVirtualCtrl(e) ? copyItem() : selectCurrentTool(EditorTool.CONNECTION)));
+  onKey(['l'], (e: KeyboardEvent) => (isVirtualCtrl(e) ? copyItem() : selectCurrentTool(EditorTool.CONNECTION)));
 
   // CMD+X = Cut, CMD+V = Cut
   onKey(['x'], (e: KeyboardEvent) => {
@@ -1314,11 +1552,12 @@ function inlineEdit(item: Item) {
 .viewer {
   box-sizing: border-box;
   position: absolute;
-  top: 30px;
+  /* top: 30px;
   left: 30px;
   width: calc(100% - 30px);
   height: calc(100% - 30px);
-  background-color: rgb(237, 237, 237);
+  background-color: rgb(237, 237, 237); 
+  */
   user-select: none;
   background-image: linear-gradient(90deg, rgba(140, 140, 140, 0.15) 10%, rgba(0, 0, 0, 0) 10%),
     linear-gradient(rgba(140, 140, 140, 0.15) 10%, rgba(0, 0, 0, 0) 10%);
@@ -1360,7 +1599,7 @@ function inlineEdit(item: Item) {
   left: 0px;
   width: 30px;
   height: 30px;
-  background-color: #18181c;
+  background-color: #494949;
 }
 
 .toolbars-container {

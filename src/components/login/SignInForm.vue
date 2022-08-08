@@ -35,7 +35,7 @@ const handleLogin = () => {
       localStorage.setItem('userID', res.data.userID);
       signIn(res.data.token);
       window.$message.info('登录成功');
-      console.log(localStorage.getItem('inviteLink'));
+      // console.log(localStorage.getItem('inviteLink'));
       if (localStorage.getItem('inviteLink')) {
         router.push({ name: 'AttendTeam', params: { code: localStorage.getItem('inviteLink') } });
       } else {

@@ -56,13 +56,10 @@ import { NButton, NSpace, NModal, NForm, NGrid, NGridItem, NFormItem, NAvatar, N
 import { onMounted, ref, reactive } from 'vue';
 
 import { useRouter, useRoute } from 'vue-router';
-import type UploadButton from '../common/UploadButton.vue';
-const router = useRouter();
 const route = useRoute();
 const isAdmin = ref(false);
 const showQuitModal = ref(false);
 const showDeleteModal = ref(false);
-const upload = ref<InstanceType<typeof UploadButton> | null>(null);
 const data = reactive({
   teamname: 'Loading...',
   summary: 'Loading...',

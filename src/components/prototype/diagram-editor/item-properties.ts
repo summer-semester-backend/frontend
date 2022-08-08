@@ -270,9 +270,9 @@ export const imageModel: ObjectInspectorModel = {
         {
           // Style
           name: 'style',
-          title: '来源于样式',
+          title: '图片属性',
           properties: [
-            { name: 'url', label: 'URL', type: PropertyType.TEXT, editorFullsize: true },
+            { name: 'url', label: '图片', type: PropertyType.UPLOAD, editorFullsize: true },
             separator$,
             {
               name: 'clipType',
@@ -546,7 +546,7 @@ export const iconModel: ObjectInspectorModel = {
               editorFullsize: true,
               readonly: true,
               formatValue: (obj: any, prop: ObjectProperty, value: any) =>
-                `<a href='https://fonts.google.com/icons?icon.set=Material+Icons&icon.style=Outlined' target='_blank' style='color: #4af;'>See available icons</a>`,
+                `<a href='https://fonts.google.com/icons?icon.set=Material+Icons&icon.style=Outlined' target='_blank' style='color: #4af;'>查看全部可用图标</a>`,
             },
             separator$,
             { name: 'textColor', label: '颜色', type: PropertyType.COLOR, editorRightAlign: true },
@@ -683,5 +683,44 @@ export const buttonModel: ObjectInspectorModel = {
         },
       ],
     },
+  ],
+};
+
+export const pageModel: ObjectInspectorModel = {
+  tabs: [
+    {
+      title: '样式',
+      sections: [
+        {
+          name: 'properties',
+          title: '页面属性',
+          properties: [{ name: 'pageName', label: '页面名称', type: PropertyType.TEXT, editorFullsize: true }],
+        },
+        {
+          // Style
+          name: 'style',
+          title: '文本与样式',
+          properties: [
+            fontSize$,
+            textHAlign$,
+            textVAlign$,
+            separator$,
+            backColor$,
+            textColor$,
+            opacity$,
+            locked$,
+            shadow$,
+          ],
+        },
+        borderSection$,
+        {
+          // Position & size
+          name: 'pos_size',
+          title: '位置与大小',
+          properties: [x$, y$, w$, h$, separator$, rotate$],
+        },
+      ], // sections
+    },
+    otherTab,
   ],
 };
