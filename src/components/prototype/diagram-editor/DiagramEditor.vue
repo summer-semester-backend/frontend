@@ -192,7 +192,7 @@
                 isItem(selectedItem)
                   ? isPage(selectedItem)
                     ? currentPageTargets
-                    : [`[data-item-id='${selectedItem.id}']`]
+                    : [`[data-item-id='${(selectedItem as DiagramElement).id}']`]
                   : []
               "
               :zoom="1 / zoomFactor"
@@ -492,6 +492,8 @@ onMounted(() => {
 onBeforeMount(() => {
   loadProto();
 });
+
+// watch(()=>selectedItem.value)
 
 // Set the handlers to manage keyboard shortcuts
 setupKeyboardHandlers();
@@ -857,6 +859,13 @@ function handleSync() {
     (element as Item).w = w;
     (element as Item).h = h;
   });
+  syncManager.registerAddItemFunc((element: DiagramElement) => {
+    historyManager.value.execute(new AddItemCommand(loadElements.value, element as Item, currentPage.value));
+  });
+  syncManager.registerDeleteItemFunc((targetID: string) => {
+    var element = loadElements.value.find((elem) => elem.id == targetID);
+    historyManager.value.execute(new DeleteCommand(loadElements.value, element as Item));
+  });
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -1120,6 +1129,7 @@ function deleteItem() {
         historyManager.value.execute(new DeleteCommand(loadElements.value, ele));
       });
     } else {
+      syncManager.sendMessage(OperationType.DELETE_ITEM, { targetID: (selectedItem.value as DiagramElement).id });
       historyManager.value.execute(new DeleteCommand(loadElements.value, selectedItem.value));
       emit('delete-item', selectedItem.value);
       selectNone();
@@ -1216,6 +1226,7 @@ function onCanvasClick(e: any): void {
   });
   console.log('creating new item', toolDef, toolDef.itemType, newItem);
   historyManager.value.execute(new AddItemCommand(loadElements.value, newItem, currentPage.value));
+  syncManager.sendMessage(OperationType.ADD_ITEM, { element: newItem });
   emit('add-item', newItem);
   currentTool.value = EditorTool.SELECT;
 }
