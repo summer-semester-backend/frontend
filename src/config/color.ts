@@ -11,3 +11,10 @@ export const colorConfig = {
     tabFontWeightActive: '700',
   },
 };
+
+export const prototypeWorkspaceConfig = {
+  common: {
+    bodyColor: '#494949',
+    cardColor: '#494949',
+  },
+};

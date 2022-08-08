@@ -1,8 +1,9 @@
 <template>
   <div class="object-inspector">
-    <div class="inspector-title">
-      <div>查看器</div>
-      <div @click="expanded = !expanded" style="cursor: pointer">
+    <div class="inspector-title" @click="expanded = !expanded" style="cursor: pointer">
+      <n-text>查看器</n-text>
+      <div style="flex-grow: 1; pointer-events: none"></div>
+      <div>
         <EditorIcon v-show="expanded" size="16px" icon="keyboard_arrow_down" color="white" />
         <EditorIcon v-show="!expanded" size="16px" icon="keyboard_arrow_right" color="white" />
       </div>
@@ -96,7 +97,7 @@ function getTabSections() {
   height: 100%;
   max-height: 100%;
 
-  background-color: #18181c;
+  background-color: #494949;
 
   overflow-x: hidden;
   overflow-y: auto;
@@ -119,9 +120,8 @@ function getTabSections() {
   color: #ddd;
   padding: 8px 8px 2px 8px;
   text-align: center;
-  font-size: 11px;
-  line-height: 1;
-  text-transform: uppercase;
+  font-size: 15px;
+  line-height: 2;
   letter-spacing: 1px;
 }
 

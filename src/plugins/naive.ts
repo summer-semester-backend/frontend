@@ -62,6 +62,7 @@ import {
   NPageHeader,
   NPagination,
   NAvatar,
+  NAvatarGroup,
   NAnchor,
   NAnchorLink,
   NH1,
@@ -79,6 +80,7 @@ import {
   NLayoutSider,
   NLayoutFooter,
   NLayoutHeader,
+  NButtonGroup,
 } from 'naive-ui';
 
 /** 按需引入naiveUI */
@@ -86,11 +88,13 @@ export default function setupNaiveUI(app: App) {
   const naive = create({
     components: [
       NAvatar,
+      NAvatarGroup,
       NBadge,
       NBackTop,
       NBreadcrumb,
       NBreadcrumbItem,
       NButton,
+      NButtonGroup,
       NCard,
       NCheckbox,
       NColorPicker,

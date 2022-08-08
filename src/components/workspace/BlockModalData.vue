@@ -18,12 +18,17 @@
         <template #cover>
           <div v-if="editButtonRef" style="position: absolute; top: 5px; right: 5px">
             <n-space>
-              <n-button circle type="error" size="small" @click.stop="emit('handleClickDelete',item)">
+              <n-button circle ghost type="error" size="small" color="rgba(208, 48, 80,0.85)" @click.stop="emit('handleClickDelete',item)">
                 <n-icon size="20"><Trash/></n-icon>
               </n-button>
-              <n-button circle type="warning" size="small" @click.stop="emit('handleClickEdit',item)">
-                <n-icon size="20"><Create/></n-icon>
-              </n-button>
+              <!-- <n-space vertical> -->
+                <n-button circle ghost type="warning" size="small" color="rgba(240, 160, 32,0.85)" @click.stop="emit('handleClickEdit',item)">
+                  <n-icon size="20"><Create/></n-icon>
+                </n-button>
+                <n-button circle ghost type="info" size="small" color="rgba(32, 128, 240,0.85)" @click.stop="emit('handleClickCopy',item)">
+                  <n-icon size="20"><Copy/></n-icon>
+                </n-button>
+              <!-- </n-space> -->
             </n-space>
           </div>
 
@@ -43,10 +48,15 @@
               <slot name="icon"></slot>
             </n-icon>
             <n-ellipsis
-              :tooltip="false"
-              style="background-color: #fff; font-size: 1rem; font-weight: 500; margin: 0 24px"
+              :tooltip="true"
+              style="background-color: #fff; font-size: 1rem; font-weight: 500; margin: 0 24px;max-width: 5vw"
             >
               {{ item.fileName }}
+              <template #tooltip>
+                <div style="font-family: 'Mulish'">
+                  File：{{item.fileName}}.svg
+                </div>
+              </template>
             </n-ellipsis>
           </n-space>
 
@@ -107,7 +117,7 @@
 <script setup lang="ts">
 import { NButton, NIcon, NSpace, useDialog } from 'naive-ui';
 import { h, ref, computed, onMounted } from 'vue';
-import { Add,AddCircleOutline, Trash, ArrowRedo, Create ,GridOutline,List} from '@vicons/ionicons5';
+import { Add,AddCircleOutline, Trash, ArrowRedo, Create ,GridOutline,List,Copy} from '@vicons/ionicons5';
 
 interface File {
   fileID: number;
@@ -117,7 +127,7 @@ interface File {
   fileImage: string;
 }
 
-const emit = defineEmits(["handleClickOpen","handleClickDelete","handleClickEdit","openModel"]);
+const emit = defineEmits(["handleClickOpen","handleClickDelete","handleClickEdit","handleClickCopy","openModel"]);
 
 const props = defineProps<{
   files:File[];

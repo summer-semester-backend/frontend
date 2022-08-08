@@ -47,3 +47,7 @@ export function editFile(data: {
 export function clearBin() {
   return backend.post('/file/clearBin');
 }
+
+export function copyFile(data: { fileID: number ;fatherID:number;teamID: number | null; newName: string | null}) {
+  return backend.post('/file/copy', data);
+}
