@@ -65,6 +65,7 @@
         >
           <div
             ref="viewport"
+            id="tryText2"
             :class="{ viewport: true, 'viewport-area': viewportSize }"
             :style="{
               width: viewportSize ? viewportSize[0] + 'px' : '100%',
@@ -99,6 +100,7 @@
             <div
               v-for="(item, i) in items"
               class="item"
+              id="tryText3"
               :key="item.id"
               :data-item-id="item.id"
               :class="{ target: item.id === selectedItem?.id, locked: item.locked === true }"
@@ -109,7 +111,7 @@
               @mouseover.stop="creatingConnection && onMouseOver(item, $event)"
               @mouseleave.stop="creatingConnection && onMouseLeave(item, $event)"
             >
-              <component :is="item.component" :item="item" />
+              <component :is="item.component" :item="item" class="screenshot" />
 
               <!-- Item decorators (delete, locked, size info) -->
               <div
@@ -438,6 +440,7 @@ import { createSyncManager, syncManager, isSyncManagerInitialized, OperationType
 import { wsurl } from '@/api/utils/request';
 import { darkTheme } from 'naive-ui';
 import { prototypeWorkspaceConfig } from '@/config/color';
+import { resolve } from 'path';
 export type Item = _Item & { hover?: boolean };
 // The component props and events
 // ------------------------------------------------------------------------------------------------------------------------
@@ -557,14 +560,59 @@ const route = useRoute();
 const handleToolBoxSelect = (selected: EditorTool) => {
   currentTool.value = selected;
 };
+var canvas2 = document.createElement('canvas');
+var ctx2 = canvas2.getContext('2d');
+function draw() {
+  let elems = Array.from(document.getElementsByClassName('screenshot') as HTMLCollectionOf<HTMLElement>);
+  var len = elems.length;
+  console.log('len:' + len);
+  canvas2.width = (currentPage.value as PageItem).w;
+  canvas2.height = (currentPage.value as PageItem).h;
+  var index = 0;
+  elems.forEach((elem: any) => {
+    var canvas = document.createElement('canvas');
+    var width = elem.offsetWidth; //获取dom 宽度
+    var height = elem.offsetHeight; //获取dom 高度
+
+    canvas.width = width;
+    console.log('text' + canvas.width);
+    canvas.height = height;
+    var opts = {
+      scale: 1, // 添加的scale 参数
+      canvas: canvas, //自定义 canvas
+      logging: true, //日志开关
+      width: width, //dom 原始宽度
+      height: height, //dom 原始高度
+      useCORS: true,
+      withCredentials: true,
+      allowTaint: true,
+    };
+    html2canvas(elem, opts).then(function (canvas) {
+      if (ctx2 != null) {
+        ctx2.drawImage(canvas, 200, 200, canvas.width, canvas.height);
+        index++;
+        console.log(index);
+        if (index == len) {
+          let imgUrl = canvas2.toDataURL();
+          let a = document.createElement('a');
+          a.href = imgUrl;
+          // 利用浏览器下载器下载图片
+          a.setAttribute('download', '需要生成图片.png');
+          a.click();
+        }
+      }
+    });
+  });
+  return Promise.resolve(123);
+}
 
 function saveToImage() {
+  draw();
   let dom = document.createElement('div');
-  let elems = Array.from(document.getElementsByClassName('screenshot') as HTMLCollectionOf<Element>);
-  elems.forEach((elem) => {
-    var node = elem.cloneNode();
-    dom.appendChild(node);
-  });
+  // elems.forEach((elem) => {
+  //   var node = elem.cloneNode();
+  //   dom.appendChild(node);
+  // });
 
   // var canvas = document.getElementsByClassName('viewport-area')[0] as HTMLElement;
   // var canvas = document.getElementById('tryText') as HTMLElement;
@@ -573,37 +621,37 @@ function saveToImage() {
   //   FileSaver.saveAs(canvas, 'test.png');
   // });
 
-  const shareContent = document.getElementById('tryText') as HTMLElement; //需要截图的包裹的（原生的）DOM 对象
+  // const shareContent = document.getElementById('tryText2') as HTMLElement; //需要截图的包裹的（原生的）DOM 对象
 
-  // const shareContent = dom;
-  var width = shareContent.offsetWidth; //获取dom 宽度
-  var height = shareContent.offsetHeight; //获取dom 高度
-  var canvas = document.createElement('canvas'); //创建一个canvas节点
-  // var scale = 2; //定义任意放大倍数 支持小数
-  canvas.width = width * 1; //定义canvas 宽度 * 缩放
-  canvas.height = height * 1; //定义canvas高度 *缩放
+  // // const shareContent = dom;
+  // var width = shareContent.offsetWidth; //获取dom 宽度
+  // var height = shareContent.offsetHeight; //获取dom 高度
+  // var canvas = document.createElement('canvas'); //创建一个canvas节点
+  // var scale = 1; //定义任意放大倍数 支持小数
+  // canvas.width = width * 1; //定义canvas 宽度 * 缩放
+  // canvas.height = height * 1; //定义canvas高度 *缩放
   // canvas.getContext('2d').scale(scale, scale); //获取context,设置scale
-  var opts = {
-    scale: 1, // 添加的scale 参数
-    canvas: canvas, //自定义 canvas
-    logging: true, //日志开关
-    width: width, //dom 原始宽度
-    height: height, //dom 原始高度
-    useCORS: true,
-    withCredentials: true,
-    allowTaint: true,
-  };
-  html2canvas(shareContent, opts).then(function (canvas) {
-    //如果想要生成图片 引入canvas2Image.js 下载地址：
-    //https://github.com/hongru/canvas2image/blob/master/canvas2image.js
-    let imgUrl = canvas.toDataURL();
-    // 动态生成下载图片链接
-    let a = document.createElement('a');
-    a.href = imgUrl;
-    // 利用浏览器下载器下载图片
-    a.setAttribute('download', '需要生成图片.png');
-    a.click();
-  });
+  // var opts = {
+  //   scale: 1, // 添加的scale 参数
+  //   canvas: canvas, //自定义 canvas
+  //   logging: true, //日志开关
+  //   width: width, //dom 原始宽度
+  //   height: height, //dom 原始高度
+  //   useCORS: true,
+  //   withCredentials: true,
+  //   allowTaint: true,
+  // };
+  // html2canvas(shareContent, opts).then(function (canvas) {
+  //   //如果想要生成图片 引入canvas2Image.js 下载地址：
+  //   //https://github.com/hongru/canvas2image/blob/master/canvas2image.js
+  //   let imgUrl = canvas.toDataURL();
+  //   // 动态生成下载图片链接
+  //   let a = document.createElement('a');
+  //   a.href = imgUrl;
+  //   // 利用浏览器下载器下载图片
+  //   a.setAttribute('download', '需要生成图片.png');
+  //   a.click();
+  // });
 }
 
 function onDragOver(e: any) {
