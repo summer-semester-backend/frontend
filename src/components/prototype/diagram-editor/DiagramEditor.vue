@@ -9,7 +9,7 @@
             :pages="pages"
             :selected-page="currentPage?.id as string"
           />
-          <ToolBox @tool-selected="handleToolBoxSelect" />
+          <ToolBox @tool-selected="handleToolBoxSelect" @icon-selected="handleIconSelected" />
         </n-config-provider>
       </div>
     </div>
@@ -433,14 +433,11 @@ import FileSaver, { saveAs } from 'file-saver';
 import { useRoute } from 'vue-router';
 import ZoomToolbarVue from './components/ZoomToolbar.vue';
 import { editFile, readFile } from '@/api/file';
-<<<<<<< HEAD
 import html2canvas from 'html2canvas';
-=======
 import { createSyncManager, syncManager, isSyncManagerInitialized, OperationType } from './synchronous/SyncManager';
 import { wsurl } from '@/api/utils/request';
 import { darkTheme } from 'naive-ui';
 import { prototypeWorkspaceConfig } from '@/config/color';
->>>>>>> c6ef11b78386bcf11dd9b5046489fa0eb1927490
 export type Item = _Item & { hover?: boolean };
 // The component props and events
 // ------------------------------------------------------------------------------------------------------------------------
@@ -525,6 +522,7 @@ const selectedItemActive = computed(() => {
 const shiftPressed = useKeyModifier('Shift');
 const historyManager = ref(new HistoryManager());
 const currentTool = ref(EditorTool.SELECT);
+const currentIcon = ref('');
 
 const creatingConnection = computed<boolean>(() => currentTool.value === EditorTool.CONNECTION);
 
@@ -559,6 +557,12 @@ const mouseCoords = ref<Position>({ x: 0, y: 0 });
 const route = useRoute();
 const handleToolBoxSelect = (selected: EditorTool) => {
   currentTool.value = selected;
+  currentIcon.value = '';
+};
+
+const handleIconSelected = (icon: string) => {
+  currentTool.value = EditorTool.ICON;
+  currentIcon.value = icon;
 };
 
 function saveToImage() {
@@ -774,11 +778,18 @@ function onDragGroupEnd(e: { events: any }): void {
 // Handle Move Sync
 // ---------------------------------------------------------------------------------------------------------------------
 
-function handleMoveSync() {
+function handleSync() {
   syncManager.registerMoveFunc((targetID: string, x: number, y: number) => {
     var element = loadElements.value.find((elem) => elem.id == targetID);
     (element as Item).x = x;
     (element as Item).y = y;
+  });
+  syncManager.registerResizeFunc((targetID: string, x: number, y: number, w: number, h: number) => {
+    var element = loadElements.value.find((elem) => elem.id == targetID);
+    (element as Item).x = x;
+    (element as Item).y = y;
+    (element as Item).w = w;
+    (element as Item).h = h;
   });
 }
 
@@ -802,6 +813,14 @@ function onResize(e: any): void {
   selectedItem.value.y = Math.floor(e.drag.beforeTranslate[1]);
   selectedItem.value.w = Math.floor(e.width);
   selectedItem.value.h = Math.floor(e.height);
+
+  syncManager.sendMessage(OperationType.RESIZE, {
+    targetID: selectedItem.value.id,
+    x: selectedItem.value.x,
+    y: selectedItem.value.y,
+    w: selectedItem.value.w,
+    h: selectedItem.value.h,
+  });
 
   e.target.style.transform = e.drag.transform;
   e.target.style.width = `${Math.floor(e.width)}px`;
@@ -979,7 +998,7 @@ function loadProto() {
           clipStyle: '',
         }));
       createSyncManager(wsurl, loadElements.value);
-      handleMoveSync();
+      handleSync();
     });
 }
 
@@ -1127,6 +1146,7 @@ function onCanvasClick(e: any): void {
     id: getUniqueId(),
     x: mouseCoords.value.x,
     y: mouseCoords.value.y,
+    title: currentIcon.value,
   });
   console.log('creating new item', toolDef, toolDef.itemType, newItem);
   historyManager.value.execute(new AddItemCommand(loadElements.value, newItem, currentPage.value));
@@ -1204,7 +1224,9 @@ function focusPage(page: PageItem) {
 
 function selectPage(page: PageItem) {
   currentPage.value = page;
-  currentPageTargets.value = page.containedIDs;
+  if (page != null) {
+    currentPageTargets.value = page.containedIDs;
+  }
 }
 
 /** Setup all the keyboard shortcuts */

@@ -20,7 +20,7 @@
 </template>
 <script setup lang="ts">
 import { getUserInfo } from '@/api/user';
-import { onMounted, ref } from 'vue';
+import { onMounted, onUnmounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import { syncManager } from './SyncManager';
 const route = useRoute();
@@ -36,6 +36,8 @@ const createDropdownOptions = (options: Array<{ name: string; avatar: string }>)
     label: option.name,
   }));
 
+const userMap = new Map<number, string>();
+
 onMounted(() => {
   var user = parseInt(localStorage.getItem('userID') as string);
   var file = parseInt(route.params.protoID as string);
@@ -46,9 +48,20 @@ onMounted(() => {
     window.$message.info('加入新用户!');
     getUserInfo({ userID: userID.toString() }).then((res) => {
       if (res.data.result == 0) {
+        userMap.set(userID, res.data.data.username);
         options.value.push({ name: res.data.data.username, src: res.data.data.avatar });
       }
     });
   });
+  syncManager.registerLeaveFunc((userID: number, fileID: number) => {
+    var userIndex = options.value.findIndex((ele) => {
+      return userMap.get(userID) == ele.name;
+    });
+    options.value.splice(userIndex, 1);
+  });
+});
+
+onUnmounted(() => {
+  syncManager.closeWebSocket();
 });
 </script>

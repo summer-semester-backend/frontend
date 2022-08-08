@@ -44,15 +44,15 @@
             </n-collapse>
           </n-tab-pane>
           <n-tab-pane name="icon" tab="图标">
-            <n-scrollbar style="max-height: 520px" class="mt-3">
-              <n-grid :x-gap="8" :y-gap="8" :cols="4">
+            <n-scrollbar style="max-height: 550px; padding-right: 20px" class="mt-3">
+              <n-grid :x-gap="12" :y-gap="10" :cols="3">
                 <n-gi v-for="t in popularIcons">
                   <ToolBoxItem
                     :tool-name="t"
                     :is-editor-icon="true"
                     draggable="true"
                     @drag.stop=""
-                    @mousedown="emits('tool-selected', EditorTool.ICON)"
+                    @mousedown="emits('icon-selected', t)"
                   ></ToolBoxItem>
                 </n-gi>
               </n-grid>
@@ -66,10 +66,11 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import { getPopoularIcons } from '../diagram-editor/components/icons';
+import { popularIcons } from '../diagram-editor/components/icons';
 import { toolDefinitions, EditorTool, ToolBoxGroup } from '../diagram-editor/types';
 interface ToolbarEvents {
   (e: 'tool-selected', toolType: EditorTool): void;
+  (e: 'icon-selected', icon: string): void;
 }
 const expanded = ref(true);
 const emits = defineEmits<ToolbarEvents>();
@@ -83,7 +84,6 @@ const basic = computed(() => {
     return tool.group == ToolBoxGroup.BASIC;
   });
 });
-const popularIcons = getPopoularIcons();
 </script>
 
 <style scoped>

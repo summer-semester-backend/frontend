@@ -546,7 +546,7 @@ export const iconModel: ObjectInspectorModel = {
               editorFullsize: true,
               readonly: true,
               formatValue: (obj: any, prop: ObjectProperty, value: any) =>
-                `<a href='https://fonts.google.com/icons?icon.set=Material+Icons&icon.style=Outlined' target='_blank' style='color: #4af;'>See available icons</a>`,
+                `<a href='https://fonts.google.com/icons?icon.set=Material+Icons&icon.style=Outlined' target='_blank' style='color: #4af;'>查看全部可用图标</a>`,
             },
             separator$,
             { name: 'textColor', label: '颜色', type: PropertyType.COLOR, editorRightAlign: true },

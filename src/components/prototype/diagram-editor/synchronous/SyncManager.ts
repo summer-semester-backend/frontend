@@ -18,11 +18,12 @@ export type RegisterFunc = (userID: number, fileID: number) => any;
 export type LeaveFunc = (userID: number, fileID: number) => any;
 export type AddItemFunc = (userID: number, elements: DiagramElement) => any;
 export type MoveFunc = (targetID: string, x: number, y: number) => any;
-
+export type ResizeFunc = (targetID: string, x: number, y: number, w: number, h: number) => any;
 export class SyncManager {
   private registerFuncs: Array<RegisterFunc> = [];
   private leaveFuncs: Array<RegisterFunc> = [];
   private moveFuncs: Array<MoveFunc> = [];
+  private resizeFuncs: Array<ResizeFunc> = [];
   private addItemFuncs: Array<AddItemFunc> = [];
   private websocket: WebSocket;
   constructor(private url: string, private elements: DiagramElement[]) {
@@ -34,7 +35,6 @@ export class SyncManager {
       console.log(message);
       switch (message.operation) {
         case 'register':
-          console.log(this.registerFuncs.length);
           this.registerFuncs.forEach((func) => {
             func(message.userID, message.fileID);
           });
@@ -50,6 +50,9 @@ export class SyncManager {
           });
           break;
         case 'resize':
+          this.resizeFuncs.forEach((func) => {
+            func(message.targetID, message.x, message.y, message.w, message.h);
+          });
           break;
         default:
           console.log(message.operation);
@@ -73,6 +76,10 @@ export class SyncManager {
     this.moveFuncs.push(func);
   }
 
+  registerResizeFunc(func: ResizeFunc) {
+    this.resizeFuncs.push(func);
+  }
+
   registerOpen(userID: number, fileID: number): void {
     this.websocket.onopen = (ev: Event) => {
       window.$message.info('同步开启');
@@ -89,6 +96,10 @@ export class SyncManager {
 
   sendMessage(operation: OperationType, message: object) {
     this.websocket.send(JSON.stringify({ operation, userID, ...message }));
+  }
+
+  closeWebSocket() {
+    this.websocket.close();
   }
 }
 
