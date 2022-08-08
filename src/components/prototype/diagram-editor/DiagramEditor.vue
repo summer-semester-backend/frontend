@@ -46,6 +46,7 @@
         <VueInfiniteViewer
           ref="viewer"
           class="viewer"
+          id="tryText"
           :useMouseDrag="shiftPressed"
           :useWheelScroll="true"
           :zoom="zoomFactor"
@@ -425,6 +426,7 @@ import FileSaver, { saveAs } from 'file-saver';
 import { useRoute } from 'vue-router';
 import ZoomToolbarVue from './components/ZoomToolbar.vue';
 import { editFile, readFile } from '@/api/file';
+import html2canvas from 'html2canvas';
 export type Item = _Item & { hover?: boolean };
 
 // The component props and events
@@ -548,15 +550,49 @@ const handleToolBoxSelect = (selected: EditorTool) => {
 
 function saveToImage() {
   let dom = document.createElement('div');
-  // let elems = Array.from(document.getElementsByClassName('screenshot') as HTMLCollectionOf<Element>);
-  // elems.forEach((elem) => {
-  //   var node = elem.cloneNode();
-  //   dom.appendChild(node);
+  let elems = Array.from(document.getElementsByClassName('screenshot') as HTMLCollectionOf<Element>);
+  elems.forEach((elem) => {
+    var node = elem.cloneNode();
+    dom.appendChild(node);
+  });
+
+  // var canvas = document.getElementsByClassName('viewport-area')[0] as HTMLElement;
+  // var canvas = document.getElementById('tryText') as HTMLElement;
+  // var canvas = dom as HTMLElement;
+  // htmlToImage.toPng(canvas).then((canvas) => {
+  //   FileSaver.saveAs(canvas, 'test.png');
   // });
 
-  var canvas = document.getElementsByClassName('viewport-area')[0] as HTMLElement;
-  htmlToImage.toPng(canvas).then((canvas) => {
-    FileSaver.saveAs(canvas, 'test.png');
+  const shareContent = document.getElementById('tryText') as HTMLElement; //需要截图的包裹的（原生的）DOM 对象
+
+  // const shareContent = dom;
+  var width = shareContent.offsetWidth; //获取dom 宽度
+  var height = shareContent.offsetHeight; //获取dom 高度
+  var canvas = document.createElement('canvas'); //创建一个canvas节点
+  // var scale = 2; //定义任意放大倍数 支持小数
+  canvas.width = width * 1; //定义canvas 宽度 * 缩放
+  canvas.height = height * 1; //定义canvas高度 *缩放
+  // canvas.getContext('2d').scale(scale, scale); //获取context,设置scale
+  var opts = {
+    scale: 1, // 添加的scale 参数
+    canvas: canvas, //自定义 canvas
+    logging: true, //日志开关
+    width: width, //dom 原始宽度
+    height: height, //dom 原始高度
+    useCORS: true,
+    withCredentials: true,
+    allowTaint: true,
+  };
+  html2canvas(shareContent, opts).then(function (canvas) {
+    //如果想要生成图片 引入canvas2Image.js 下载地址：
+    //https://github.com/hongru/canvas2image/blob/master/canvas2image.js
+    let imgUrl = canvas.toDataURL();
+    // 动态生成下载图片链接
+    let a = document.createElement('a');
+    a.href = imgUrl;
+    // 利用浏览器下载器下载图片
+    a.setAttribute('download', '需要生成图片.png');
+    a.click();
   });
 }
 
