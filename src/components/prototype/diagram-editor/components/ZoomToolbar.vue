@@ -1,9 +1,10 @@
 <template>
   <div class="toolbar">
-    <div class="btn" @click="zoomOut" title="Zoom Out"><EditorIcon icon="zoom_out" /></div>
+    <div class="btn" @click="zoomOut" title="缩小"><EditorIcon icon="zoom_out" /></div>
     <div class="zoom-info" title="Current Zoom">{{ zoomManager.getZoomFactor() * 100 }}%</div>
-    <div class="btn" @click="zoomIn" title="Zoom In"><EditorIcon icon="zoom_in" /></div>
-    <div class="btn" @click="zoomReset" title="Zoom Reset"><EditorIcon icon="center_focus_weak" /></div>
+    <div class="btn" @click="zoomIn" title="放大"><EditorIcon icon="zoom_in" /></div>
+    <div class="btn" @click="zoomReset" title="重置"><EditorIcon icon="center_focus_weak" /></div>
+    <div class="mode-info" @click="emit('mode-changed')" title="模式切换">{{ editable ? '编辑模式' : '预览模式' }}</div>
   </div>
 </template>
 
@@ -14,12 +15,14 @@ import { IZoomManager } from '../ZoomManager';
 // ------------------------------------------------------------------------------------------------------------------------
 interface ToolbarProps {
   zoomManager: IZoomManager;
+  editable: boolean;
 }
 
-const { zoomManager } = defineProps<ToolbarProps>();
+const { zoomManager, editable } = defineProps<ToolbarProps>();
 
 interface ToolbarEvents {
   (e: 'zoom-changed', newZoomFactor: number, scrollViewerToCenter?: boolean): void;
+  (e: 'mode-changed'): void;
 }
 
 const emit = defineEmits<ToolbarEvents>();
@@ -75,6 +78,22 @@ defineExpose({ zoomReset });
 }
 
 .btn:hover {
+  background-color: #efefef;
+}
+
+.mode-info {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  width: 64px;
+  height: 32px;
+  text-align: center;
+  background-color: #fefefe;
+  color: #888;
+}
+
+.mode-info :hover {
   background-color: #efefef;
 }
 .zoom-info {

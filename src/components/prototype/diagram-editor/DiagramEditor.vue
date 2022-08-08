@@ -1,6 +1,6 @@
 <template>
   <div class="flex h-full">
-    <div class="basis-1/7 min-w-60 h-full bg-[#494949]">
+    <div v-if="editable" class="min-w-60 h-full bg-[#494949]">
       <div class="m-2">
         <n-config-provider :theme="darkTheme" :theme-overrides="prototypeWorkspaceConfig">
           <PageBox
@@ -13,7 +13,7 @@
         </n-config-provider>
       </div>
     </div>
-    <div class="basis-5/7 h-full">
+    <div class="w-full h-full">
       <div class="editor-container">
         <!-- Rulers -->
         <Guides
@@ -33,7 +33,6 @@
         <Guides
           v-show="guidesVisible"
           class="ruler ruler-vertical"
-          className="custom-color"
           :showGuides="showGuides"
           @changeGuides="vGuideValues = $event.guides"
           type="vertical"
@@ -50,6 +49,16 @@
         <VueInfiniteViewer
           ref="viewer"
           class="viewer"
+          :class="{
+            'bg-dark-700': !editable,
+            'bg-[#ededed]': editable,
+            'top-30px': editable,
+            'left-30px': editable,
+            'w-[calc(100%-30px)]': editable,
+            'h-[calc(100%-30px)]': editable,
+            'w-[calc(100%)]': !editable,
+            'h-[calc(100%)]': !editable,
+          }"
           id="tryText"
           :useMouseDrag="shiftPressed"
           :useWheelScroll="true"
@@ -257,7 +266,13 @@
             @toolSelected="selectCurrentTool"
           />
           <div class="toolbar-separator"></div>
-          <ZoomToolbar ref="zoomToolbar" :zoomManager="zoomManager" @zoomChanged="onZoomChanged" />
+          <ZoomToolbar
+            ref="zoomToolbar"
+            :editable="editable"
+            :zoomManager="zoomManager"
+            @zoomChanged="onZoomChanged"
+            @mode-changed="editable = !editable"
+          />
           <div class="toolbar-separator"></div>
           <div v-if="editable" class="toolbar">
             <button class="toolbar-item" @click="undo" :disabled="!historyManager.canUndo()" title="Undo">
@@ -362,14 +377,10 @@
       </div>
       <!-- editor-container -->
     </div>
-    <div class="flex flex-col basis-1/7 min-w-50 bg-[#494949] h-full">
+    <div v-if="editable" class="flex flex-col w-90 bg-[#494949] h-full">
       <n-config-provider :theme="darkTheme" :theme-overrides="prototypeWorkspaceConfig">
         <SyncEditMembers v-if="isSyncManagerInitialized" />
-        <ObjectInspector
-          :schema="selectedItem ? getItemBlueprint(selectedItem.component)[1] : null"
-          :object="selectedItem"
-          @property-changed="onPropertyChange"
-        />
+        <ObjectInspector :schema="objectInspectorSchema" :object="selectedItem" @property-changed="onPropertyChange" />
       </n-config-provider>
     </div>
   </div>
@@ -428,8 +439,6 @@ import ClipCommand from './commands/ClipCommand';
 import DeleteCommand from './commands/DeleteCommand';
 import KeyboardHelp from './components/KeyboardHelp.vue';
 import { DefaultZoomManager, IZoomManager } from './ZoomManager';
-import * as htmlToImage from 'html-to-image';
-import FileSaver, { saveAs } from 'file-saver';
 import { useRoute } from 'vue-router';
 import ZoomToolbarVue from './components/ZoomToolbar.vue';
 import { editFile, readFile } from '@/api/file';
@@ -442,7 +451,6 @@ export type Item = _Item & { hover?: boolean };
 // The component props and events
 // ------------------------------------------------------------------------------------------------------------------------
 export interface DiagramEditorProps {
-  editable?: boolean;
   customWidgets?: boolean;
   viewportSize?: [number, number];
 }
@@ -456,8 +464,7 @@ export interface DiagramEditorEvents {
 }
 
 // Define props
-const { editable, viewportSize } = withDefaults(defineProps<DiagramEditorProps>(), {
-  editable: true,
+const { viewportSize } = withDefaults(defineProps<DiagramEditorProps>(), {
   customWidgets: false,
 });
 
@@ -486,6 +493,7 @@ onBeforeMount(() => {
 // Set the handlers to manage keyboard shortcuts
 setupKeyboardHandlers();
 
+const editable = ref(true);
 // The component state
 // ------------------------------------------------------------------------------------------------------------------------
 const zoomManager = ref<IZoomManager>(new DefaultZoomManager());
@@ -500,7 +508,7 @@ const zoomToolbar = ref<InstanceType<typeof ZoomToolbarVue> | null>(null);
 const hGuides = ref();
 const vGuides = ref();
 const showRulers = ref(true);
-const guidesVisible = computed(() => showRulers.value && editable);
+const guidesVisible = computed(() => showRulers.value && editable.value);
 const hGuideValues = ref<number[]>([]); // Horizontal guides added by the user
 const vGuideValues = ref<number[]>([]); // Vertical guides added by the user
 const showGuides = ref(true); // Show or hide all the guides
@@ -517,6 +525,10 @@ const selectedItemActive = computed(() => {
 
   // An item is 'active' if not locked, a connection is always 'active'
   return isItem(selectedItem.value) ? !selectedItem.value.locked === true : true;
+});
+
+const objectInspectorSchema = computed(() => {
+  return selectedItem.value ? getItemBlueprint(selectedItem.value.component)[1] : null;
 });
 
 const shiftPressed = useKeyModifier('Shift');
@@ -1434,11 +1446,12 @@ function inlineEdit(item: Item) {
 .viewer {
   box-sizing: border-box;
   position: absolute;
-  top: 30px;
+  /* top: 30px;
   left: 30px;
   width: calc(100% - 30px);
   height: calc(100% - 30px);
-  background-color: rgb(237, 237, 237);
+  background-color: rgb(237, 237, 237); 
+  */
   user-select: none;
   background-image: linear-gradient(90deg, rgba(140, 140, 140, 0.15) 10%, rgba(0, 0, 0, 0) 10%),
     linear-gradient(rgba(140, 140, 140, 0.15) 10%, rgba(0, 0, 0, 0) 10%);
@@ -1474,16 +1487,13 @@ function inlineEdit(item: Item) {
   width: 30px !important;
 }
 
-.custom-color .scena-guides .guide {
-  background-color: #494949;
-}
 .rulers-left-top-box {
   position: absolute;
   top: 0px;
   left: 0px;
   width: 30px;
   height: 30px;
-  background-color: #18181c;
+  background-color: #494949;
 }
 
 .toolbars-container {
