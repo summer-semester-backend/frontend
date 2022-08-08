@@ -10,20 +10,22 @@
     </div>
     <div class="pagebox-content">
       <n-card v-if="expanded" :bordered="false" class="card">
-        <n-menu :options="pageOptions" class="w-full" @update-value="handleUpdateValue" v-model:value="page"></n-menu>
-        <n-button-group class="w-full ml-2 my-1 h-10">
-          <n-button class="w-5/7 h-full" @click="emits('page-create', newPageName, currentResolution)">
-            <template #icon>
-              <n-icon><Add /></n-icon>
-            </template>
-            {{ currentResolution }}
-          </n-button>
-          <n-button class="w-22/100 h-full">
-            <n-dropdown trigger="click" :options="resolutionOptions" @select="handleSelectResolution">
-              <n-icon><ChevronDownOutline /></n-icon>
-            </n-dropdown>
-          </n-button>
-        </n-button-group>
+        <n-scrollbar style="max-height: 200px">
+          <n-menu :options="pageOptions" class="w-full" @update-value="handleUpdateValue" v-model:value="page"></n-menu>
+          <n-button-group class="w-full ml-2 my-1 h-10">
+            <n-button class="w-5/7 h-full" @click="emits('page-create', newPageName, currentResolution)">
+              <template #icon>
+                <n-icon><Add /></n-icon>
+              </template>
+              {{ currentResolution }}
+            </n-button>
+            <n-button class="w-22/100 h-full">
+              <n-dropdown trigger="click" :options="resolutionOptions" @select="handleSelectResolution">
+                <n-icon><ChevronDownOutline /></n-icon>
+              </n-dropdown>
+            </n-button>
+          </n-button-group>
+        </n-scrollbar>
       </n-card>
     </div>
   </div>
