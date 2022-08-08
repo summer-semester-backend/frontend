@@ -16,7 +16,7 @@ export type LeaveFunc = (userID: number, fileID: number) => any;
 export type AddItemFunc = (element: DiagramElement, targetPageID: string) => any;
 export type MoveFunc = (targetID: string, x: number, y: number) => any;
 export type ResizeFunc = (targetID: string, x: number, y: number, w: number, h: number) => any;
-export type ModifyFunc = (targetID: string, element: DiagramElement) => any;
+export type ModifyFunc = (element: DiagramElement) => any;
 export type DeleteItemFunc = (targetID: string) => any;
 export class SyncManager {
   private registerFuncs: Array<RegisterFunc> = [];
@@ -57,7 +57,7 @@ export class SyncManager {
           break;
         case 'modify':
           this.modifyFuncs.forEach((func) => {
-            func(message.targetID, message.element);
+            func(message.element);
           });
           break;
         case 'add_item':

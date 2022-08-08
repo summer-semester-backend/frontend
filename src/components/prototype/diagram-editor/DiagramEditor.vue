@@ -543,7 +543,9 @@ const currentIcon = ref('');
 
 const creatingConnection = computed<boolean>(() => currentTool.value === EditorTool.CONNECTION);
 
-const items = computed(() => loadElements.value.filter((e) => isItem(e)) as Item[]);
+const items = computed(() => {
+  return loadElements.value.filter((e) => isItem(e)) as Item[];
+});
 const connections = computed(() => loadElements.value.filter((e) => isConnection(e)) as ItemConnection[]);
 const pages = ref<Array<PageItem>>([]);
 const currentPage = ref<PageItem | null>(null);
@@ -896,6 +898,12 @@ function handleSync() {
     } else {
       historyManager.value.execute(new DeleteCommand(loadElements.value, element as Item));
     }
+  });
+  syncManager.registerModifyFunc((element: DiagramElement) => {
+    selectedItem.value = element;
+    var trueElementIndex = loadElements.value.findIndex((elem) => elem.id == element.id);
+    loadElements.value.splice(trueElementIndex, 1, element);
+    nextTick(() => moveable.value?.updateRect());
   });
 }
 
@@ -1259,7 +1267,7 @@ function onCanvasClick(e: any): void {
   });
   console.log('creating new item', toolDef, toolDef.itemType, newItem);
   historyManager.value.execute(new AddItemCommand(loadElements.value, newItem, currentPage.value));
-  syncManager.sendMessage(OperationType.ADD_ITEM, { element: newItem });
+  syncManager.sendMessage(OperationType.ADD_ITEM, { element: newItem, targetPageID: currentPage.value?.id });
   emit('add-item', newItem);
   currentTool.value = EditorTool.SELECT;
 }
@@ -1297,7 +1305,7 @@ function onPropertyChange(p: ObjectProperty, newValue: any) {
   //console.log('onPropertyChange', p, 'New value:', newValue);
   // TODO: create a history command for this change so the action is undoable (for that we need the 'oldValue' as well)
   // historyManager.value.execute(new PropertyChangeCommand(selectedItem.value, oldValue, newValue));
-
+  syncManager.sendMessage(OperationType.MODIFY, { element: selectedItem.value });
   nextTick(() => moveable.value?.updateRect());
 }
 
