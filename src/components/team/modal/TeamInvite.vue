@@ -25,7 +25,7 @@ const route = useRoute();
 const code = ref('');
 const show = ref(false);
 
-const handlePositiveClick = async () => {
+const handlePositiveClick = () => {
   if (navigator.clipboard && window.isSecureContext) {
     // navigator clipboard 向剪贴板写文本
     return navigator.clipboard.writeText(code.value);
