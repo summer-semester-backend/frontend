@@ -2,7 +2,7 @@
   <div id="workBar">
     <div id="barBox">
       <div id="leftOptions">
-        <n-icon style="z-index: 2" size="25" @click="$router.push({ path: '/project/desktop' })">
+        <n-icon style="z-index: 2" size="25" @click="$router.back()">
           <KeyboardArrowLeftOutlined />
         </n-icon>
         <n-image
@@ -76,7 +76,7 @@ const getProjInfo = (id: number | null) => {
 const handleUpdateTab = (value: string) => {
   tabValue.value = value;
   const projID = parseInt(route.params.ProjID.toString());
-  router.push(`/workspace/${projID}/${value}`);
+  router.replace(`/workspace/${projID}/${value}`);
 };
 onMounted(() => {
   getProjInfo(parseInt(route.params.ProjID.toString()));
