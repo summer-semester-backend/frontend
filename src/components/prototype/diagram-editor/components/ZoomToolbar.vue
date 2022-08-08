@@ -4,7 +4,7 @@
     <div class="zoom-info" title="Current Zoom">{{ zoomManager.getZoomFactor() * 100 }}%</div>
     <div class="btn" @click="zoomIn" title="放大"><EditorIcon icon="zoom_in" /></div>
     <div class="btn" @click="zoomReset" title="重置"><EditorIcon icon="center_focus_weak" /></div>
-    <div class="mode-info" @click="emit('mode-changed')" title="模式切换">{{ editable ? '编辑模式' : '预览模式' }}</div>
+    <div class="mode-info" @click="emit('mode-changed')" title="模式切换">{{ editable ? '预览模式' : '编辑模式' }}</div>
   </div>
 </template>
 

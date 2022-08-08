@@ -273,7 +273,7 @@
             :editable="editable"
             :zoomManager="zoomManager"
             @zoomChanged="onZoomChanged"
-            @mode-changed="editable = !editable"
+            @mode-changed="onModeChanged"
           />
           <div class="toolbar-separator"></div>
           <div v-if="editable" class="toolbar">
@@ -390,7 +390,7 @@
 
 <script setup lang="ts">
 import { onKeyStroke, useKeyModifier } from '@vueuse/core';
-import { computed, nextTick, onBeforeMount, onMounted, ref } from 'vue';
+import { computed, getCurrentInstance, nextTick, onBeforeMount, onMounted, ref } from 'vue';
 import Guides from 'vue3-guides';
 import { VueInfiniteViewer } from 'vue3-infinite-viewer';
 import Moveable from 'vue3-moveable';
@@ -450,6 +450,7 @@ import { wsurl } from '@/api/utils/request';
 import { darkTheme } from 'naive-ui';
 import { prototypeWorkspaceConfig } from '@/config/color';
 import { resolve } from 'path';
+import router from '@/router';
 export type Item = _Item & { hover?: boolean };
 // The component props and events
 // ------------------------------------------------------------------------------------------------------------------------
@@ -1315,6 +1316,14 @@ function onZoomChanged(newZoomFactor: number, scrollViewerToCenter?: boolean) {
   zoomFactor.value = newZoomFactor;
 
   if (scrollViewerToCenter === true) nextTick(() => viewer.value?.scrollCenter());
+}
+
+function onModeChanged() {
+  if (editable.value == false) {
+    router.go(0);
+    window.location.reload();
+  }
+  editable.value = !editable.value;
 }
 
 /** Handle scroll to page */
