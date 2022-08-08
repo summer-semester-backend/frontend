@@ -571,13 +571,18 @@ var canvas2 = document.createElement('canvas');
 var ctx2 = canvas2.getContext('2d');
 function draw() {
   let elems = Array.from(document.getElementsByClassName('screenshot') as HTMLCollectionOf<HTMLElement>);
+
   var len = elems.length;
   console.log('len:' + len);
-  canvas2.width = (currentPage.value as PageItem).w;
-  canvas2.height = (currentPage.value as PageItem).h;
+  canvas2.width = 1000;
+  canvas2.height = 800;
   var index = 0;
   elems.forEach((elem: any) => {
     var canvas = document.createElement('canvas');
+    var context = canvas.getContext('2d');
+    if (context != null) {
+      context.fillStyle = 'rgba(255, 255, 255, 0)';
+    }
     var width = elem.offsetWidth; //获取dom 宽度
     var height = elem.offsetHeight; //获取dom 高度
 
@@ -593,10 +598,11 @@ function draw() {
       useCORS: true,
       withCredentials: true,
       allowTaint: true,
+      backgroundColor: null,
     };
     html2canvas(elem, opts).then(function (canvas) {
       if (ctx2 != null) {
-        ctx2.drawImage(canvas, 200, 200, canvas.width, canvas.height);
+        ctx2.drawImage(canvas, 0, 0, canvas.width, canvas.height);
         index++;
         console.log(index);
         if (index == len) {
