@@ -15,10 +15,11 @@ export enum OperationType {
 // handle recevie
 export type RegisterFunc = (userID: number, fileID: number) => any;
 export type LeaveFunc = (userID: number, fileID: number) => any;
-export type AddItemFunc = (userID: number, elements: DiagramElement) => any;
+export type AddItemFunc = (element: DiagramElement) => any;
 export type MoveFunc = (targetID: string, x: number, y: number) => any;
 export type ResizeFunc = (targetID: string, x: number, y: number, w: number, h: number) => any;
 export type ModifyFunc = (targetID: string, element: DiagramElement) => any;
+export type DeleteItemFunc = (targetID: string) => any;
 export class SyncManager {
   private registerFuncs: Array<RegisterFunc> = [];
   private leaveFuncs: Array<RegisterFunc> = [];
@@ -26,6 +27,7 @@ export class SyncManager {
   private resizeFuncs: Array<ResizeFunc> = [];
   private modifyFuncs: Array<ModifyFunc> = [];
   private addItemFuncs: Array<AddItemFunc> = [];
+  private deleteItemFuncs: Array<DeleteItemFunc> = [];
   private websocket: WebSocket;
   constructor(private url: string, private elements: DiagramElement[]) {
     this.url = url;
@@ -60,6 +62,15 @@ export class SyncManager {
             func(message.targetID, message.element);
           });
           break;
+        case 'add_item':
+          this.addItemFuncs.forEach((func) => {
+            func(message.element);
+          });
+        case 'del_item':
+          this.deleteItemFuncs.forEach((func) => {
+            func(message.targetID);
+          });
+          break;
       }
     };
   }
@@ -74,6 +85,10 @@ export class SyncManager {
 
   registerAddItemFunc(func: AddItemFunc) {
     this.addItemFuncs.push(func);
+  }
+
+  registerDeleteItemFunc(func: DeleteItemFunc) {
+    this.deleteItemFuncs.push(func);
   }
 
   registerMoveFunc(func: MoveFunc) {
