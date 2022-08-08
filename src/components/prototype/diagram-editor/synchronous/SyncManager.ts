@@ -10,6 +10,7 @@ export enum OperationType {
   DELETE_ITEM = 'del_item',
   DELETE_PAGE = 'del_page',
   MOVE = 'move',
+  RESIZE = 'resize',
   MODIFY = 'modify',
 }
 // handle recevie
@@ -31,19 +32,27 @@ export class SyncManager {
     this.websocket.onmessage = (ev: MessageEvent<any>) => {
       const message = JSON.parse(ev.data);
       console.log(message);
-      switch (message.type) {
-        case OperationType.REGISTER:
+      switch (message.operation) {
+        case 'register':
+          console.log(this.registerFuncs.length);
           this.registerFuncs.forEach((func) => {
             func(message.userID, message.fileID);
           });
-        case OperationType.LEAVE:
+          break;
+        case 'leave':
           this.leaveFuncs.forEach((func) => {
             func(message.userID, message.fileID);
           });
-        case OperationType.MOVE:
+          break;
+        case 'move':
           this.moveFuncs.forEach((func) => {
             func(message.targetID, message.x, message.y);
           });
+          break;
+        case 'resize':
+          break;
+        default:
+          console.log(message.operation);
       }
     };
   }
@@ -79,10 +88,11 @@ export class SyncManager {
   }
 
   sendMessage(operation: OperationType, message: object) {
-    this.websocket.send(JSON.stringify({ operation, ...message }));
+    this.websocket.send(JSON.stringify({ operation, userID, ...message }));
   }
 }
 
+let userID: number = parseInt(localStorage.getItem('userID') as string);
 let syncManager: SyncManager;
 let isSyncManagerInitialized = ref(false);
 function createSyncManager(url: string, elements: DiagramElement[]) {

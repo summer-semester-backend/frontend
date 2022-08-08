@@ -10,34 +10,55 @@
     </div>
     <div class="toolbox-content">
       <n-card v-if="expanded" :bordered="false" class="card">
-        <n-collapse>
-          <n-collapse-item title="图形">
-            <n-grid :x-gap="8" :y-gap="8" :cols="4">
-              <n-gi v-for="t in shapes">
-                <ToolBoxItem
-                  :tool-name="t.title"
-                  :icon="t.iconComponent"
-                  draggable="true"
-                  @drag.stop=""
-                  @mousedown="emits('tool-selected', t.type as EditorTool)"
-                ></ToolBoxItem>
-              </n-gi>
-            </n-grid>
-          </n-collapse-item>
-          <n-collapse-item title="基本">
-            <n-grid :x-gap="8" :y-gap="8" :cols="4">
-              <n-gi v-for="t in basic">
-                <ToolBoxItem
-                  :tool-name="t.title"
-                  :icon="t.iconComponent"
-                  draggable="true"
-                  @drag.stop=""
-                  @mousedown="emits('tool-selected', t.type as EditorTool)"
-                ></ToolBoxItem>
-              </n-gi>
-            </n-grid>
-          </n-collapse-item>
-        </n-collapse>
+        <n-tabs default-value="component" type="bar" size="small">
+          <n-tab-pane name="component" tab="组件">
+            <n-collapse class="mt-3">
+              <n-collapse-item title="图形">
+                <n-grid :x-gap="8" :y-gap="8" :cols="4">
+                  <n-gi v-for="t in shapes">
+                    <ToolBoxItem
+                      :tool-name="t.title"
+                      :icon="t.iconComponent"
+                      :is-editor-icon="false"
+                      draggable="true"
+                      @drag.stop=""
+                      @mousedown="emits('tool-selected', t.type as EditorTool)"
+                    ></ToolBoxItem>
+                  </n-gi>
+                </n-grid>
+              </n-collapse-item>
+              <n-collapse-item title="基本">
+                <n-grid :x-gap="8" :y-gap="8" :cols="4">
+                  <n-gi v-for="t in basic">
+                    <ToolBoxItem
+                      :tool-name="t.title"
+                      :icon="t.iconComponent"
+                      :is-editor-icon="false"
+                      draggable="true"
+                      @drag.stop=""
+                      @mousedown="emits('tool-selected', t.type as EditorTool)"
+                    ></ToolBoxItem>
+                  </n-gi>
+                </n-grid>
+              </n-collapse-item>
+            </n-collapse>
+          </n-tab-pane>
+          <n-tab-pane name="icon" tab="图标">
+            <n-scrollbar style="max-height: 520px" class="mt-3">
+              <n-grid :x-gap="8" :y-gap="8" :cols="4">
+                <n-gi v-for="t in popularIcons">
+                  <ToolBoxItem
+                    :tool-name="t"
+                    :is-editor-icon="true"
+                    draggable="true"
+                    @drag.stop=""
+                    @mousedown="emits('tool-selected', EditorTool.ICON)"
+                  ></ToolBoxItem>
+                </n-gi>
+              </n-grid>
+            </n-scrollbar>
+          </n-tab-pane>
+        </n-tabs>
       </n-card>
     </div>
   </div>
@@ -45,7 +66,7 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import { darkTheme } from 'naive-ui';
+import { getPopoularIcons } from '../diagram-editor/components/icons';
 import { toolDefinitions, EditorTool, ToolBoxGroup } from '../diagram-editor/types';
 interface ToolbarEvents {
   (e: 'tool-selected', toolType: EditorTool): void;
@@ -62,9 +83,14 @@ const basic = computed(() => {
     return tool.group == ToolBoxGroup.BASIC;
   });
 });
+const popularIcons = getPopoularIcons();
 </script>
 
 <style scoped>
+:deep(.n-card) {
+  margin-top: 3px;
+  margin-bottom: 3px;
+}
 .toolbox {
   height: 100%;
   overflow-x: hidden;
