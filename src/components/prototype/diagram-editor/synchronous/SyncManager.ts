@@ -1,4 +1,3 @@
-import { Message } from 'postcss';
 import { ref } from 'vue';
 import { DiagramElement } from '../types';
 
@@ -19,11 +18,13 @@ export type LeaveFunc = (userID: number, fileID: number) => any;
 export type AddItemFunc = (userID: number, elements: DiagramElement) => any;
 export type MoveFunc = (targetID: string, x: number, y: number) => any;
 export type ResizeFunc = (targetID: string, x: number, y: number, w: number, h: number) => any;
+export type ModifyFunc = (targetID: string, element: DiagramElement) => any;
 export class SyncManager {
   private registerFuncs: Array<RegisterFunc> = [];
   private leaveFuncs: Array<RegisterFunc> = [];
   private moveFuncs: Array<MoveFunc> = [];
   private resizeFuncs: Array<ResizeFunc> = [];
+  private modifyFuncs: Array<ModifyFunc> = [];
   private addItemFuncs: Array<AddItemFunc> = [];
   private websocket: WebSocket;
   constructor(private url: string, private elements: DiagramElement[]) {
@@ -32,7 +33,7 @@ export class SyncManager {
     this.websocket = new WebSocket(url);
     this.websocket.onmessage = (ev: MessageEvent<any>) => {
       const message = JSON.parse(ev.data);
-      console.log(message);
+      console.log(message.operation, message);
       switch (message.operation) {
         case 'register':
           this.registerFuncs.forEach((func) => {
@@ -54,8 +55,11 @@ export class SyncManager {
             func(message.targetID, message.x, message.y, message.w, message.h);
           });
           break;
-        default:
-          console.log(message.operation);
+        case 'modify':
+          this.modifyFuncs.forEach((func) => {
+            func(message.targetID, message.element);
+          });
+          break;
       }
     };
   }
@@ -80,30 +84,37 @@ export class SyncManager {
     this.resizeFuncs.push(func);
   }
 
-  registerOpen(userID: number, fileID: number): void {
+  registerModifyFunc(func: ModifyFunc) {
+    this.modifyFuncs.push(func);
+  }
+
+  registerOpen(userId: number, fileId: number): void {
+    userID = userId;
+    fileID = fileId;
     this.websocket.onopen = (ev: Event) => {
       window.$message.info('同步开启');
-      this.sendMessage(OperationType.REGISTER, { fileID, userID });
+      this.sendMessage(OperationType.REGISTER, { userID, fileID });
     };
   }
 
-  registerClose(userID: number, fileID: number): void {
+  registerClose(): void {
     this.websocket.onclose = (ev: Event) => {
       window.$message.info('同步结束');
-      this.sendMessage(OperationType.LEAVE, { fileID, userID });
+      console.log('关闭socket');
+      this.sendMessage(OperationType.LEAVE, { userID, fileID });
     };
   }
 
   sendMessage(operation: OperationType, message: object) {
-    this.websocket.send(JSON.stringify({ operation, userID, ...message }));
+    this.websocket.send(JSON.stringify({ operation, ...message }));
   }
 
   closeWebSocket() {
     this.websocket.close();
   }
 }
-
-let userID: number = parseInt(localStorage.getItem('userID') as string);
+let fileID: number;
+let userID: number;
 let syncManager: SyncManager;
 let isSyncManagerInitialized = ref(false);
 function createSyncManager(url: string, elements: DiagramElement[]) {

@@ -20,7 +20,7 @@
 </template>
 <script setup lang="ts">
 import { getUserInfo } from '@/api/user';
-import { onMounted, onUnmounted, ref } from 'vue';
+import { onBeforeUnmount, onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import { syncManager } from './SyncManager';
 const route = useRoute();
@@ -43,7 +43,7 @@ onMounted(() => {
   var file = parseInt(route.params.protoID as string);
   console.log('use syncManager');
   syncManager.registerOpen(user, file);
-  syncManager.registerClose(user, file);
+  syncManager.registerClose();
   syncManager.registerRegisterFunc((userID: number, fileID: number) => {
     window.$message.info('加入新用户!');
     getUserInfo({ userID: userID.toString() }).then((res) => {
@@ -61,7 +61,8 @@ onMounted(() => {
   });
 });
 
-onUnmounted(() => {
+onBeforeUnmount(() => {
+  console.log('before onUnmounted');
   syncManager.closeWebSocket();
 });
 </script>
