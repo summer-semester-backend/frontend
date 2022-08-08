@@ -431,14 +431,11 @@ import FileSaver, { saveAs } from 'file-saver';
 import { useRoute } from 'vue-router';
 import ZoomToolbarVue from './components/ZoomToolbar.vue';
 import { editFile, readFile } from '@/api/file';
-<<<<<<< HEAD
 import html2canvas from 'html2canvas';
-=======
 import { createSyncManager, syncManager, isSyncManagerInitialized, OperationType } from './synchronous/SyncManager';
 import { wsurl } from '@/api/utils/request';
 import { darkTheme } from 'naive-ui';
 import { prototypeWorkspaceConfig } from '@/config/color';
->>>>>>> c6ef11b78386bcf11dd9b5046489fa0eb1927490
 export type Item = _Item & { hover?: boolean };
 // The component props and events
 // ------------------------------------------------------------------------------------------------------------------------
