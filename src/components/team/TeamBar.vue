@@ -6,7 +6,7 @@
         :options="options"
         label-field="teamName"
         value-field="teamID"
-        style="width: 130px; font-weight: bold"
+        style="width: 160px; font-weight: bold"
         @update:value="handleSelectUpdate"
       />
       <!-- <div class="titleBox">软工小学期</div> -->
