@@ -58,6 +58,7 @@ export interface Item extends DiagramElement {
   textVAlign: TextVAlign;
 
   border: ItemBorder;
+  connection?: ItemConnection;
 }
 
 export enum TextHAlign {

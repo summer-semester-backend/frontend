@@ -7,6 +7,7 @@
       :type="item.type"
       :color="item.color"
       class="button-center"
+      @click.stop="handleLinkClick"
     >
       {{ item.value }}
     </n-button>
@@ -14,8 +15,16 @@
 </template>
 <script setup lang="ts">
 import { ButtonItem } from '../types';
-
-const { item } = defineProps<{ item: ButtonItem }>();
+interface LinkClickEvents {
+  (e: 'link-to-click', itemID: string): void;
+}
+const emits = defineEmits<LinkClickEvents>();
+const props = defineProps<{ item: ButtonItem }>();
+const handleLinkClick = () => {
+  if (props.item.connection != undefined) {
+    emits('link-to-click', props.item.connection.to.item);
+  }
+};
 </script>
 
 <style scoped>

@@ -9,6 +9,7 @@
       opacity: item.opacity / 100,
       boxShadow: item.shadow ? '3px 3px 5px #aaa' : 'none',
     }"
+    @click.stop="handleLinkClick"
   ></div>
 </template>
 
@@ -16,6 +17,15 @@
 import { Item } from '../types';
 
 const { item } = defineProps<{ item: Item }>();
+interface LinkClickEvents {
+  (e: 'link-to-click', itemID: string): void;
+}
+const emits = defineEmits<LinkClickEvents>();
+const handleLinkClick = () => {
+  if (item.connection != undefined) {
+    emits('link-to-click', item.connection.to.item);
+  }
+};
 </script>
 
 <style scoped>

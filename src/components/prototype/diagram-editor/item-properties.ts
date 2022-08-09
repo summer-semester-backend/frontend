@@ -9,7 +9,6 @@ export const id$: ObjectProperty = {
   label: 'ID',
   type: PropertyType.TEXT,
   editorFullsize: true,
-  readonly: true,
   formatValue: (obj, prop, value) => value + ' (' + obj.component + ')',
 };
 export const title$: ObjectProperty = { name: 'title', label: '文字', type: PropertyType.TEXT, editorFullsize: true };
@@ -476,6 +475,14 @@ export const connectionModel: ObjectInspectorModel = {
               editorFullsize: true,
               editorOptions: { min: 1, max: 10, step: 1 },
             },
+          ],
+        },
+        {
+          name: 'linkAttr',
+          title: '连接',
+          properties: [
+            { name: 'from.item', label: '来自', type: PropertyType.TEXT, editorFullsize: true },
+            { name: 'to.item', label: '去往', type: PropertyType.TEXT, editorFullsize: true },
           ],
         },
       ], // sections

@@ -87,7 +87,7 @@
               :connection="c"
               :style="{ zIndex: c.z }"
               :selected="c.id === selectedItem?.id"
-              @selected.stop="selectItem(c)"
+              @selected="selectItem(c)"
             />
 
             <!-- Use to render a connection line during a new connection creation -->
@@ -97,7 +97,7 @@
               :y1="getHandlePosition(connectionInfo.startItem, connectionInfo.startPoint).y"
               :x2="mouseCoords.x"
               :y2="mouseCoords.y"
-              :type="ConnectionType.LINE"
+              :type="ConnectionType.CURVE"
               style="z-index: -100000"
               selected
             />
@@ -115,7 +115,7 @@
               @mouseover.stop="creatingConnection && onMouseOver(item, $event)"
               @mouseleave.stop="creatingConnection && onMouseLeave(item, $event)"
             >
-              <component :is="item.component" :item="item" :id="item.id" />
+              <component :is="item.component" :item="item" :id="item.id" @link-to-click="handleLinkToClick" />
 
               <!-- Item decorators (delete, locked, size info) -->
               <div
@@ -1188,6 +1188,9 @@ function deleteItem() {
   }
 
   if (isConnection(selectedItem.value)) {
+    var fromID = (selectedItem.value as ItemConnection).from.item;
+    var element = loadElements.value.find((elem) => elem.id == fromID);
+    (element as Item).connection = undefined;
     historyManager.value.execute(new DeleteCommand(loadElements.value, selectedItem.value));
     emit('delete-connection', selectedItem.value);
     selectNone();
@@ -1304,6 +1307,9 @@ function connectionHandleClick(item: Item, point: ConnectionHandle) {
     createConnection(ci.startItem.id, ci.endItem.id, { from: { handle: ci.startPoint }, to: { handle: ci.endPoint } })
   );
 
+  // set start item the new connection properties;
+  ci.startItem.connection = newConnection;
+
   ci.startItem = null;
   ci.endItem = null;
 
@@ -1347,13 +1353,22 @@ function handleSelectPage(page: PageItem) {
   });
 }
 
-function focusPage(page: PageItem) {
-  window.$message.info('聚焦' + page.pageName);
-  const left = page.x - 100;
-  const top = page.y - 100;
-  viewer.value?.scrollTo(left, top);
-  zoomToolbar.value?.zoomReset();
+function focusPage(page: Item) {
+  if (isPage(page)) {
+    window.$message.info('聚焦' + (page as PageItem).pageName);
+    const left = page.x - 100;
+    const top = page.y - 100;
+    viewer.value?.scrollTo(left, top);
+    zoomToolbar.value?.zoomReset();
+  }
   // console.log('page info', currentPage.value, currentPageTargets.value);
+}
+
+function handleLinkToClick(itemID: string) {
+  if (!editable.value) {
+    var element = loadElements.value.find((elem) => elem.id == itemID) as Item;
+    focusPage(element);
+  }
 }
 
 function selectPage(page: PageItem) {
