@@ -225,6 +225,7 @@ export function registerDefaultItemTypes() {
     backgroundColor: 'white',
     textColor: 'black',
     fontSize: 14,
+    fontWeight: 400,
 
     locked: false,
 
