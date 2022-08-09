@@ -84,3 +84,7 @@ export function getPrototypeShareCode(data: { fileID: number }) {
 export function readModule(data: { fileID: number | null }) {
   return backend.post('/file/commonRead', data);
 }
+
+export function projectToTeam(data: { fileID: number | null }) {
+  return backend.post('/file/projectToTeam', data);
+}
