@@ -1,6 +1,6 @@
 import { backend } from './utils/request';
 
-export function readFile(data: { fileID: number | null; teamID: number | null }) {
+export function readFile(data: { fileID: number | null; teamID: number | null; shareCode?: string }) {
   return backend.post('/file/read', data);
 }
 
@@ -77,6 +77,14 @@ export function copyFile(data: {
   return backend.post('/file/copy', data);
 }
 
+export function getPrototypeShareCode(data: { fileID: number }) {
+  return backend.post('/file/sharePrototype', data);
+}
+
 export function readModule(data: { fileID: number | null }) {
   return backend.post('/file/commonRead', data);
+}
+
+export function projectToTeam(data: { fileID: number | null }) {
+  return backend.post('/file/projectToTeam', data);
 }

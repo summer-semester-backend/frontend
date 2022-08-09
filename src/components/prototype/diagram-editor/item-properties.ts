@@ -157,7 +157,7 @@ const otherTab: InspectorTab = {
         separator$,
         {
           name: 'id',
-          label: 'DEBUG',
+          label: '属性',
           type: PropertyType.TEXT,
           editorFullsize: true,
           readonly: true,
@@ -420,7 +420,6 @@ export const textModel: ObjectInspectorModel = {
             shadow$,
           ],
         },
-        borderSection$,
         {
           // Position & size
           name: 'pos_size',

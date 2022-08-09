@@ -23,22 +23,24 @@ import { inviteTeamMember } from '@/api/team';
 import { ref } from 'vue';
 import { useRoute } from 'vue-router';
 import Clipboard from 'clipboard';
+import { useMessage } from 'naive-ui';
 
 const route = useRoute();
 const code = ref('');
 const show = ref(false);
+const message = useMessage();
 
 const handlePositiveClick = () => {
   var clipboard = new Clipboard('#copy');
 
   clipboard.on('success', (e) => {
-    console.log('复制成功');
+    message.success('复制成功');
     // 释放内存
     clipboard.destroy();
   });
   clipboard.on('error', (e) => {
     // 不支持复制
-    console.log('该浏览器不支持自动复制');
+    message.error('该浏览器不支持自动复制');
     // 释放内存
     clipboard.destroy();
   });

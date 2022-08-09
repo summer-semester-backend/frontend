@@ -1,18 +1,20 @@
 <template>
   <div class="flex h-full">
-    <div v-if="editable" class="min-w-60 h-full bg-[#494949]">
-      <div class="m-2">
-        <n-config-provider :theme="darkTheme" :theme-overrides="prototypeWorkspaceConfig">
+    <n-config-provider :theme="darkTheme" :theme-overrides="prototypeWorkspaceConfig">
+      <div class="min-w-60 h-full bg-[#494949]">
+        <div>
+          <SyncEditMembers v-if="isSyncManagerInitialized" />
           <PageBox
             @page-create="handleCreatePage"
             @page-selected="handleSelectPage"
+            :editable="editable"
             :pages="pages"
-            :selected-page="currentPage?.id as string"
+            :selected-page="currentPageID"
           />
-          <ToolBox @tool-selected="handleToolBoxSelect" @icon-selected="handleIconSelected" />
-        </n-config-provider>
+          <ToolBox v-if="editable" @tool-selected="handleToolBoxSelect" @icon-selected="handleIconSelected" />
+        </div>
       </div>
-    </div>
+    </n-config-provider>
     <div class="w-full h-full">
       <div class="editor-container">
         <!-- Rulers -->
@@ -49,23 +51,18 @@
         <VueInfiniteViewer
           ref="viewer"
           class="viewer"
-          :class="{
-            'bg-dark-700': !editable,
-            'bg-[#ededed]': editable,
-            'top-30px': editable,
-            'left-30px': editable,
-            'w-[calc(100%-30px)]': editable,
-            'h-[calc(100%-30px)]': editable,
-            'w-[calc(100%)]': !editable,
-            'h-[calc(100%)]': !editable,
-          }"
-          id="tryText"
           :useMouseDrag="shiftPressed"
           :useWheelScroll="true"
           :zoom="zoomFactor"
           :zoomOffsetX="mouseCoords.x"
           :zoomOffsetY="mouseCoords.y"
-          :style="{ cursor: currentTool == EditorTool.SELECT ? 'auto' : 'crosshair' }"
+          :style="{
+            cursor: currentTool == EditorTool.SELECT ? 'auto' : 'crosshair',
+            top: editable ? '30px' : '0px',
+            left: editable ? '30px' : '0px',
+            width: editable ? 'calc(100% - 30px)' : '100%',
+            height: editable ? 'calc(100% - 30px)' : '100%',
+          }"
           @wheel="onScroll"
           @scroll="onScroll"
           @dragover.stop="onDragOver($event)"
@@ -74,11 +71,10 @@
         >
           <div
             ref="viewport"
-            id="tryText2"
             :class="{ viewport: true, 'viewport-area': viewportSize }"
             :style="{
-              width: viewportSize ? viewportSize[0] + 'px' : '100%',
-              height: viewportSize ? viewportSize[1] + 'px' : '100%',
+              width: '100%',
+              height: '100%',
             }"
           >
             <!-- Render Connections (default component='Connection') -->
@@ -109,7 +105,6 @@
             <div
               v-for="(item, i) in items"
               class="item"
-              id="tryText3"
               :key="item.id"
               :data-item-id="item.id"
               :class="{ target: item.id === selectedItem?.id, locked: item.locked === true }"
@@ -120,7 +115,7 @@
               @mouseover.stop="creatingConnection && onMouseOver(item, $event)"
               @mouseleave.stop="creatingConnection && onMouseLeave(item, $event)"
             >
-              <component :is="item.component" :item="item" class="screenshot" />
+              <component :is="item.component" :item="item" :id="item.id" />
 
               <!-- Item decorators (delete, locked, size info) -->
               <div
@@ -187,6 +182,7 @@
 
             <!-- Manage drag / resize / rotate / rounding of selected item -->
             <Moveable
+              v-if="editable"
               ref="moveable"
               :target="
                 isItem(selectedItem)
@@ -271,6 +267,7 @@
           <ZoomToolbar
             ref="zoomToolbar"
             :editable="editable"
+            :show-mode-change="showModeChange"
             :zoomManager="zoomManager"
             @zoomChanged="onZoomChanged"
             @mode-changed="onModeChanged"
@@ -381,7 +378,6 @@
     </div>
     <div v-if="editable" class="flex flex-col w-90 bg-[#494949] h-full">
       <n-config-provider :theme="darkTheme" :theme-overrides="prototypeWorkspaceConfig">
-        <SyncEditMembers v-if="isSyncManagerInitialized" />
         <ObjectInspector :schema="objectInspectorSchema" :object="selectedItem" @property-changed="onPropertyChange" />
       </n-config-provider>
     </div>
@@ -500,6 +496,7 @@ onBeforeMount(() => {
 setupKeyboardHandlers();
 
 const editable = ref(true);
+const showModeChange = ref(true);
 // The component state
 // ------------------------------------------------------------------------------------------------------------------------
 const zoomManager = ref<IZoomManager>(new DefaultZoomManager());
@@ -550,6 +547,13 @@ const items = computed(() => {
 const connections = computed(() => loadElements.value.filter((e) => isConnection(e)) as ItemConnection[]);
 const pages = ref<Array<PageItem>>([]);
 const currentPage = ref<PageItem | null>(null);
+const currentPageID = computed(() => {
+  if (currentPage.value == null) {
+    return '';
+  } else {
+    return currentPage.value.id;
+  }
+});
 
 const itemToPaste = ref(null as Item | null);
 const inlineEditing = ref(false);
@@ -584,17 +588,35 @@ const handleIconSelected = (icon: string) => {
   currentTool.value = EditorTool.ICON;
   currentIcon.value = icon;
 };
-var canvas2 = document.createElement('canvas');
-var ctx2 = canvas2.getContext('2d');
-function draw() {
-  let elems = Array.from(document.getElementsByClassName('screenshot') as HTMLCollectionOf<HTMLElement>);
 
+var outputCanvas = document.createElement('canvas');
+var ctx2 = outputCanvas.getContext('2d');
+function drawCanvas() {
+  let elems: Array<HTMLElement> = [];
+  (currentPage.value as PageItem).containedIDs.forEach((dataID) => {
+    var id = dataID.split("'")[1];
+    elems.push(document.getElementById(id) as HTMLElement);
+    console.log(id);
+  });
+  elems.sort((ele1, ele2) => {
+    return parseInt(ele2.style.zIndex) - parseInt(ele1.style.zIndex);
+  });
+  selectedPageItems.value.sort((ele1, ele2) => {
+    return ele1.z - ele2.z;
+  });
   var len = elems.length;
-  console.log('len:' + len);
-  canvas2.width = 1000;
-  canvas2.height = 800;
+  console.log('len', len);
+  var pageAttrs = {
+    w: (currentPage.value as PageItem).w,
+    h: (currentPage.value as PageItem).h,
+    x: (currentPage.value as PageItem).x,
+    y: (currentPage.value as PageItem).y,
+    pagaName: (currentPage.value as PageItem).pageName,
+  };
+  outputCanvas.width = pageAttrs.w;
+  outputCanvas.height = pageAttrs.h;
   var index = 0;
-  elems.forEach((elem: any) => {
+  elems.forEach((elem: any, i: number) => {
     var canvas = document.createElement('canvas');
     var context = canvas.getContext('2d');
     if (context != null) {
@@ -602,9 +624,10 @@ function draw() {
     }
     var width = elem.offsetWidth; //获取dom 宽度
     var height = elem.offsetHeight; //获取dom 高度
-
+    var x = selectedPageItems.value[i].x - pageAttrs.x;
+    var y = selectedPageItems.value[i].y - pageAttrs.y;
+    var yOffset = selectedPageItems.value[i].yOffset;
     canvas.width = width;
-    console.log('text' + canvas.width);
     canvas.height = height;
     var opts = {
       scale: 1, // 添加的scale 参数
@@ -612,76 +635,32 @@ function draw() {
       logging: true, //日志开关
       width: width, //dom 原始宽度
       height: height, //dom 原始高度
+      y: yOffset,
       useCORS: true,
       withCredentials: true,
       allowTaint: true,
       backgroundColor: null,
     };
-    html2canvas(elem, opts).then(function (canvas) {
+    html2canvas(elem, opts).then((canvas) => {
       if (ctx2 != null) {
-        ctx2.drawImage(canvas, 0, 0, canvas.width, canvas.height);
+        ctx2.drawImage(canvas, x, y, canvas.width, canvas.height);
         index++;
-        console.log(index);
+        // console.log(index);
         if (index == len) {
-          let imgUrl = canvas2.toDataURL();
+          let imgUrl = outputCanvas.toDataURL();
           let a = document.createElement('a');
           a.href = imgUrl;
           // 利用浏览器下载器下载图片
-          a.setAttribute('download', '需要生成图片.png');
+          a.setAttribute('download', pageAttrs.pagaName);
           a.click();
         }
       }
     });
   });
-  return Promise.resolve(123);
 }
 
 function saveToImage() {
-  draw();
-  let dom = document.createElement('div');
-  // elems.forEach((elem) => {
-  //   var node = elem.cloneNode();
-  //   dom.appendChild(node);
-  // });
-
-  // var canvas = document.getElementsByClassName('viewport-area')[0] as HTMLElement;
-  // var canvas = document.getElementById('tryText') as HTMLElement;
-  // var canvas = dom as HTMLElement;
-  // htmlToImage.toPng(canvas).then((canvas) => {
-  //   FileSaver.saveAs(canvas, 'test.png');
-  // });
-
-  // const shareContent = document.getElementById('tryText2') as HTMLElement; //需要截图的包裹的（原生的）DOM 对象
-
-  // // const shareContent = dom;
-  // var width = shareContent.offsetWidth; //获取dom 宽度
-  // var height = shareContent.offsetHeight; //获取dom 高度
-  // var canvas = document.createElement('canvas'); //创建一个canvas节点
-  // var scale = 1; //定义任意放大倍数 支持小数
-  // canvas.width = width * 1; //定义canvas 宽度 * 缩放
-  // canvas.height = height * 1; //定义canvas高度 *缩放
-  // canvas.getContext('2d').scale(scale, scale); //获取context,设置scale
-  // var opts = {
-  //   scale: 1, // 添加的scale 参数
-  //   canvas: canvas, //自定义 canvas
-  //   logging: true, //日志开关
-  //   width: width, //dom 原始宽度
-  //   height: height, //dom 原始高度
-  //   useCORS: true,
-  //   withCredentials: true,
-  //   allowTaint: true,
-  // };
-  // html2canvas(shareContent, opts).then(function (canvas) {
-  //   //如果想要生成图片 引入canvas2Image.js 下载地址：
-  //   //https://github.com/hongru/canvas2image/blob/master/canvas2image.js
-  //   let imgUrl = canvas.toDataURL();
-  //   // 动态生成下载图片链接
-  //   let a = document.createElement('a');
-  //   a.href = imgUrl;
-  //   // 利用浏览器下载器下载图片
-  //   a.setAttribute('download', '需要生成图片.png');
-  //   a.click();
-  // });
+  drawCanvas();
 }
 
 function onDragOver(e: any) {
@@ -861,6 +840,9 @@ function handleSync() {
       (element as Item).x = x;
       (element as Item).y = y;
     }
+    if (selectedItem.value != null) {
+      selectNone();
+    }
   });
   syncManager.registerResizeFunc((targetID: string, x: number, y: number, w: number, h: number) => {
     var element = loadElements.value.find((elem) => elem.id == targetID);
@@ -869,6 +851,9 @@ function handleSync() {
       (element as Item).y = y;
       (element as Item).w = w;
       (element as Item).h = h;
+    }
+    if (selectedItem.value != null) {
+      selectNone();
     }
   });
   syncManager.registerAddItemFunc((element: DiagramElement, targetPageID: string) => {
@@ -880,6 +865,9 @@ function handleSync() {
     } else {
       var page = loadElements.value.find((elem) => elem.id == targetPageID) as PageItem;
       historyManager.value.execute(new AddItemCommand(loadElements.value, element as Item, page));
+    }
+    if (selectedItem.value != null) {
+      selectNone();
     }
   });
   syncManager.registerDeleteItemFunc((targetID: string) => {
@@ -899,12 +887,18 @@ function handleSync() {
     } else {
       historyManager.value.execute(new DeleteCommand(loadElements.value, element as Item));
     }
+    if (selectedItem.value != null) {
+      selectNone();
+    }
   });
   syncManager.registerModifyFunc((element: DiagramElement) => {
     selectedItem.value = element;
     var trueElementIndex = loadElements.value.findIndex((elem) => elem.id == element.id);
     loadElements.value.splice(trueElementIndex, 1, element);
     nextTick(() => moveable.value?.updateRect());
+    if (selectedItem.value != null) {
+      selectNone();
+    }
   });
 }
 
@@ -1074,47 +1068,63 @@ function saveProto(): void {
 
 function loadProto() {
   var protoID = parseInt(route.params.protoID as string);
-  readFile({ fileID: protoID, teamID: null })
-    .then((res) => {
-      if (res.data.data != null) {
-        loadElements.value = JSON.parse(res.data.data) as DiagramElement[];
-      } else {
-        loadElements.value = [
-          // createPageItem()
-        ];
-      }
+  var shareCode = route.query.shareCode;
+  console.log('shareCode', shareCode);
+  if (shareCode === undefined) {
+    readFile({ fileID: protoID, teamID: null })
+      .then((res) => {
+        try {
+          loadElements.value = JSON.parse(res.data.data) as DiagramElement[];
+        } catch (e) {
+          addPage('首页', '1080x720');
+        }
+      })
+      .finally(protoFunctionInit);
+  } else {
+    editable.value = false;
+    showModeChange.value = false;
+    readFile({ fileID: protoID, teamID: null, shareCode: shareCode as string })
+      .then((res) => {
+        try {
+          loadElements.value = JSON.parse(res.data.data) as DiagramElement[];
+        } catch (e) {
+          addPage('首页', '1080x720');
+        }
+      })
+      .finally(protoFunctionInit);
+  }
+}
+
+function protoFunctionInit() {
+  pages.value = loadElements.value.filter((ele) => ele.isPage == true) as PageItem[];
+  selectPage(pages.value[0]);
+  originGroup = new Array<Frame>(loadElements.value.length)
+    .fill({
+      x: 0,
+      y: 0,
+      w: 0,
+      h: 0,
+      z: 0,
+      r: 0,
+      borderRadius: 0,
+      opacity: 1,
+      clipType: ClipType.NONE,
+      clipStyle: '',
     })
-    .finally(() => {
-      pages.value = loadElements.value.filter((ele) => ele.isPage == true) as PageItem[];
-      selectPage(pages.value[0]);
-      originGroup = new Array<Frame>(loadElements.value.length)
-        .fill({
-          x: 0,
-          y: 0,
-          w: 0,
-          h: 0,
-          z: 0,
-          r: 0,
-          borderRadius: 0,
-          opacity: 1,
-          clipType: ClipType.NONE,
-          clipStyle: '',
-        })
-        .map((item: Frame) => ({
-          x: 0,
-          y: 0,
-          w: 0,
-          h: 0,
-          z: 0,
-          r: 0,
-          borderRadius: 0,
-          opacity: 1,
-          clipType: ClipType.NONE,
-          clipStyle: '',
-        }));
-      createSyncManager(wsurl, loadElements.value);
-      handleSync();
-    });
+    .map((item: Frame) => ({
+      x: 0,
+      y: 0,
+      w: 0,
+      h: 0,
+      z: 0,
+      r: 0,
+      borderRadius: 0,
+      opacity: 1,
+      clipType: ClipType.NONE,
+      clipStyle: '',
+    }));
+  createSyncManager(wsurl, loadElements.value);
+  handleSync();
 }
 
 function handleCreatePage(newPageName: string, pageResolution: string) {
@@ -1124,8 +1134,6 @@ function handleCreatePage(newPageName: string, pageResolution: string) {
 }
 
 function addPage(newPageName: string, pageResolution: string): void {
-  // TODO: page ID and save proto
-  saveProto();
   // Clicking the canvas with other tools => create a new item of related type
   const toolDef = getToolDefinition(EditorTool.PAGE);
   const properties = getItemBlueprint(toolDef.itemType!)[0];
@@ -1150,6 +1158,7 @@ function addPage(newPageName: string, pageResolution: string): void {
   currentPage.value = newItem;
   pages.value.push(currentPage.value as PageItem);
   emit('add-item', newItem);
+  saveProto();
 }
 
 /** Delete current selected item / connection */
@@ -1161,11 +1170,11 @@ function deleteItem() {
       currentPage.value = null;
       currentPageTargets.value = [];
       var containedIDs = (selectedItem.value as PageItem).containedIDs;
-      console.log(containedIDs);
+      //console.log(containedIDs);
       var deleteItems = loadElements.value.filter((ele) => {
         return containedIDs.includes(`[data-item-id='${ele.id}']`);
       });
-      console.log(deleteItems);
+      //console.log(deleteItems);
       deleteItems.forEach((ele) => {
         syncManager.sendMessage(OperationType.DELETE_ITEM, { targetID: (ele as DiagramElement).id });
         historyManager.value.execute(new DeleteCommand(loadElements.value, ele));
@@ -1235,7 +1244,7 @@ function selectCurrentTool(tool: EditorTool): void {
 
 /** Handle the clik in the overall canvas */
 function onCanvasClick(e: any): void {
-  console.log('onCanvasClick', e);
+  //console.log('onCanvasClick', e);
 
   // Was just clicking the scrollbar for scrolling?
   if (e.target?.classList?.contains('infinite-viewer-scroll-thumb')) return;
@@ -1243,7 +1252,7 @@ function onCanvasClick(e: any): void {
   // Current tool is 'select' => clicking the canvas unselect all
   if (currentTool.value === EditorTool.SELECT) {
     if (!selectedItem.value?.isPage) {
-      console.log('Unselecting all');
+      //console.log('Unselecting all');
       selectNone();
     }
     // selectNone();
@@ -1312,18 +1321,16 @@ function onPropertyChange(p: ObjectProperty, newValue: any) {
 
 /** Handle zoom changes from the zoom toolbar */
 function onZoomChanged(newZoomFactor: number, scrollViewerToCenter?: boolean) {
-  console.log('onZoomChanged', newZoomFactor, scrollViewerToCenter);
+  //console.log('onZoomChanged', newZoomFactor, scrollViewerToCenter);
   zoomFactor.value = newZoomFactor;
 
   if (scrollViewerToCenter === true) nextTick(() => viewer.value?.scrollCenter());
 }
 
 function onModeChanged() {
-  if (editable.value == false) {
-    router.go(0);
-    window.location.reload();
-  }
   editable.value = !editable.value;
+  focusPage(currentPage.value as PageItem);
+  selectNone();
 }
 
 /** Handle scroll to page */
@@ -1346,7 +1353,7 @@ function focusPage(page: PageItem) {
   const top = page.y - 100;
   viewer.value?.scrollTo(left, top);
   zoomToolbar.value?.zoomReset();
-  console.log('page info', currentPage.value, currentPageTargets.value);
+  // console.log('page info', currentPage.value, currentPageTargets.value);
 }
 
 function selectPage(page: PageItem) {
@@ -1383,7 +1390,7 @@ function setupKeyboardHandlers() {
 
   // Delete / backspace to delete selected item
   onKey(['Backspace', 'Delete'], (e: KeyboardEvent) => {
-    console.log('Pressed delete', e);
+    // console.log('Pressed delete', e);
     if (selectedItem.value) deleteItem();
   });
 
@@ -1399,7 +1406,7 @@ function setupKeyboardHandlers() {
   onKey(['ArrowLeft', 'ArrowRight', 'ArrowDown', 'ArrowUp'], (e: KeyboardEvent) => {
     if (!selectedItem.value) return;
 
-    console.log('Pressed arrow key', e);
+    // console.log('Pressed arrow key', e);
 
     const item = selectedItem.value as Item;
 
@@ -1449,7 +1456,7 @@ function setupKeyboardHandlers() {
 
   onKey(['Escape'], (e: KeyboardEvent) => {
     if (creatingConnection.value === true) {
-      console.log('ESC pressed: cancelling connection creation');
+      // console.log('ESC pressed: cancelling connection creation');
       connectionInfo.startItem = null;
       connectionInfo.endItem = null;
       selectCurrentTool(EditorTool.SELECT);
@@ -1467,7 +1474,7 @@ function deepCloneItem(item: any): any {
 function copyItem() {
   if (!isItem(selectedItem.value)) return;
 
-  console.log('Copying item', selectedItem.value);
+  // console.log('Copying item', selectedItem.value);
 
   itemToPaste.value = selectedItem.value;
 
@@ -1477,14 +1484,14 @@ function copyItem() {
 function cutItem() {
   if (!isItem(selectedItem.value)) return;
 
-  console.log('Cutting item', selectedItem.value);
+  // console.log('Cutting item', selectedItem.value);
   itemToPaste.value = selectedItem.value;
   deleteItem();
 }
 
 function pasteItem() {
   if (!itemToPaste.value) return;
-  console.log('Paste item', selectedItem.value);
+  // console.log('Paste item', selectedItem.value);
 
   const newItem = deepCloneItem(itemToPaste.value) as Item;
 
@@ -1561,12 +1568,6 @@ function inlineEdit(item: Item) {
 .viewer {
   box-sizing: border-box;
   position: absolute;
-  /* top: 30px;
-  left: 30px;
-  width: calc(100% - 30px);
-  height: calc(100% - 30px);
-  background-color: rgb(237, 237, 237); 
-  */
   user-select: none;
   background-image: linear-gradient(90deg, rgba(140, 140, 140, 0.15) 10%, rgba(0, 0, 0, 0) 10%),
     linear-gradient(rgba(140, 140, 140, 0.15) 10%, rgba(0, 0, 0, 0) 10%);
