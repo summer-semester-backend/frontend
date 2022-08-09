@@ -4,8 +4,10 @@
 import { h, ref, computed, onMounted } from 'vue';
 import { acceptInvitation } from '@/api/team';
 import { useRoute, useRouter } from 'vue-router';
+import { useMessage } from 'naive-ui';
 const router = useRouter();
 const route = useRoute();
+const message = useMessage();
 
 onMounted(() => {
   console.log(route.params.code + ' test');
@@ -14,7 +16,7 @@ onMounted(() => {
   acceptInvitation({ inviteCode: route.params.code as string })
     .then((res) => {
       router.push({ name: 'teamProject', params: { teamID: res.data.teamID } });
-      console.log('1');
+      message.success('加入团队成功');
     })
     .catch((err) => {
       localStorage.setItem('inviteLink', route.params.code as string);
