@@ -87,10 +87,10 @@ function zoomOut() {
 }
 
 function shareLink() {
-  let currentFileID = route.params.fileID as string;
+  let currentFileID = route.params.protoID as string;
   getPrototypeShareCode({ fileID: parseInt(currentFileID) }).then((res) => {
     if (res.data.result == 0) {
-      code.value = window.location.origin + '/' + currentFileID + '?shareCode=' + res.data.shareCode;
+      code.value = window.location.origin + '/prototype/' + currentFileID + '?shareCode=' + res.data.shareCode;
       show.value = true;
     }
   });
