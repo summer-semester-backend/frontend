@@ -80,9 +80,7 @@ const initEditor = () => {
     });
 
     //设置值
-    if (fileInfo.value.data) {
-      engineInstance.setHtml(fileInfo.value.data);
-    }
+    engineInstance.setHtml(fileInfo.value.data || '');
 
     engine.value = engineInstance;
   } else {
@@ -154,8 +152,8 @@ const saveModule = (fileID: number | null, fileName: string) => {
 };
 
 //保存到服务器
-const save = () => {
-  editFile({
+const save = async () => {
+  return editFile({
     fileID: fileInfo.value.fileID || -1,
     fileName: fileInfo.value.fileName,
     data: engine.value?.getHtml() || '',
@@ -164,6 +162,16 @@ const save = () => {
   }).then((res) => {
     if (res.data.result == 0) console.log('保存成功');
   });
+};
+
+//在离开前保存
+const saveBeforeLeave = (e: Event | null) => {
+  if (engine.value) {
+    save().then((res) => {
+      engine.value?.destroy();
+      engine.value = null;
+    });
+  }
 };
 
 defineExpose({
@@ -197,14 +205,10 @@ onMounted(() => {
           initEditor();
         });
     });
+  window.addEventListener('beforeunload', saveBeforeLeave);
 });
 onUnmounted(() => {
-  if (engine.value) engine.value.destroy();
-  save();
-});
-onBeforeRouteLeave((to, from, next) => {
-  if (engine.value) engine.value.destroy();
-  save();
-  next();
+  saveBeforeLeave(null);
+  window.removeEventListener('beforeunload', saveBeforeLeave);
 });
 </script>

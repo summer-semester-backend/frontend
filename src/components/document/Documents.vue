@@ -45,9 +45,10 @@ import {
   Add,
   FolderOutline,
   DocumentTextOutline,
+  Copy,
 } from '@vicons/ionicons5';
 import { ProjectOutlined, TeamOutlined } from '@vicons/antd';
-import { createFile, deleteFile, editFile, getAncestor } from '@/api/file';
+import { copyFile, createFile, deleteFile, editFile, getAncestor } from '@/api/file';
 import { readFile, readFileCenter } from '@/api/file';
 import { onBeforeRouteUpdate, useRoute } from 'vue-router';
 import { ToolBar } from './components';
@@ -82,14 +83,15 @@ const columns = ref([
     key: 'fileName',
     render: (row: any) => {
       return h(
-        NSpace,
+        NButton,
         {
-          inline: true,
-          justify: 'end',
-          size: 4,
+          size: 'small',
+          text: true,
+          onClick: () => handleOpen(row),
         },
-        [
-          h(NIcon, {
+        {
+          default: row.fileName,
+          icon: h(NIcon, {
             component: () => {
               switch (row.fileType) {
                 case 0:
@@ -104,8 +106,7 @@ const columns = ref([
             },
             size: '18',
           }),
-          row.fileName,
-        ]
+        }
       );
     },
   },
@@ -128,22 +129,6 @@ const columns = ref([
           h(
             NButton,
             {
-              type: 'success',
-              size: 'small',
-              strong: true,
-              secondary: true,
-              onClick(e) {
-                handleOpen(row);
-              },
-            },
-            {
-              default: '打开',
-              icon: h(NIcon, { component: ArrowRedo }),
-            }
-          ),
-          h(
-            NButton,
-            {
               type: 'warning',
               size: 'small',
               strong: true,
@@ -181,69 +166,27 @@ const columns = ref([
             {
               default: '删除',
               icon: h(NIcon, { component: Trash }),
+            }
+          ),
+          h(
+            NButton,
+            {
+              type: 'info',
+              size: 'small',
+              strong: true,
+              secondary: true,
+              onClick(e) {
+                handleCopy(row);
+              },
+            },
+            {
+              default: '复制',
+              icon: h(NIcon, { component: Copy }),
             }
           ),
         ]);
       } else if (row.fileType == 2) {
         return h(NSpace, [
-          h(
-            NButton,
-            {
-              type: 'success',
-              size: 'small',
-              strong: true,
-              secondary: true,
-              onClick(e) {
-                handleOpen(row);
-              },
-            },
-            {
-              default: '打开',
-              icon: h(NIcon, { component: ArrowRedo }),
-            }
-          ),
-          h(
-            NButton,
-            {
-              type: 'warning',
-              size: 'small',
-              strong: true,
-              secondary: true,
-              onClick(e) {
-                handleEdit(row);
-              },
-            },
-            {
-              default: '修改',
-              icon: h(NIcon, { component: Create }),
-            }
-          ),
-          h(
-            NButton,
-            {
-              type: 'error',
-              size: 'small',
-              strong: true,
-              secondary: true,
-              onClick(e) {
-                window.$dialog.warning({
-                  title: '警告',
-                  content: '你确定要删除这个文件吗？',
-                  positiveText: '确定',
-                  negativeText: '取消',
-                  onPositiveClick: () => {
-                    row.isLoaded = false;
-                    handleDelete(row.fileID);
-                  },
-                  onNegativeClick: () => {},
-                });
-              },
-            },
-            {
-              default: '删除',
-              icon: h(NIcon, { component: Trash }),
-            }
-          ),
           h(
             NDropdown,
             {
@@ -254,7 +197,7 @@ const columns = ref([
             h(
               NButton,
               {
-                type: 'info',
+                type: 'success',
                 size: 'small',
                 strong: true,
                 secondary: true,
@@ -269,25 +212,67 @@ const columns = ref([
               }
             )
           ),
-        ]);
-      } else if (row.fileType == 1) {
-        return h(NSpace, [
           h(
             NButton,
             {
-              type: 'success',
+              type: 'warning',
               size: 'small',
               strong: true,
               secondary: true,
               onClick(e) {
-                handleOpen(row);
+                handleEdit(row);
               },
             },
             {
-              default: '打开',
-              icon: h(NIcon, { component: ArrowRedo }),
+              default: '修改',
+              icon: h(NIcon, { component: Create }),
             }
           ),
+          h(
+            NButton,
+            {
+              type: 'error',
+              size: 'small',
+              strong: true,
+              secondary: true,
+              onClick(e) {
+                window.$dialog.warning({
+                  title: '警告',
+                  content: '你确定要删除这个文件吗？',
+                  positiveText: '确定',
+                  negativeText: '取消',
+                  onPositiveClick: () => {
+                    row.isLoaded = false;
+                    handleDelete(row.fileID);
+                  },
+                  onNegativeClick: () => {},
+                });
+              },
+            },
+            {
+              default: '删除',
+              icon: h(NIcon, { component: Trash }),
+            }
+          ),
+          h(
+            NButton,
+            {
+              type: 'info',
+              size: 'small',
+              strong: true,
+              secondary: true,
+              onClick(e) {
+                handleCopy(row);
+              },
+            },
+            {
+              default: '复制',
+              icon: h(NIcon, { component: Copy }),
+            }
+          ),
+        ]);
+      } else if (row.fileType == 1) {
+        return h(NSpace, [
           h(
             NDropdown,
             {
@@ -298,7 +283,7 @@ const columns = ref([
             h(
               NButton,
               {
-                type: 'info',
+                type: 'success',
                 size: 'small',
                 strong: true,
                 secondary: true,
@@ -529,7 +514,7 @@ const handleOpen = (row: any) => {
         id: row.fileID,
       },
     });
-  } else if (type === 'team') {
+  } else if (row.fileType > 0 && type === 'team') {
     router.push({
       name: 'directory',
       params: {
@@ -537,7 +522,7 @@ const handleOpen = (row: any) => {
         teamID: teamID.value,
       },
     });
-  } else {
+  } else if (row.fileType > 0) {
     router.push({
       name: 'DirList',
       params: {
@@ -546,6 +531,18 @@ const handleOpen = (row: any) => {
       },
     });
   }
+};
+//复制文件
+const handleCopy = (row: any) => {
+  copyFile({ fatherID: fileID.value, fileID: row.fileID, teamID: teamID.value, newName: row.fileName }).then(
+    (res: any) => {
+      if (res.data.result <= 1) {
+        window.$message.success('复制成功');
+        files.value = [];
+        getFileList(fileID.value, teamID.value);
+      }
+    }
+  );
 };
 
 //关闭模态框

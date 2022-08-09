@@ -178,7 +178,7 @@ export const pluginConfig: { [key: string]: PluginOptions } = {
   },
   [Image.pluginName]: {
     onBeforeRender: (status: string, url: string) => {
-      return url;
+      return url + `?token=12323`;
     },
   },
   [ImageUploader.pluginName]: {
@@ -192,7 +192,9 @@ export const pluginConfig: { [key: string]: PluginOptions } = {
       crossOrigin: true,
       withCredentials: true,
     },
-    isRemote: (src: string) => src.indexOf(DOMAIN) < 0,
+    isRemote: (src: string) => {
+      return false;
+    },
     parse: (res: any) => {
       console.log(res);
       if (res.result == 0) {
