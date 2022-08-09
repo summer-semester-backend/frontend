@@ -108,7 +108,7 @@
 <script setup lang="ts">
 import { NButton, NIcon, NSpace, useDialog } from 'naive-ui';
 import { h, ref, computed, onMounted } from 'vue';
-import { Add, AddCircleOutline, Trash, ArrowRedo, Create, GridOutline, List } from '@vicons/ionicons5';
+import { Add, AddCircleOutline, Trash, ArrowRedo, Create, GridOutline, List, Copy } from '@vicons/ionicons5';
 import { UnorderedListOutlined, EditOutlined, FileImageFilled } from '@vicons/antd';
 import { readFile, createFile, editFile, deleteFile, copyFile } from '@/api/file';
 import { useRoute } from 'vue-router';
@@ -204,6 +204,9 @@ const columns = ref([
   {
     title: '文件名称',
     key: 'fileName',
+    render(row: any) {
+      return h(NButton, { text: true, onClick: () => handleClickOpen(row) }, { default: row.fileName });
+    },
   },
   {
     title: '创建者',
@@ -239,22 +242,6 @@ const columns = ref([
         h(
           NButton,
           {
-            type: 'success',
-            size: 'small',
-            strong: true,
-            secondary: true,
-            onClick(e) {
-              handleClickOpen(row);
-            },
-          },
-          {
-            default: '打开',
-            icon: h(NIcon, { component: ArrowRedo }),
-          }
-        ),
-        h(
-          NButton,
-          {
             type: 'warning',
             size: 'small',
             strong: true,
@@ -281,7 +268,7 @@ const columns = ref([
           },
           {
             default: '复制',
-            icon: h(NIcon, { component: Create }),
+            icon: h(NIcon, { component: Copy }),
           }
         ),
       ]);
