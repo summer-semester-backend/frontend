@@ -16,9 +16,16 @@
             <div class="topTest">
               {{ currentProject.projName }}
             </div>
-            <n-icon size="20" color="#bfbfbf">
-              <InformationCircleOutline />
-            </n-icon>
+            <n-popover trigger="click" placement="bottom-start">
+              <template #trigger>
+                <n-icon size="20" color="#bfbfbf" @click="getTeamInfo">
+                  <InformationCircleOutline />
+                </n-icon>
+              </template>
+              <div>项目名称：{{ currentProject.projName }}</div>
+              <div>所属团队：{{ teamDetail.teamName }}</div>
+              <div style="max-width: 200px">团队简介： {{ teamDetail.summary }}</div>
+            </n-popover>
           </div>
           <div class="bottomData">
             <n-tabs
@@ -87,7 +94,7 @@ import { useRouter, useRoute } from 'vue-router';
 import { readFile, projectToTeam } from '@/api/file';
 import Clipboard from 'clipboard';
 import { useMessage } from 'naive-ui';
-import { inviteTeamMember } from '@/api/team';
+import { inviteTeamMember, getTeamDetail } from '@/api/team';
 
 const message = useMessage();
 
@@ -136,6 +143,19 @@ const renderPrototype = () => h('div', { style: 'font-size:14px;' }, '原型');
 const renderUml = () => h('div', { style: 'font-size:14px;' }, 'UML图');
 const renderRecycleBin = () => h('div', { style: 'font-size:14px;' }, '回收站');
 
+const teamDetail = ref({
+  teamName: '',
+  summary: '',
+});
+
+const getTeamInfo = () => {
+  getTeamDetail({ teamID: props.teamID as string }).then((res) => {
+    console.log(res);
+    teamDetail.value.teamName = res.data.teamname;
+    teamDetail.value.summary = res.data.summary;
+  });
+};
+
 const getProjInfo = (id: number | null) => {
   readFile({ fileID: id, teamID: -1 }).then((res) => {
     if (res.data.result == 0) {
@@ -160,7 +180,6 @@ onMounted(() => {
   getProjInfo(parseInt(route.params.ProjID.toString()));
   if (route.fullPath.split('/').length == 4) {
     tabValue.value = route.fullPath.split('/')[3];
-    console.log(tabValue.value);
   }
 });
 </script>
