@@ -1,8 +1,9 @@
 <template>
   <div class="flex h-full">
     <n-config-provider :theme="darkTheme" :theme-overrides="prototypeWorkspaceConfig">
-      <div v-if="editable" class="min-w-60 h-full bg-[#494949]">
+      <div class="min-w-60 h-full bg-[#494949]">
         <div>
+          <SyncEditMembers v-if="isSyncManagerInitialized" />
           <PageBox
             @page-create="handleCreatePage"
             @page-selected="handleSelectPage"
@@ -10,17 +11,8 @@
             :pages="pages"
             :selected-page="currentPageID"
           />
-          <ToolBox @tool-selected="handleToolBoxSelect" @icon-selected="handleIconSelected" />
+          <ToolBox v-if="editable" @tool-selected="handleToolBoxSelect" @icon-selected="handleIconSelected" />
         </div>
-      </div>
-      <div v-else class="min-w-60 h-full bg-[#494949]">
-        <PageBox
-          @page-create="handleCreatePage"
-          @page-selected="handleSelectPage"
-          :editable="editable"
-          :pages="pages"
-          :selected-page="currentPageID"
-        />
       </div>
     </n-config-provider>
     <div class="w-full h-full">
@@ -386,7 +378,6 @@
     </div>
     <div v-if="editable" class="flex flex-col w-90 bg-[#494949] h-full">
       <n-config-provider :theme="darkTheme" :theme-overrides="prototypeWorkspaceConfig">
-        <SyncEditMembers v-if="isSyncManagerInitialized" />
         <ObjectInspector :schema="objectInspectorSchema" :object="selectedItem" @property-changed="onPropertyChange" />
       </n-config-provider>
     </div>

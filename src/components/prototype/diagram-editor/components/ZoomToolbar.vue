@@ -1,7 +1,7 @@
 <template>
   <div class="toolbar">
     <div class="btn" @click="zoomOut" title="缩小"><EditorIcon icon="zoom_out" /></div>
-    <div class="zoom-info" title="Current Zoom">{{ zoomManager.getZoomFactor() * 100 }}%</div>
+    <div class="zoom-info" title="Current Zoom">{{ props.zoomManager.getZoomFactor() * 100 }}%</div>
     <div class="btn" @click="zoomIn" title="放大"><EditorIcon icon="zoom_in" /></div>
     <div class="btn" @click="zoomReset" title="重置"><EditorIcon icon="center_focus_weak" /></div>
     <div v-if="showModeChange" class="mode-info" @click="emit('mode-changed')" title="模式切换">
@@ -44,7 +44,7 @@ interface ToolbarProps {
   showModeChange?: boolean;
 }
 
-const { zoomManager, editable, showModeChange } = withDefaults(defineProps<ToolbarProps>(), { showModeChange: true });
+const props = withDefaults(defineProps<ToolbarProps>(), { showModeChange: true });
 
 interface ToolbarEvents {
   (e: 'zoom-changed', newZoomFactor: number, scrollViewerToCenter?: boolean): void;
@@ -69,20 +69,20 @@ const handlePositiveClick = () => {
   });
 };
 function zoomReset() {
-  const oldZoom = zoomManager.getZoomFactor();
-  const newZoom = zoomManager.zoomReset();
+  const oldZoom = props.zoomManager.getZoomFactor();
+  const newZoom = props.zoomManager.zoomReset();
   if (oldZoom !== newZoom) emit('zoom-changed', newZoom, true);
 }
 
 function zoomIn() {
-  const oldZoom = zoomManager.getZoomFactor();
-  const newZoom = zoomManager.zoomIn();
+  const oldZoom = props.zoomManager.getZoomFactor();
+  const newZoom = props.zoomManager.zoomIn();
   if (oldZoom !== newZoom) emit('zoom-changed', newZoom, false);
 }
 
 function zoomOut() {
-  const oldZoom = zoomManager.getZoomFactor();
-  const newZoom = zoomManager.zoomOut();
+  const oldZoom = props.zoomManager.getZoomFactor();
+  const newZoom = props.zoomManager.zoomOut();
   if (oldZoom !== newZoom) emit('zoom-changed', newZoom, false);
 }
 
