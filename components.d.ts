@@ -10,6 +10,7 @@ declare module 'vue' {
     Button: typeof import('./src/components/prototype/diagram-editor/blocks/Button.vue')['default']
     ColorEditor: typeof import('./src/components/prototype/inspector/property-editors/ColorEditor.vue')['default']
     Connection: typeof import('./src/components/prototype/diagram-editor/blocks/Connection.vue')['default']
+    CopyModal: typeof import('./src/components/document/components/CopyModal.vue')['default']
     CreateModal: typeof import('./src/components/project/CreateModal.vue')['default']
     DiagramEditor: typeof import('./src/components/prototype/diagram-editor/DiagramEditor.vue')['default']
     Doc: typeof import('./src/components/workspace/Doc.vue')['default']
