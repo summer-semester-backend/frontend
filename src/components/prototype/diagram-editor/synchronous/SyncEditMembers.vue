@@ -20,7 +20,7 @@
 </template>
 <script setup lang="ts">
 import { getUserInfo } from '@/api/user';
-import { onBeforeUnmount, onMounted, ref } from 'vue';
+import { onBeforeMount, onBeforeUnmount, onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import { syncManager } from './SyncManager';
 const route = useRoute();
@@ -37,6 +37,9 @@ const createDropdownOptions = (options: Array<{ name: string; avatar: string }>)
   }));
 
 const userMap = new Map<number, string>();
+onBeforeMount(() => {
+  syncManager.openWebSocket();
+});
 
 onMounted(() => {
   var user = parseInt(localStorage.getItem('userID') as string);

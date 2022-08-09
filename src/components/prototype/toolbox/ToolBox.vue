@@ -44,8 +44,8 @@
             </n-collapse>
           </n-tab-pane>
           <n-tab-pane name="icon" tab="图标">
-            <n-scrollbar style="max-height: 550px; padding-right: 20px" class="mt-3">
-              <n-grid :x-gap="12" :y-gap="10" :cols="3">
+            <n-scrollbar style="max-height: 550px" class="mt-3">
+              <n-grid :x-gap="8" :y-gap="8" :cols="3">
                 <n-gi v-for="t in popularIcons">
                   <ToolBoxItem
                     :tool-name="t"

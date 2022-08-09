@@ -24,9 +24,12 @@ const isNoFoundPage = computed(() => {
 backend.interceptors.response.use(
   (response) => {
     if (response.data.result == 10) {
-      window.$message.error('登录认证失败');
+      window.$message.error('登录认证失败！');
       signOut();
       router.push({ name: 'login' });
+    } else if (response.data.result == 11) {
+      window.$message.error(response.data.message);
+      router.push({ name: 'NoFound' });
     } else if (response.data.result != 0) {
       if (response.data.result == 1) {
         window.$message.warning(response.data.message);

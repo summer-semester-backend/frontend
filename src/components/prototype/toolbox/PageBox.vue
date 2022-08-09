@@ -12,7 +12,7 @@
       <n-card v-if="expanded" :bordered="false" class="card">
         <n-scrollbar style="max-height: 200px">
           <n-menu :options="pageOptions" class="w-full" @update-value="handleUpdateValue" v-model:value="page"></n-menu>
-          <n-button-group class="w-full ml-2 my-1 h-10">
+          <n-button-group v-if="editable" class="w-full ml-2 my-1 h-10">
             <n-button class="w-5/7 h-full" @click="emits('page-create', newPageName, currentResolution)">
               <template #icon>
                 <n-icon><Add /></n-icon>
@@ -40,7 +40,7 @@ interface PageBoxEvents {
   (e: 'page-selected', pageItem: PageItem): void;
   (e: 'page-create', pageName: string, pageResolution: string): void;
 }
-const props = defineProps<{ pages: Array<PageItem>; selectedPage: string }>();
+const props = defineProps<{ pages: Array<PageItem>; selectedPage: string; editable: boolean }>();
 const pageOptions = ref<Array<{ key: string; label: string }>>([]);
 const renderIcon = (icon: Component) => {
   return () => {

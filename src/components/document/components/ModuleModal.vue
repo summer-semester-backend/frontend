@@ -23,7 +23,7 @@
         </n-tree>
       </n-layout-sider>
       <n-layout>
-        <n-scrollbar x-scrollable style="max-height: 68vh">
+        <n-scrollbar x-scrollable style="max-height: 70vh">
           <div id="container"></div>
         </n-scrollbar>
       </n-layout>
@@ -33,7 +33,9 @@
 <script setup lang="ts">
 import { copyFile, getCommonModule, getTeamModule, readFile, readModule } from '@/api/file';
 import { useRoute } from 'vue-router';
-import { onMounted, ref } from 'vue';
+import { h, onMounted, ref } from 'vue';
+import { NDivider, NIcon, NInput } from 'naive-ui';
+import { CreateOutline } from '@vicons/ionicons5';
 type Module = {
   fileName: string;
   fileID: number;
@@ -49,6 +51,7 @@ const emits = defineEmits(['close', 'refresh']);
 const treeData = ref<Module[]>([]);
 const teamID = ref<number | null>(-1);
 const selectFileID = ref<number | null>(-1);
+const newFileName = ref<string>('');
 
 //获取通用模板
 const getCommonModuleList = (fileID: number | null, dad: any) => {
@@ -102,7 +105,7 @@ const handleLoad = (row: any) => {
 
 //预览
 const handleSelect = (keys: Array<number | string>, rows: Array<any>) => {
-  if (keys.length > 0 && rows[0].fileType == 14) {
+  if (keys.length > 0 && (rows[0].fileType == 14 || rows[0].fileType == 15)) {
     selectFileID.value = parseInt(keys[0].toString());
     readModule({ fileID: parseInt(keys[0].toString()) }).then((res) => {
       const tempNode = document.createElement('div');
@@ -115,12 +118,49 @@ const handleSelect = (keys: Array<number | string>, rows: Array<any>) => {
 };
 
 const handleCreate = () => {
-  copyFile({ fileID: selectFileID.value, teamID: teamID.value, fatherID: props.fatherID }).then((res) => {
-    if (res.data.result == 0) {
-      window.$message.success('创建成功');
-      emits('close');
-      emits('refresh');
-    }
+  window.$dialog.info({
+    title: '新建文件',
+    content: () => {
+      return h('div', {}, [
+        h(NDivider, { style: 'margin-top: 10px;' }),
+        h(NInput, {
+          style: 'width: 100%;',
+          placeholder: '请输入文件名称',
+          onInput: (e: any) => {
+            newFileName.value = e;
+          },
+        }),
+      ]);
+    },
+    icon: () => {
+      return h(NIcon, {
+        component: CreateOutline,
+      });
+    },
+    positiveText: '确定',
+    negativeText: '取消',
+    maskClosable: false,
+    onPositiveClick: () => {
+      if (selectFileID.value == -1) {
+        window.$message.warning('请选择模板');
+      } else if (newFileName.value.length == 0) {
+        window.$message.warning('请输入文件名称');
+      } else if (newFileName.value.length > 0) {
+        copyFile({
+          fileID: selectFileID.value,
+          teamID: teamID.value,
+          fatherID: props.fatherID,
+          newName: newFileName.value,
+        }).then((res) => {
+          if (res.data.result == 0) {
+            window.$message.success('创建成功');
+            emits('close');
+            emits('refresh');
+          }
+        });
+      }
+    },
+    onNegativeClick: () => {},
   });
 };
 

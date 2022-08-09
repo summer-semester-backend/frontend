@@ -31,46 +31,6 @@ export class SyncManager {
     this.url = url;
     this.elements = elements;
     this.websocket = new WebSocket(url);
-    this.websocket.onmessage = (ev: MessageEvent<any>) => {
-      const message = JSON.parse(ev.data);
-      console.log(message.operation, message);
-      switch (message.operation) {
-        case 'register':
-          this.registerFuncs.forEach((func) => {
-            func(message.userID, message.fileID);
-          });
-          break;
-        case 'leave':
-          this.leaveFuncs.forEach((func) => {
-            func(message.userID, message.fileID);
-          });
-          break;
-        case 'move':
-          this.moveFuncs.forEach((func) => {
-            func(message.targetID, message.x, message.y);
-          });
-          break;
-        case 'resize':
-          this.resizeFuncs.forEach((func) => {
-            func(message.targetID, message.x, message.y, message.w, message.h);
-          });
-          break;
-        case 'modify':
-          this.modifyFuncs.forEach((func) => {
-            func(message.element);
-          });
-          break;
-        case 'add_item':
-          this.addItemFuncs.forEach((func) => {
-            func(message.element, message.targetPageID);
-          });
-        case 'del_item':
-          this.deleteItemFuncs.forEach((func) => {
-            func(message.targetID);
-          });
-          break;
-      }
-    };
   }
 
   registerRegisterFunc(func: RegisterFunc) {
@@ -119,11 +79,57 @@ export class SyncManager {
   }
 
   sendMessage(operation: OperationType, message: object) {
-    this.websocket.send(JSON.stringify({ operation, ...message }));
+    if (this.websocket.readyState < 2) {
+      this.websocket.send(JSON.stringify({ operation, ...message }));
+    }
   }
 
   closeWebSocket() {
     this.websocket.close();
+  }
+
+  openWebSocket() {
+    this.websocket = new WebSocket(this.url);
+    this.websocket.onmessage = (ev: MessageEvent<any>) => {
+      const message = JSON.parse(ev.data);
+      console.log(message.operation, message);
+      switch (message.operation) {
+        case 'register':
+          this.registerFuncs.forEach((func) => {
+            func(message.userID, message.fileID);
+          });
+          break;
+        case 'leave':
+          this.leaveFuncs.forEach((func) => {
+            func(message.userID, message.fileID);
+          });
+          break;
+        case 'move':
+          this.moveFuncs.forEach((func) => {
+            func(message.targetID, message.x, message.y);
+          });
+          break;
+        case 'resize':
+          this.resizeFuncs.forEach((func) => {
+            func(message.targetID, message.x, message.y, message.w, message.h);
+          });
+          break;
+        case 'modify':
+          this.modifyFuncs.forEach((func) => {
+            func(message.element);
+          });
+          break;
+        case 'add_item':
+          this.addItemFuncs.forEach((func) => {
+            func(message.element, message.targetPageID);
+          });
+        case 'del_item':
+          this.deleteItemFuncs.forEach((func) => {
+            func(message.targetID);
+          });
+          break;
+      }
+    };
   }
 }
 let fileID: number;
