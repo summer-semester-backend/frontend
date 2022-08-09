@@ -25,6 +25,7 @@ export interface DiagramElement {
   title: string; // The element title / label
   z: number; // The element z-index
   isPage: boolean; // whether used as page
+  yOffset: number;
 
   backgroundColor: string; // The element background color (item background, connection stroke color)
   textColor: string; // The element text color (text inside the element, etc.)

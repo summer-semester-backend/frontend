@@ -205,6 +205,7 @@ export function registerDefaultItemTypes() {
     id: '',
     title: '',
     isPage: false,
+    yOffset: 0,
 
     x: 100,
     y: 100,
@@ -255,10 +256,16 @@ export function registerDefaultItemTypes() {
     {
       ...defaults,
       title: 'Hello World',
+      yOffset: 0,
       backgroundColor: 'transparent',
       textColor: 'black',
 
       component: type,
+      border: {
+        width: 0,
+        style: ConnectionStyle.SOLID,
+        color: 'black',
+      },
     },
     textModel
   );
@@ -377,6 +384,7 @@ export function registerDefaultItemTypes() {
       component: type,
       title: 'portrait', // icon name
       supportsRoundable: true,
+      yOffset: 15,
 
       backgroundColor: 'transparent',
       fontSize: 60,

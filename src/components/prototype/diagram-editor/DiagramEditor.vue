@@ -120,7 +120,7 @@
               @mouseover.stop="creatingConnection && onMouseOver(item, $event)"
               @mouseleave.stop="creatingConnection && onMouseLeave(item, $event)"
             >
-              <component :is="item.component" :item="item" class="screenshot" />
+              <component :is="item.component" :item="item" :id="item.id" />
 
               <!-- Item decorators (delete, locked, size info) -->
               <div
@@ -584,17 +584,34 @@ const handleIconSelected = (icon: string) => {
   currentTool.value = EditorTool.ICON;
   currentIcon.value = icon;
 };
-var canvas2 = document.createElement('canvas');
-var ctx2 = canvas2.getContext('2d');
-function draw() {
-  let elems = Array.from(document.getElementsByClassName('screenshot') as HTMLCollectionOf<HTMLElement>);
 
+var outputCanvas = document.createElement('canvas');
+var ctx2 = outputCanvas.getContext('2d');
+function drawCanvas() {
+  let elems: Array<HTMLElement> = [];
+  (currentPage.value as PageItem).containedIDs.forEach((dataID) => {
+    var id = dataID.split("'")[1];
+    elems.push(document.getElementById(id) as HTMLElement);
+    console.log(id);
+  });
+  elems.sort((ele1, ele2) => {
+    return parseInt(ele2.style.zIndex) - parseInt(ele1.style.zIndex);
+  });
+  selectedPageItems.value.sort((ele1, ele2) => {
+    return ele1.z - ele2.z;
+  });
   var len = elems.length;
-  console.log('len:' + len);
-  canvas2.width = 1000;
-  canvas2.height = 800;
+  console.log('len', len);
+  var pageAttrs = {
+    w: (currentPage.value as PageItem).w,
+    h: (currentPage.value as PageItem).h,
+    x: (currentPage.value as PageItem).x,
+    y: (currentPage.value as PageItem).y,
+  };
+  outputCanvas.width = pageAttrs.w;
+  outputCanvas.height = pageAttrs.h;
   var index = 0;
-  elems.forEach((elem: any) => {
+  elems.forEach((elem: any, i: number) => {
     var canvas = document.createElement('canvas');
     var context = canvas.getContext('2d');
     if (context != null) {
@@ -602,9 +619,10 @@ function draw() {
     }
     var width = elem.offsetWidth; //获取dom 宽度
     var height = elem.offsetHeight; //获取dom 高度
-
+    var x = selectedPageItems.value[i].x - pageAttrs.x;
+    var y = selectedPageItems.value[i].y - pageAttrs.y;
+    var yOffset = selectedPageItems.value[i].yOffset;
     canvas.width = width;
-    console.log('text' + canvas.width);
     canvas.height = height;
     var opts = {
       scale: 1, // 添加的scale 参数
@@ -612,18 +630,19 @@ function draw() {
       logging: true, //日志开关
       width: width, //dom 原始宽度
       height: height, //dom 原始高度
+      y: yOffset,
       useCORS: true,
       withCredentials: true,
       allowTaint: true,
       backgroundColor: null,
     };
-    html2canvas(elem, opts).then(function (canvas) {
+    html2canvas(elem, opts).then((canvas) => {
       if (ctx2 != null) {
-        ctx2.drawImage(canvas, 0, 0, canvas.width, canvas.height);
+        ctx2.drawImage(canvas, x, y, canvas.width, canvas.height);
         index++;
-        console.log(index);
+        // console.log(index);
         if (index == len) {
-          let imgUrl = canvas2.toDataURL();
+          let imgUrl = outputCanvas.toDataURL();
           let a = document.createElement('a');
           a.href = imgUrl;
           // 利用浏览器下载器下载图片
@@ -633,11 +652,10 @@ function draw() {
       }
     });
   });
-  return Promise.resolve(123);
 }
 
 function saveToImage() {
-  draw();
+  drawCanvas();
   let dom = document.createElement('div');
   // elems.forEach((elem) => {
   //   var node = elem.cloneNode();
@@ -672,8 +690,8 @@ function saveToImage() {
   //   allowTaint: true,
   // };
   // html2canvas(shareContent, opts).then(function (canvas) {
-  //   //如果想要生成图片 引入canvas2Image.js 下载地址：
-  //   //https://github.com/hongru/canvas2image/blob/master/canvas2image.js
+  //   //如果想要生成图片 引入outputCanvasImage.js 下载地址：
+  //   //https://github.com/hongru/outputCanvasimage/blob/master/outputCanvasimage.js
   //   let imgUrl = canvas.toDataURL();
   //   // 动态生成下载图片链接
   //   let a = document.createElement('a');
@@ -1161,11 +1179,11 @@ function deleteItem() {
       currentPage.value = null;
       currentPageTargets.value = [];
       var containedIDs = (selectedItem.value as PageItem).containedIDs;
-      console.log(containedIDs);
+      //console.log(containedIDs);
       var deleteItems = loadElements.value.filter((ele) => {
         return containedIDs.includes(`[data-item-id='${ele.id}']`);
       });
-      console.log(deleteItems);
+      //console.log(deleteItems);
       deleteItems.forEach((ele) => {
         syncManager.sendMessage(OperationType.DELETE_ITEM, { targetID: (ele as DiagramElement).id });
         historyManager.value.execute(new DeleteCommand(loadElements.value, ele));
@@ -1235,7 +1253,7 @@ function selectCurrentTool(tool: EditorTool): void {
 
 /** Handle the clik in the overall canvas */
 function onCanvasClick(e: any): void {
-  console.log('onCanvasClick', e);
+  //console.log('onCanvasClick', e);
 
   // Was just clicking the scrollbar for scrolling?
   if (e.target?.classList?.contains('infinite-viewer-scroll-thumb')) return;
@@ -1243,7 +1261,7 @@ function onCanvasClick(e: any): void {
   // Current tool is 'select' => clicking the canvas unselect all
   if (currentTool.value === EditorTool.SELECT) {
     if (!selectedItem.value?.isPage) {
-      console.log('Unselecting all');
+      //console.log('Unselecting all');
       selectNone();
     }
     // selectNone();
@@ -1312,7 +1330,7 @@ function onPropertyChange(p: ObjectProperty, newValue: any) {
 
 /** Handle zoom changes from the zoom toolbar */
 function onZoomChanged(newZoomFactor: number, scrollViewerToCenter?: boolean) {
-  console.log('onZoomChanged', newZoomFactor, scrollViewerToCenter);
+  //console.log('onZoomChanged', newZoomFactor, scrollViewerToCenter);
   zoomFactor.value = newZoomFactor;
 
   if (scrollViewerToCenter === true) nextTick(() => viewer.value?.scrollCenter());
@@ -1346,7 +1364,7 @@ function focusPage(page: PageItem) {
   const top = page.y - 100;
   viewer.value?.scrollTo(left, top);
   zoomToolbar.value?.zoomReset();
-  console.log('page info', currentPage.value, currentPageTargets.value);
+  // console.log('page info', currentPage.value, currentPageTargets.value);
 }
 
 function selectPage(page: PageItem) {
@@ -1383,7 +1401,7 @@ function setupKeyboardHandlers() {
 
   // Delete / backspace to delete selected item
   onKey(['Backspace', 'Delete'], (e: KeyboardEvent) => {
-    console.log('Pressed delete', e);
+    // console.log('Pressed delete', e);
     if (selectedItem.value) deleteItem();
   });
 
@@ -1399,7 +1417,7 @@ function setupKeyboardHandlers() {
   onKey(['ArrowLeft', 'ArrowRight', 'ArrowDown', 'ArrowUp'], (e: KeyboardEvent) => {
     if (!selectedItem.value) return;
 
-    console.log('Pressed arrow key', e);
+    // console.log('Pressed arrow key', e);
 
     const item = selectedItem.value as Item;
 
@@ -1449,7 +1467,7 @@ function setupKeyboardHandlers() {
 
   onKey(['Escape'], (e: KeyboardEvent) => {
     if (creatingConnection.value === true) {
-      console.log('ESC pressed: cancelling connection creation');
+      // console.log('ESC pressed: cancelling connection creation');
       connectionInfo.startItem = null;
       connectionInfo.endItem = null;
       selectCurrentTool(EditorTool.SELECT);
@@ -1467,7 +1485,7 @@ function deepCloneItem(item: any): any {
 function copyItem() {
   if (!isItem(selectedItem.value)) return;
 
-  console.log('Copying item', selectedItem.value);
+  // console.log('Copying item', selectedItem.value);
 
   itemToPaste.value = selectedItem.value;
 
@@ -1477,14 +1495,14 @@ function copyItem() {
 function cutItem() {
   if (!isItem(selectedItem.value)) return;
 
-  console.log('Cutting item', selectedItem.value);
+  // console.log('Cutting item', selectedItem.value);
   itemToPaste.value = selectedItem.value;
   deleteItem();
 }
 
 function pasteItem() {
   if (!itemToPaste.value) return;
-  console.log('Paste item', selectedItem.value);
+  // console.log('Paste item', selectedItem.value);
 
   const newItem = deepCloneItem(itemToPaste.value) as Item;
 
