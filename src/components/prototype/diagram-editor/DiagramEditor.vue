@@ -1,18 +1,28 @@
 <template>
   <div class="flex h-full">
-    <div v-if="editable" class="min-w-60 h-full bg-[#494949]">
-      <div class="m-2">
-        <n-config-provider :theme="darkTheme" :theme-overrides="prototypeWorkspaceConfig">
+    <n-config-provider :theme="darkTheme" :theme-overrides="prototypeWorkspaceConfig">
+      <div v-if="editable" class="min-w-60 h-full bg-[#494949]">
+        <div>
           <PageBox
             @page-create="handleCreatePage"
             @page-selected="handleSelectPage"
+            :editable="editable"
             :pages="pages"
             :selected-page="currentPage?.id as string"
           />
           <ToolBox @tool-selected="handleToolBoxSelect" @icon-selected="handleIconSelected" />
-        </n-config-provider>
+        </div>
       </div>
-    </div>
+      <div v-else class="min-w-60 h-full bg-[#494949]">
+        <PageBox
+          @page-create="handleCreatePage"
+          @page-selected="handleSelectPage"
+          :editable="editable"
+          :pages="pages"
+          :selected-page="(currentPage as PageItem).id"
+        />
+      </div>
+    </n-config-provider>
     <div class="w-full h-full">
       <div class="editor-container">
         <!-- Rulers -->
@@ -49,23 +59,18 @@
         <VueInfiniteViewer
           ref="viewer"
           class="viewer"
-          :class="{
-            'bg-dark-700': !editable,
-            'bg-[#ededed]': editable,
-            'top-30px': editable,
-            'left-30px': editable,
-            'w-[calc(100%-30px)]': editable,
-            'h-[calc(100%-30px)]': editable,
-            'w-[calc(100%)]': !editable,
-            'h-[calc(100%)]': !editable,
-          }"
-          id="tryText"
           :useMouseDrag="shiftPressed"
           :useWheelScroll="true"
           :zoom="zoomFactor"
           :zoomOffsetX="mouseCoords.x"
           :zoomOffsetY="mouseCoords.y"
-          :style="{ cursor: currentTool == EditorTool.SELECT ? 'auto' : 'crosshair' }"
+          :style="{
+            cursor: currentTool == EditorTool.SELECT ? 'auto' : 'crosshair',
+            top: editable ? '30px' : '0px',
+            left: editable ? '30px' : '0px',
+            width: editable ? 'calc(100% - 30px)' : '100%',
+            height: editable ? 'calc(100% - 30px)' : '100%',
+          }"
           @wheel="onScroll"
           @scroll="onScroll"
           @dragover.stop="onDragOver($event)"
@@ -74,11 +79,10 @@
         >
           <div
             ref="viewport"
-            id="tryText2"
             :class="{ viewport: true, 'viewport-area': viewportSize }"
             :style="{
-              width: viewportSize ? viewportSize[0] + 'px' : '100%',
-              height: viewportSize ? viewportSize[1] + 'px' : '100%',
+              width: '100%',
+              height: '100%',
             }"
           >
             <!-- Render Connections (default component='Connection') -->
@@ -109,7 +113,6 @@
             <div
               v-for="(item, i) in items"
               class="item"
-              id="tryText3"
               :key="item.id"
               :data-item-id="item.id"
               :class="{ target: item.id === selectedItem?.id, locked: item.locked === true }"
@@ -187,6 +190,7 @@
 
             <!-- Manage drag / resize / rotate / rounding of selected item -->
             <Moveable
+              v-if="editable"
               ref="moveable"
               :target="
                 isItem(selectedItem)
@@ -526,6 +530,8 @@ const selectedItem = ref<DiagramElement | null>(null);
 const selectedPageItems = ref<Array<Item>>([]);
 const currentPageTargets = ref<Array<string>>([]);
 
+const viewCss = computed(() => {});
+
 const selectedItemActive = computed(() => {
   if (!selectedItem.value) return false;
 
@@ -607,6 +613,7 @@ function drawCanvas() {
     h: (currentPage.value as PageItem).h,
     x: (currentPage.value as PageItem).x,
     y: (currentPage.value as PageItem).y,
+    pagaName: (currentPage.value as PageItem).pageName,
   };
   outputCanvas.width = pageAttrs.w;
   outputCanvas.height = pageAttrs.h;
@@ -646,7 +653,7 @@ function drawCanvas() {
           let a = document.createElement('a');
           a.href = imgUrl;
           // 利用浏览器下载器下载图片
-          a.setAttribute('download', '需要生成图片.png');
+          a.setAttribute('download', pageAttrs.pagaName);
           a.click();
         }
       }
@@ -656,50 +663,6 @@ function drawCanvas() {
 
 function saveToImage() {
   drawCanvas();
-  let dom = document.createElement('div');
-  // elems.forEach((elem) => {
-  //   var node = elem.cloneNode();
-  //   dom.appendChild(node);
-  // });
-
-  // var canvas = document.getElementsByClassName('viewport-area')[0] as HTMLElement;
-  // var canvas = document.getElementById('tryText') as HTMLElement;
-  // var canvas = dom as HTMLElement;
-  // htmlToImage.toPng(canvas).then((canvas) => {
-  //   FileSaver.saveAs(canvas, 'test.png');
-  // });
-
-  // const shareContent = document.getElementById('tryText2') as HTMLElement; //需要截图的包裹的（原生的）DOM 对象
-
-  // // const shareContent = dom;
-  // var width = shareContent.offsetWidth; //获取dom 宽度
-  // var height = shareContent.offsetHeight; //获取dom 高度
-  // var canvas = document.createElement('canvas'); //创建一个canvas节点
-  // var scale = 1; //定义任意放大倍数 支持小数
-  // canvas.width = width * 1; //定义canvas 宽度 * 缩放
-  // canvas.height = height * 1; //定义canvas高度 *缩放
-  // canvas.getContext('2d').scale(scale, scale); //获取context,设置scale
-  // var opts = {
-  //   scale: 1, // 添加的scale 参数
-  //   canvas: canvas, //自定义 canvas
-  //   logging: true, //日志开关
-  //   width: width, //dom 原始宽度
-  //   height: height, //dom 原始高度
-  //   useCORS: true,
-  //   withCredentials: true,
-  //   allowTaint: true,
-  // };
-  // html2canvas(shareContent, opts).then(function (canvas) {
-  //   //如果想要生成图片 引入outputCanvasImage.js 下载地址：
-  //   //https://github.com/hongru/outputCanvasimage/blob/master/outputCanvasimage.js
-  //   let imgUrl = canvas.toDataURL();
-  //   // 动态生成下载图片链接
-  //   let a = document.createElement('a');
-  //   a.href = imgUrl;
-  //   // 利用浏览器下载器下载图片
-  //   a.setAttribute('download', '需要生成图片.png');
-  //   a.click();
-  // });
 }
 
 function onDragOver(e: any) {
@@ -879,6 +842,9 @@ function handleSync() {
       (element as Item).x = x;
       (element as Item).y = y;
     }
+    if (selectedItem.value != null) {
+      selectNone();
+    }
   });
   syncManager.registerResizeFunc((targetID: string, x: number, y: number, w: number, h: number) => {
     var element = loadElements.value.find((elem) => elem.id == targetID);
@@ -887,6 +853,9 @@ function handleSync() {
       (element as Item).y = y;
       (element as Item).w = w;
       (element as Item).h = h;
+    }
+    if (selectedItem.value != null) {
+      selectNone();
     }
   });
   syncManager.registerAddItemFunc((element: DiagramElement, targetPageID: string) => {
@@ -898,6 +867,9 @@ function handleSync() {
     } else {
       var page = loadElements.value.find((elem) => elem.id == targetPageID) as PageItem;
       historyManager.value.execute(new AddItemCommand(loadElements.value, element as Item, page));
+    }
+    if (selectedItem.value != null) {
+      selectNone();
     }
   });
   syncManager.registerDeleteItemFunc((targetID: string) => {
@@ -917,12 +889,18 @@ function handleSync() {
     } else {
       historyManager.value.execute(new DeleteCommand(loadElements.value, element as Item));
     }
+    if (selectedItem.value != null) {
+      selectNone();
+    }
   });
   syncManager.registerModifyFunc((element: DiagramElement) => {
     selectedItem.value = element;
     var trueElementIndex = loadElements.value.findIndex((elem) => elem.id == element.id);
     loadElements.value.splice(trueElementIndex, 1, element);
     nextTick(() => moveable.value?.updateRect());
+    if (selectedItem.value != null) {
+      selectNone();
+    }
   });
 }
 
@@ -1094,12 +1072,11 @@ function loadProto() {
   var protoID = parseInt(route.params.protoID as string);
   readFile({ fileID: protoID, teamID: null })
     .then((res) => {
-      if (res.data.data != null) {
+      console.log(res.data.data);
+      try {
         loadElements.value = JSON.parse(res.data.data) as DiagramElement[];
-      } else {
-        loadElements.value = [
-          // createPageItem()
-        ];
+      } catch (e) {
+        addPage('首页', '1080x720');
       }
     })
     .finally(() => {
@@ -1142,8 +1119,6 @@ function handleCreatePage(newPageName: string, pageResolution: string) {
 }
 
 function addPage(newPageName: string, pageResolution: string): void {
-  // TODO: page ID and save proto
-  saveProto();
   // Clicking the canvas with other tools => create a new item of related type
   const toolDef = getToolDefinition(EditorTool.PAGE);
   const properties = getItemBlueprint(toolDef.itemType!)[0];
@@ -1168,6 +1143,7 @@ function addPage(newPageName: string, pageResolution: string): void {
   currentPage.value = newItem;
   pages.value.push(currentPage.value as PageItem);
   emit('add-item', newItem);
+  saveProto();
 }
 
 /** Delete current selected item / connection */
@@ -1337,11 +1313,9 @@ function onZoomChanged(newZoomFactor: number, scrollViewerToCenter?: boolean) {
 }
 
 function onModeChanged() {
-  if (editable.value == false) {
-    router.go(0);
-    window.location.reload();
-  }
   editable.value = !editable.value;
+  focusPage(currentPage.value as PageItem);
+  selectNone();
 }
 
 /** Handle scroll to page */
@@ -1579,12 +1553,6 @@ function inlineEdit(item: Item) {
 .viewer {
   box-sizing: border-box;
   position: absolute;
-  /* top: 30px;
-  left: 30px;
-  width: calc(100% - 30px);
-  height: calc(100% - 30px);
-  background-color: rgb(237, 237, 237); 
-  */
   user-select: none;
   background-image: linear-gradient(90deg, rgba(140, 140, 140, 0.15) 10%, rgba(0, 0, 0, 0) 10%),
     linear-gradient(rgba(140, 140, 140, 0.15) 10%, rgba(0, 0, 0, 0) 10%);
