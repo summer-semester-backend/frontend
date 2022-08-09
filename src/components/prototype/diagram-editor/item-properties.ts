@@ -93,6 +93,55 @@ export const opacity$: ObjectProperty = {
   editorOptions: { min: 0, max: 100, step: 1 },
 };
 
+export const clipType$: ObjectProperty = {
+  name: 'clipType',
+  label: '剪裁',
+  type: PropertyType.ICON_LIST,
+  editorFullsize: true,
+  editorOptions: {
+    items: [
+      { name: ClipType.NONE, icon: 'image' },
+      { name: ClipType.RECT, icon: 'rectangle' },
+      { name: ClipType.POLYGON, icon: 'timeline' },
+      { name: ClipType.ELLIPSE, icon: 'circle' },
+    ],
+  },
+};
+export const fit$: ObjectProperty = {
+  name: 'fit',
+  label: '适应',
+  type: PropertyType.ICON_LIST,
+  editorFullsize: true,
+  editorOptions: {
+    items: [
+      { name: 'none', text: 'None' },
+      { name: 'contain', text: 'Contain' },
+      { name: 'cover', text: 'Cover' },
+      { name: 'fill', text: 'Fill' },
+    ],
+  },
+};
+export const flip$: ObjectProperty = {
+  name: 'flip',
+  label: '翻转',
+  type: PropertyType.ICON_LIST,
+  editorFullsize: true,
+  editorOptions: {
+    items: [
+      { name: 'none', text: 'None' },
+      { name: 'horizontal', text: 'Horizontal' },
+      { name: 'vertical', text: 'Vertical' },
+      { name: 'both', text: 'Both' },
+    ],
+  },
+};
+
+export const locationSection$ = {
+  name: 'rect',
+  title: '矩形操作',
+  properties: [clipType$, fit$, flip$],
+};
+
 export const borderSection$ = {
   // Border
   name: 'border',
@@ -222,6 +271,7 @@ export const shapeModel: ObjectInspectorModel = {
             shadow$,
           ],
         },
+        locationSection$,
         borderSection$,
         {
           // Position & size
@@ -258,6 +308,7 @@ export const shapeWithoutRadiusModel: ObjectInspectorModel = {
             shadow$,
           ],
         },
+        locationSection$,
         borderWithoutRadiusSection$,
         {
           // Position & size
