@@ -68,7 +68,12 @@ export function createTeamModule(data: { fileName: string | null; fileID: number
   return backend.post('/file/createTemplate', data);
 }
 
-export function copyFile(data: { fatherID: number | null; fileID: number | null; teamID: number | null；newName: string }) {
+export function copyFile(data: {
+  fatherID: number | null;
+  fileID: number | null;
+  teamID: number | null;
+  newName: string;
+}) {
   return backend.post('/file/copy', data);
 }
 
