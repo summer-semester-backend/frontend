@@ -140,6 +140,32 @@ const columns = ref([
           h(
             NButton,
             {
+              type: 'error',
+              size: 'small',
+              strong: true,
+              secondary: true,
+              onClick(e) {
+                window.$dialog.warning({
+                  title: '警告',
+                  content: '你确定要删除这个文件吗？',
+                  positiveText: '确定',
+                  negativeText: '取消',
+                  onPositiveClick: () => {
+                    row.isLoaded = false;
+                    handleDelete(row.fileID);
+                  },
+                  onNegativeClick: () => {},
+                });
+              },
+            },
+            {
+              default: '删除',
+              icon: h(NIcon, { component: Trash }),
+            }
+          ),
+          h(
+            NButton,
+            {
               type: 'warning',
               size: 'small',
               strong: true,
@@ -153,6 +179,25 @@ const columns = ref([
               icon: h(NIcon, { component: Create }),
             }
           ),
+          h(
+            NButton,
+            {
+              type: 'info',
+              size: 'small',
+              strong: true,
+              secondary: true,
+              onClick(e) {
+                handleCopy(row);
+              },
+            },
+            {
+              default: '复制',
+              icon: h(NIcon, { component: Copy }),
+            }
+          ),
+        ]);
+      } else if (row.fileType == 2) {
+        return h(NSpace, [
           h(
             NButton,
             {
@@ -182,6 +227,22 @@ const columns = ref([
           h(
             NButton,
             {
+              type: 'warning',
+              size: 'small',
+              strong: true,
+              secondary: true,
+              onClick(e) {
+                handleEdit(row);
+              },
+            },
+            {
+              default: '修改',
+              icon: h(NIcon, { component: Create }),
+            }
+          ),
+          h(
+            NButton,
+            {
               type: 'info',
               size: 'small',
               strong: true,
@@ -195,9 +256,6 @@ const columns = ref([
               icon: h(NIcon, { component: Copy }),
             }
           ),
-        ]);
-      } else if (row.fileType == 2) {
-        return h(NSpace, [
           h(
             NDropdown,
             {
@@ -222,64 +280,6 @@ const columns = ref([
                 icon: h(NIcon, { component: Add }),
               }
             )
-          ),
-          h(
-            NButton,
-            {
-              type: 'warning',
-              size: 'small',
-              strong: true,
-              secondary: true,
-              onClick(e) {
-                handleEdit(row);
-              },
-            },
-            {
-              default: '修改',
-              icon: h(NIcon, { component: Create }),
-            }
-          ),
-          h(
-            NButton,
-            {
-              type: 'error',
-              size: 'small',
-              strong: true,
-              secondary: true,
-              onClick(e) {
-                window.$dialog.warning({
-                  title: '警告',
-                  content: '你确定要删除这个文件吗？',
-                  positiveText: '确定',
-                  negativeText: '取消',
-                  onPositiveClick: () => {
-                    row.isLoaded = false;
-                    handleDelete(row.fileID);
-                  },
-                  onNegativeClick: () => {},
-                });
-              },
-            },
-            {
-              default: '删除',
-              icon: h(NIcon, { component: Trash }),
-            }
-          ),
-          h(
-            NButton,
-            {
-              type: 'info',
-              size: 'small',
-              strong: true,
-              secondary: true,
-              onClick(e) {
-                handleCopy(row);
-              },
-            },
-            {
-              default: '复制',
-              icon: h(NIcon, { component: Copy }),
-            }
           ),
         ]);
       } else if (row.fileType == 1) {

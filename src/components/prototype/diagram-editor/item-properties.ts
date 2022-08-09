@@ -306,6 +306,20 @@ export const shapeWithoutRadiusModel: ObjectInspectorModel = {
             opacity$,
             locked$,
             shadow$,
+            {
+              name: 'clipType',
+              label: '剪裁',
+              type: PropertyType.ICON_LIST,
+              editorFullsize: true,
+              editorOptions: {
+                items: [
+                  { name: ClipType.NONE, icon: 'image' },
+                  { name: ClipType.RECT, icon: 'rectangle' },
+                  { name: ClipType.POLYGON, icon: 'timeline' },
+                  { name: ClipType.ELLIPSE, icon: 'circle' },
+                ],
+              },
+            },
           ],
         },
         locationSection$,
