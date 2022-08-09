@@ -15,6 +15,7 @@ declare module 'vue' {
     DiagramEditor: typeof import('./src/components/prototype/diagram-editor/DiagramEditor.vue')['default']
     Doc: typeof import('./src/components/workspace/Doc.vue')['default']
     Documents: typeof import('./src/components/document/Documents.vue')['default']
+    DocumentTree: typeof import('./src/components/document/DocumentTree.vue')['default']
     EditModal: typeof import('./src/components/project/EditModal.vue')['default']
     EditorIcon: typeof import('./src/components/prototype/diagram-editor/components/EditorIcon.vue')['default']
     Ellipse: typeof import('./src/components/prototype/diagram-editor/blocks/Ellipse.vue')['default']

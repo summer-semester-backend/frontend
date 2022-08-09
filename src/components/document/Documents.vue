@@ -31,6 +31,14 @@
     @close="handleClose"
     @refresh="reload"
   ></ModuleModal>
+
+  <CopyModal
+    :file-i-d="oriFileID"
+    :file-name="oriFileName"
+    :is-copy-modal-show="isCopyModalShow"
+    @close="handleClose"
+    @refresh="reload"
+  ></CopyModal>
 </template>
 
 <script setup lang="ts">
@@ -66,7 +74,10 @@ interface File {
 var route = useRoute();
 const newFileName = ref('');
 const isModuleModalShow = ref(false);
+const isCopyModalShow = ref(false);
 const newFileAncestor = ref<number | null>(-1);
+const oriFileID = ref<number>();
+const oriFileName = ref<string>();
 const teamID = ref<number | null>(null);
 const fileID = ref<number | null>(null);
 const { type } = withDefaults(defineProps<{ type: string }>(), { type: 'proj' });
@@ -534,20 +545,15 @@ const handleOpen = (row: any) => {
 };
 //复制文件
 const handleCopy = (row: any) => {
-  copyFile({ fatherID: fileID.value, fileID: row.fileID, teamID: teamID.value, newName: row.fileName }).then(
-    (res: any) => {
-      if (res.data.result <= 1) {
-        window.$message.success('复制成功');
-        files.value = [];
-        getFileList(fileID.value, teamID.value);
-      }
-    }
-  );
+  oriFileID.value = row.fileID;
+  oriFileName.value = row.fileName;
+  isCopyModalShow.value = true;
 };
 
 //关闭模态框
 const handleClose = () => {
   isModuleModalShow.value = false;
+  isCopyModalShow.value = false;
 };
 
 //异步加载文件

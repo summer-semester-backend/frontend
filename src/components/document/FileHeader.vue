@@ -31,18 +31,7 @@ const oriFileID = computed(() => {
 });
 
 const handleBack = () => {
-  /*switch (fileInfo.value.fileType) {
-    case 12:
-      router.push('/workspace/' + fileInfo.value.fatherID + '/uml');
-      break;
-    case 13:
-      router.push('/workspace/' + fileInfo.value.fatherID + '/prototype');
-      break;
-    case 14:
-      router.push('/workspace/' + fileInfo.value.fatherID + '/doc');
-      break;
-  }*/
-  router.go(-1);
+  router.back();
 };
 
 defineExpose({

@@ -5,7 +5,7 @@
       <n-grid>
         <n-gi :span="22"> </n-gi>
         <n-gi>
-          <n-button type="info" @click="handleCreate">使用模板</n-button>
+          <n-button type="success" @click="handleCreate">使用模板</n-button>
         </n-gi>
       </n-grid>
     </template>
