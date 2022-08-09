@@ -8,7 +8,7 @@
             @page-selected="handleSelectPage"
             :editable="editable"
             :pages="pages"
-            :selected-page="currentPage?.id as string"
+            :selected-page="currentPageID"
           />
           <ToolBox @tool-selected="handleToolBoxSelect" @icon-selected="handleIconSelected" />
         </div>
@@ -19,7 +19,7 @@
           @page-selected="handleSelectPage"
           :editable="editable"
           :pages="pages"
-          :selected-page="(currentPage as PageItem).id"
+          :selected-page="currentPageID"
         />
       </div>
     </n-config-provider>
@@ -275,6 +275,7 @@
           <ZoomToolbar
             ref="zoomToolbar"
             :editable="editable"
+            :show-mode-change="showModeChange"
             :zoomManager="zoomManager"
             @zoomChanged="onZoomChanged"
             @mode-changed="onModeChanged"
@@ -504,6 +505,7 @@ onBeforeMount(() => {
 setupKeyboardHandlers();
 
 const editable = ref(true);
+const showModeChange = ref(true);
 // The component state
 // ------------------------------------------------------------------------------------------------------------------------
 const zoomManager = ref<IZoomManager>(new DefaultZoomManager());
@@ -530,8 +532,6 @@ const selectedItem = ref<DiagramElement | null>(null);
 const selectedPageItems = ref<Array<Item>>([]);
 const currentPageTargets = ref<Array<string>>([]);
 
-const viewCss = computed(() => {});
-
 const selectedItemActive = computed(() => {
   if (!selectedItem.value) return false;
 
@@ -556,6 +556,13 @@ const items = computed(() => {
 const connections = computed(() => loadElements.value.filter((e) => isConnection(e)) as ItemConnection[]);
 const pages = ref<Array<PageItem>>([]);
 const currentPage = ref<PageItem | null>(null);
+const currentPageID = computed(() => {
+  if (currentPage.value == null) {
+    return '';
+  } else {
+    return currentPage.value.id;
+  }
+});
 
 const itemToPaste = ref(null as Item | null);
 const inlineEditing = ref(false);
@@ -1070,46 +1077,63 @@ function saveProto(): void {
 
 function loadProto() {
   var protoID = parseInt(route.params.protoID as string);
-  readFile({ fileID: protoID, teamID: null })
-    .then((res) => {
-      console.log(res.data.data);
-      try {
-        loadElements.value = JSON.parse(res.data.data) as DiagramElement[];
-      } catch (e) {
-        addPage('首页', '1080x720');
-      }
+  var shareCode = route.query.shareCode;
+  console.log('shareCode', shareCode);
+  if (shareCode === undefined) {
+    readFile({ fileID: protoID, teamID: null })
+      .then((res) => {
+        try {
+          loadElements.value = JSON.parse(res.data.data) as DiagramElement[];
+        } catch (e) {
+          addPage('首页', '1080x720');
+        }
+      })
+      .finally(protoFunctionInit);
+  } else {
+    editable.value = false;
+    showModeChange.value = false;
+    readFile({ fileID: protoID, teamID: null, shareCode: shareCode as string })
+      .then((res) => {
+        try {
+          loadElements.value = JSON.parse(res.data.data) as DiagramElement[];
+        } catch (e) {
+          addPage('首页', '1080x720');
+        }
+      })
+      .finally(protoFunctionInit);
+  }
+}
+
+function protoFunctionInit() {
+  pages.value = loadElements.value.filter((ele) => ele.isPage == true) as PageItem[];
+  selectPage(pages.value[0]);
+  originGroup = new Array<Frame>(loadElements.value.length)
+    .fill({
+      x: 0,
+      y: 0,
+      w: 0,
+      h: 0,
+      z: 0,
+      r: 0,
+      borderRadius: 0,
+      opacity: 1,
+      clipType: ClipType.NONE,
+      clipStyle: '',
     })
-    .finally(() => {
-      pages.value = loadElements.value.filter((ele) => ele.isPage == true) as PageItem[];
-      selectPage(pages.value[0]);
-      originGroup = new Array<Frame>(loadElements.value.length)
-        .fill({
-          x: 0,
-          y: 0,
-          w: 0,
-          h: 0,
-          z: 0,
-          r: 0,
-          borderRadius: 0,
-          opacity: 1,
-          clipType: ClipType.NONE,
-          clipStyle: '',
-        })
-        .map((item: Frame) => ({
-          x: 0,
-          y: 0,
-          w: 0,
-          h: 0,
-          z: 0,
-          r: 0,
-          borderRadius: 0,
-          opacity: 1,
-          clipType: ClipType.NONE,
-          clipStyle: '',
-        }));
-      createSyncManager(wsurl, loadElements.value);
-      handleSync();
-    });
+    .map((item: Frame) => ({
+      x: 0,
+      y: 0,
+      w: 0,
+      h: 0,
+      z: 0,
+      r: 0,
+      borderRadius: 0,
+      opacity: 1,
+      clipType: ClipType.NONE,
+      clipStyle: '',
+    }));
+  createSyncManager(wsurl, loadElements.value);
+  handleSync();
 }
 
 function handleCreatePage(newPageName: string, pageResolution: string) {
