@@ -13,7 +13,7 @@ import Engine from '@aomao/engine';
 import type { EngineInterface } from '@aomao/engine';
 import AmToolbar from '@aomao/toolbar-vue';
 import type { GroupItemProps } from '@aomao/toolbar-vue';
-import { onMounted, ref, onUnmounted } from 'vue';
+import { onMounted, ref, onUnmounted, watch } from 'vue';
 import { OTClient } from './ot';
 import { cards, plugins, pluginConfig } from './config';
 import { onBeforeRouteLeave, useRoute } from 'vue-router';
@@ -36,7 +36,7 @@ const toolbarItems = ref<GroupItemProps[]>([
   ['link', 'quote', 'hr'],
 ]);
 const fileID = ref<string | null>(null);
-const route = useRoute();
+var route = useRoute();
 const isView = ref<boolean>(false);
 const currentMember = ref({
   nickname: '',
@@ -182,7 +182,9 @@ defineExpose({
   saveModule,
 });
 
-onMounted(() => {
+const reload = () => {
+  engine.value?.destroy();
+  engine.value = null;
   let useid = localStorage.getItem('userID') || '';
   getUserInfo({ userID: useid })
     .then((res) => {
@@ -205,6 +207,14 @@ onMounted(() => {
           initEditor();
         });
     });
+};
+
+watch(route, () => {
+  reload();
+});
+
+onMounted(() => {
+  reload();
   window.addEventListener('beforeunload', saveBeforeLeave);
 });
 onUnmounted(() => {

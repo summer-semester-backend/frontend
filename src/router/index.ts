@@ -7,23 +7,6 @@ const routes: RouteRecordRaw[] = [
     redirect: 'login',
   },
   {
-    path: '/project',
-    name: 'project',
-    component: () => import('../views/project/ProjectOverview.vue'),
-    children: [
-      {
-        path: 'desktop',
-        name: 'ProjectDesktop',
-        component: () => import('../views/project/ProjectDesktop.vue'),
-      },
-      {
-        path: 'trash',
-        name: 'ProjectTrash',
-        component: () => import('../views/project/ProjectTrash.vue'),
-      },
-    ],
-  },
-  {
     path: '/prototype/:protoID',
     name: 'Prototype',
     component: () => import('../views/prototype/ProtoWorkSpace.vue'),
@@ -63,6 +46,11 @@ const routes: RouteRecordRaw[] = [
             name: 'directory',
             component: () => import('../views/team/DocumentCenter.vue'),
           },
+          {
+            path: 'trash/',
+            name: 'teamTrash',
+            component: () => import('../views/project/ProjectTrash.vue'),
+          },
         ],
       },
     ],
@@ -86,6 +74,11 @@ const routes: RouteRecordRaw[] = [
         path: '',
         name: 'UserDefault',
         redirect: '/user/personInfo',
+      },
+      {
+        path: 'desktop',
+        name: 'ProjectDesktop',
+        component: () => import('../views/project/ProjectDesktop.vue'),
       },
     ],
   },

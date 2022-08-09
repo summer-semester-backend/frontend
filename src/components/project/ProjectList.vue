@@ -40,7 +40,10 @@
                           <n-button circle type="error" size="small" @click.stop="handleDelete(item.fileID)">
                             <n-icon size="20"><trash-outline /></n-icon
                           ></n-button>
-                          <n-button circle type="info" size="small" @click.stop="handleEdit(item)">
+                          <n-button circle type="warning" size="small" @click.stop="handleEdit(item)">
+                            <n-icon size="20"><create-outline /></n-icon
+                          ></n-button>
+                          <n-button circle type="info" size="small" @click.stop="">
                             <n-icon size="20"><create-outline /></n-icon
                           ></n-button>
                         </n-space>
@@ -258,6 +261,7 @@ const handleDelete = (fileID: number) => {
   });
 };
 
+//编辑项目
 const handleEdit = (item: any) => {
   newFile.value = item;
   isEditModalShow.value = true;

@@ -9,19 +9,25 @@
       </n-space>
     </template>
   </file-header>
-  <AmEditor ref="AmEditorRef"></AmEditor>
+  <n-layout has-sider>
+    <n-layout-sider bordered>
+      <DocumentTree :father-i-d="fileHeaderRef?.fileInfo.fatherID"></DocumentTree>
+    </n-layout-sider>
+    <n-layout>
+      <AmEditor ref="AmEditorRef"></AmEditor>
+    </n-layout>
+  </n-layout>
 </template>
 <script setup lang="ts">
 import { onBeforeRouteUpdate, useRoute } from 'vue-router';
 import AmEditor from '@/components/editor/AmEditor.vue';
 import FileHeader from '@/components/document/FileHeader.vue';
-import { onMounted, ref, h } from '@vue/runtime-core';
+import { onMounted, ref, h, watch } from '@vue/runtime-core';
 import { Component } from 'vue';
 import { NDivider, NIcon, NInput } from 'naive-ui';
 import { FilePdfOutlined, FileWordOutlined, FileMarkdownOutlined, Html5Outlined, SaveOutlined } from '@vicons/antd';
-import { watch } from 'fs';
 import router from '@/router';
-const route = useRoute();
+var route = useRoute();
 const fileID = ref<number | null>(null);
 const AmEditorRef = ref<InstanceType<typeof AmEditor> | null>(null);
 const fileHeaderRef = ref<InstanceType<typeof FileHeader> | null>(null);
@@ -55,6 +61,7 @@ const options = ref([
     icon: renderIcon(Html5Outlined),
   },
 ]);
+//选择导出类型
 const handleSelect = (key: string | number) => {
   switch (key) {
     case 'pdf':
@@ -71,6 +78,7 @@ const handleSelect = (key: string | number) => {
       break;
   }
 };
+//保存为模板
 const handleSave = () => {
   window.$dialog.info({
     title: '保存模板',
@@ -101,11 +109,11 @@ const handleSave = () => {
     onNegativeClick: () => {},
   });
 };
+
+watch(route, () => {
+  if (route.params.id) fileID.value = parseInt(route.params.id.toString());
+});
 onMounted(() => {
   fileID.value = parseInt(route.params.id.toString());
-});
-
-onBeforeRouteUpdate((to, from) => {
-  router.go(0);
 });
 </script>

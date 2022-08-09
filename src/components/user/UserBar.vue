@@ -46,7 +46,7 @@ import { MenuOpenRound } from '@vicons/material';
 import { useRouter, RouterLink } from 'vue-router';
 
 import { NIcon } from 'naive-ui';
-import { AppstoreAddOutlined, KeyOutlined } from '@vicons/antd';
+import { AppstoreAddOutlined, KeyOutlined, UserOutlined } from '@vicons/antd';
 
 function renderIcon(icon) {
   return () => h(NIcon, null, { default: () => h(icon) });
@@ -63,13 +63,27 @@ const menuOptions = [
         RouterLink,
         {
           to: {
+            name: 'ProjectDesktop',
+          },
+        },
+        { default: () => '我的项目' }
+      ),
+    key: 'ProjectDesktop',
+    icon: renderIcon(AppstoreAddOutlined),
+  },
+  {
+    label: () =>
+      h(
+        RouterLink,
+        {
+          to: {
             name: 'PersonInfo',
           },
         },
         { default: () => '基本信息' }
       ),
     key: 'PersonInfo',
-    icon: renderIcon(AppstoreAddOutlined),
+    icon: renderIcon(UserOutlined),
   },
   {
     label: () =>
