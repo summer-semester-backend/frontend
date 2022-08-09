@@ -20,7 +20,7 @@
 </template>
 
 <script setup lang="ts">
-import { getUserInfo } from '@/api/user';
+import { getUserAvatar, getUserInfo } from '@/api/user';
 import { computed, onBeforeMount, onBeforeUnmount, onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import { syncManager } from './SyncManager';
@@ -49,12 +49,13 @@ onBeforeMount(() => {
 onMounted(() => {
   var userIDString = localStorage.getItem('userID');
   var user: number;
-  if (userIDString === undefined) {
+  if (userIDString) {
+    user = parseInt(userIDString as string);
+  } else {
     user = -1;
     options.value.length = 0;
-  } else {
-    user = parseInt(userIDString as string);
   }
+  console.log('proto userID', user);
   var file = parseInt(route.params.protoID as string);
   console.log('use syncManager');
   syncManager.registerOpen(user, file);
@@ -62,10 +63,10 @@ onMounted(() => {
   syncManager.registerRegisterFunc((userID: number, fileID: number) => {
     if (userID != -1) {
       window.$message.info('加入新用户!');
-      getUserInfo({ userID: userID.toString() }).then((res) => {
+      getUserAvatar({ userID: userID }).then((res) => {
         if (res.data.result == 0) {
-          userMap.set(userID, res.data.data.username);
-          options.value.push({ name: res.data.data.username, src: res.data.data.avatar });
+          userMap.set(userID, res.data.username);
+          options.value.push({ name: res.data.username, src: res.data.avatar });
         }
       });
     }

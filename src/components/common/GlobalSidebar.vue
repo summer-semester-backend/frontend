@@ -20,15 +20,17 @@
   </n-layout-sider>
 </template>
 
-<script setup lang="tsx">
-import { onMounted, ref } from 'vue';
+<script setup lang="ts">
 import { People, PersonCircleOutline } from '@vicons/ionicons5';
 import { ProjectOutlined } from '@vicons/antd';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '@/store/auth';
-import { getUserInfo } from '@/api/user';
+import { computed } from 'vue';
 
-const avatar = ref('');
+const avatar = computed(() => {
+  const img = localStorage.getItem('avatar') as string;
+  return img;
+});
 const router = useRouter();
 const { signOut } = useAuthStore();
 
@@ -36,13 +38,4 @@ const handleLogout = () => {
   router.push({ name: 'login' });
   signOut();
 };
-
-onMounted(() => {
-  getUserInfo({ userID: localStorage.getItem('userID') as string }).then((res) => {
-    if (res.data.result == 0) {
-      avatar.value = res.data.data.avatar;
-      localStorage.setItem('avatar', res.data.data.avatar);
-    }
-  });
-});
 </script>

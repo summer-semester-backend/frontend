@@ -1,5 +1,5 @@
 <template>
-  <div class="radio">
+  <div class="radio" @click.stop="handleLinkClick">
     <n-radio class="radio-center" :checked="item.checked" name="basic-demo" :disabled="item.disabled">
       {{ item.value }}
     </n-radio>
@@ -9,7 +9,15 @@
 import { RadioItem } from '../types';
 
 const { item } = defineProps<{ item: RadioItem }>();
-
+interface LinkClickEvents {
+  (e: 'link-to-click', itemID: string): void;
+}
+const emits = defineEmits<LinkClickEvents>();
+const handleLinkClick = () => {
+  if (item.connection != undefined) {
+    emits('link-to-click', item.connection.to.item);
+  }
+};
 // const handleChange = () => {
 //   if (item.checked === true) {
 //     item.checked = false;

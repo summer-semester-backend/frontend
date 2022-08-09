@@ -1,6 +1,6 @@
 <template>
   <n-layout has-sider position="absolute">
-    <global-sidebar v-if="!isLoginPage && !isProtoPage && !isNoFoundPage" />
+    <global-sidebar v-if="!notShow" :should-load="!notShow" />
     <global-content />
   </n-layout>
 </template>
@@ -12,14 +12,8 @@ import { useAuthStore } from '@/store/auth';
 const { signOut } = useAuthStore();
 const route = useRoute();
 const router = useRouter();
-const isLoginPage = computed(() => {
-  return route.name == 'login';
-});
-const isProtoPage = computed(() => {
-  return route.name == 'Prototype';
-});
-const isNoFoundPage = computed(() => {
-  return route.name == 'NoFound';
+const notShow = computed(() => {
+  return route.name == 'login' || route.name == 'Prototype' || route.name == 'NoFound';
 });
 backend.interceptors.response.use(
   (response) => {

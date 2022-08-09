@@ -13,6 +13,7 @@
       filter: cssFilter,
       transform: cssTransform,
     }"
+    @click.stop="handleLinkClick"
   />
 </template>
 
@@ -64,4 +65,13 @@ const cssTransform = computed(() => {
 
   return '';
 });
+interface LinkClickEvents {
+  (e: 'link-to-click', itemID: string): void;
+}
+const emits = defineEmits<LinkClickEvents>();
+const handleLinkClick = () => {
+  if (props.item.connection != undefined) {
+    emits('link-to-click', props.item.connection.to.item);
+  }
+};
 </script>

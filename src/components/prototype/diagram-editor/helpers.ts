@@ -159,9 +159,9 @@ export function createConnection(fromID: string, toID: string, c?: DeepPartial<I
       marker: c?.to?.marker || ConnectionMarker.NONE,
     },
 
-    type: c?.type || ConnectionType.LINE,
-    style: c?.style || ConnectionStyle.SOLID,
-    thick: c?.thick || 1,
+    type: c?.type || ConnectionType.CURVE,
+    style: c?.style || ConnectionStyle.DASHED,
+    thick: c?.thick || 3,
 
     backgroundColor: c?.backgroundColor || '#18181c',
   } as ItemConnection;
