@@ -2,6 +2,7 @@
   <div
     class="shape"
     :style="{
+      cursor: 'crosshair',
       backgroundColor: item.backgroundColor,
       color: item.textColor,
       borderRadius: item.borderRadius + 'px',

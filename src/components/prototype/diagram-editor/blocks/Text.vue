@@ -9,6 +9,7 @@
       borderRadius: item.borderRadius + 'px',
       border: item.border.width + 'px ' + item.border.style + ' ' + item.border.color,
       fontSize: item.fontSize + 'px',
+      fontWeight: item.fontWeight,
       opacity: item.opacity / 100,
       textShadow: item.shadow ? '3px 3px 5px #aaa' : 'none',
     }"

@@ -21,6 +21,14 @@ export const fontSize$: ObjectProperty = {
   editorOptions: { min: 4, max: 120, step: 1 },
 };
 
+export const fontWeight$: ObjectProperty = {
+  name: 'fontWeight',
+  label: '加粗',
+  type: PropertyType.RANGE,
+  editorFullsize: true,
+  editorOptions: { min: 100, max: 900, step: 1 },
+};
+
 export const textHAlign$: ObjectProperty = {
   name: 'textHAlign',
   label: '纵向对齐',
@@ -203,6 +211,7 @@ export const shapeModel: ObjectInspectorModel = {
           properties: [
             title$,
             fontSize$,
+            fontWeight$,
             textHAlign$,
             textVAlign$,
             separator$,
@@ -238,6 +247,7 @@ export const shapeWithoutRadiusModel: ObjectInspectorModel = {
           properties: [
             title$,
             fontSize$,
+            fontWeight$,
             textHAlign$,
             textVAlign$,
             separator$,
@@ -409,6 +419,7 @@ export const textModel: ObjectInspectorModel = {
           properties: [
             title$,
             fontSize$,
+            fontWeight$,
             textHAlign$,
             textVAlign$,
             separator$,
@@ -708,6 +719,7 @@ export const pageModel: ObjectInspectorModel = {
           title: '文本与样式',
           properties: [
             fontSize$,
+            fontWeight$,
             textHAlign$,
             textVAlign$,
             separator$,

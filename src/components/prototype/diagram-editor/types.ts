@@ -22,6 +22,7 @@ export interface Frame extends Rect {
 
 export interface DiagramElement {
   id: string; // The unique element ID
+  fatherID?: string;
   title: string; // The element title / label
   z: number; // The element z-index
   isPage: boolean; // whether used as page
@@ -31,6 +32,7 @@ export interface DiagramElement {
   textColor: string; // The element text color (text inside the element, etc.)
   opacity: number; // Opacity (0=full transparent, 100=full opaque). Default = 100
 
+  fontWeight: number; // text font weight
   fontSize: number; // The element text font size
   shadow: boolean; // Show/hide element shadow
 

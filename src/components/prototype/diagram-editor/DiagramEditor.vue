@@ -1093,6 +1093,8 @@ function loadProto() {
       })
       .finally(protoFunctionInit);
   }
+  // var protoData = localStorage.getItem('proto') as string;
+  // loadElements.value = JSON.parse(protoData) as DiagramElement[];
 }
 
 function protoFunctionInit() {
