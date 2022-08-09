@@ -138,7 +138,7 @@ onMounted(() => {
   if (route.params.teamID) {
     type.value = 'team';
     getFileList(-1, parseFloat(route.params.teamID.toString()), treeData.value);
-  } else {
+  } else if (route.params.projID) {
     type.value = 'proj';
     getFileList(parseFloat(route.params.projID.toString()), -1, treeData.value);
   }

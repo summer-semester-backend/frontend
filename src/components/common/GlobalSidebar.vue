@@ -3,14 +3,11 @@
     <n-layout-header class="mt-2" position="absolute">
       <n-space vertical>
         <n-avatar round class="flex m-auto"></n-avatar>
-        <sidebar-button button-name="项目" route-name="ProjectDesktop" root-route="project">
-          <project-outlined />
+        <sidebar-button button-name="个人" route-name="ProjectDesktop" root-route="user">
+          <person-circle-outline />
         </sidebar-button>
         <sidebar-button button-name="团队" route-name="team" root-route="team">
           <people />
-        </sidebar-button>
-        <sidebar-button button-name="个人" route-name="PersonInfo" root-route="user">
-          <person-circle-outline />
         </sidebar-button>
       </n-space>
     </n-layout-header>

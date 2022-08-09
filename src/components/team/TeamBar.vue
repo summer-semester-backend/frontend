@@ -61,7 +61,7 @@ import { MenuOpenRound, AddCircleOutlineFilled } from '@vicons/material';
 import { useRouter, RouterLink, useRoute } from 'vue-router';
 import { getTeamList } from '@/api/team';
 import { NIcon } from 'naive-ui';
-import { AppstoreAddOutlined, SettingOutlined, ProfileOutlined } from '@vicons/antd';
+import { AppstoreAddOutlined, SettingOutlined, ProfileOutlined, DeleteOutlined } from '@vicons/antd';
 
 function renderIcon(icon) {
   return () => h(NIcon, null, { default: () => h(icon) });
@@ -96,6 +96,11 @@ const menuOptions = [
     label: '团队设置',
     key: 'teamDetail',
     icon: renderIcon(SettingOutlined),
+  },
+  {
+    label: '回收站',
+    key: 'teamTrash',
+    icon: renderIcon(DeleteOutlined),
   },
 ];
 
@@ -132,6 +137,8 @@ const handleSelectUpdate = (value) => {
     window.open('/team/' + value + '/', '_self');
   } else if (route.name == 'documentCenter') {
     window.open('/team/' + value + '/doc', '_self');
+  } else if (route.name == 'teamTrash') {
+    window.open('/team/' + value + '/trash', '_self');
   }
 };
 const jumpTo = () => {};
@@ -142,6 +149,8 @@ const handleMenuUpdate = (value) => {
     router.push({ name: 'teamDetail', params: { teamID: curTeamID.value } });
   } else if (value == 'documentCenter') {
     router.push({ name: 'documentCenter', params: { teamID: curTeamID.value } });
+  } else if (value == 'teamTrash') {
+    router.push({ name: 'teamTrash', params: { teamID: curTeamID.value } });
   }
 };
 onMounted(() => {
