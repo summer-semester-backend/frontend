@@ -43,8 +43,8 @@
                           <n-button circle type="warning" size="small" @click.stop="handleEdit(item)">
                             <n-icon size="20"><create-outline /></n-icon
                           ></n-button>
-                          <n-button circle type="info" size="small" @click.stop="">
-                            <n-icon size="20"><create-outline /></n-icon
+                          <n-button circle type="info" size="small" @click.stop="handleCopy(item)">
+                            <n-icon size="20"><copy-outline /></n-icon
                           ></n-button>
                         </n-space>
                       </div>
@@ -137,8 +137,16 @@
 </template>
 <script setup lang="ts">
 import { ref, computed, reactive, defineProps, onMounted, h, watch } from 'vue';
-import { Add, Search, EllipsisHorizontal, TrashOutline, ArchiveOutline, CreateOutline } from '@vicons/ionicons5';
-import { deleteFile, editFile, readFile } from '@/api/file';
+import {
+  Add,
+  Search,
+  EllipsisHorizontal,
+  TrashOutline,
+  ArchiveOutline,
+  CreateOutline,
+  CopyOutline,
+} from '@vicons/ionicons5';
+import { copyFile, deleteFile, editFile, readFile } from '@/api/file';
 import { NIcon, NInput } from 'naive-ui';
 import { useRouter } from 'vue-router';
 interface Project {
@@ -265,6 +273,16 @@ const handleDelete = (fileID: number) => {
 const handleEdit = (item: any) => {
   newFile.value = item;
   isEditModalShow.value = true;
+};
+
+//复制项目
+const handleCopy = (item: any) => {
+  copyFile({ fatherID: -1, fileID: item.fileID, teamID: -1, newName: item.name }).then((res) => {
+    if (res.data.result == 0) {
+      window.$message.success('复制成功');
+      emits('refresh');
+    }
+  });
 };
 
 //刷新列表

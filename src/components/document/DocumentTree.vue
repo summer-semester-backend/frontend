@@ -1,17 +1,18 @@
 <template>
   <div>
     <n-card title="文件列表">
-      <n-tree
-        block-line
-        :data="treeData"
-        key-field="fileID"
-        label-field="fileName"
-        children-field="sonList"
-        :on-load="handleLoad"
-        :on-update:selected-keys="handleSelect"
-        :cancelable="false"
-        :default-selected-keys="[parseInt($route.params.id.toString())]"
-      ></n-tree>
+      <n-scrollbar style="height: 70vh">
+        <n-tree
+          :data="treeData"
+          key-field="fileID"
+          label-field="fileName"
+          children-field="sonList"
+          :on-load="handleLoad"
+          :on-update:selected-keys="handleSelect"
+          :cancelable="false"
+          :default-selected-keys="[parseInt($route.params.id.toString())]"
+        ></n-tree>
+      </n-scrollbar>
     </n-card>
   </div>
 </template>

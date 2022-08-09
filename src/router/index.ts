@@ -47,7 +47,7 @@ const routes: RouteRecordRaw[] = [
             component: () => import('../views/team/DocumentCenter.vue'),
           },
           {
-            path: 'trash/',
+            path: 'trash',
             name: 'teamTrash',
             component: () => import('../views/project/ProjectTrash.vue'),
           },

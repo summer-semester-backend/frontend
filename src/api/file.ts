@@ -12,7 +12,7 @@ export function recentProjectList() {
   return backend.post('/file/recently');
 }
 
-export function binList(data: { fileID: number | null }) {
+export function binList(data: { fileID: number | null; teamID: number }) {
   return backend.post('/file/binList', data);
 }
 
@@ -44,8 +44,8 @@ export function editFile(data: {
   return backend.post('/file/write', data);
 }
 
-export function clearBin() {
-  return backend.post('/file/clearBin');
+export function clearBin(data: { fileID: number | null; teamID: number }) {
+  return backend.post('/file/clearBin', data);
 }
 
 export function readFileCenter(data: { teamID: number | null; fileID: number | null }) {
