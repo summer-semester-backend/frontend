@@ -9,9 +9,11 @@
       borderRadius: item.borderRadius + 'px',
       border: item.border.width + 'px ' + item.border.style + ' ' + item.border.color,
       fontSize: item.fontSize + 'px',
+      fontWeight: item.fontWeight,
       opacity: item.opacity / 100,
       textShadow: item.shadow ? '3px 3px 5px #aaa' : 'none',
     }"
+    @click.stop="handleLinkClick"
   >
     <!-- <div><div class="diagram-item-inline-edit" v-html="item.title" :style="{ alignItems: item.textHAlign }"/></div>  -->
     <n-text>{{ item.title }}</n-text>
@@ -22,6 +24,15 @@
 import { Item } from '../types';
 
 const { item } = defineProps<{ item: Item }>();
+interface LinkClickEvents {
+  (e: 'link-to-click', itemID: string): void;
+}
+const emits = defineEmits<LinkClickEvents>();
+const handleLinkClick = () => {
+  if (item.connection != undefined) {
+    emits('link-to-click', item.connection.to.item);
+  }
+};
 </script>
 
 <style scoped>

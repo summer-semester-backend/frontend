@@ -107,12 +107,12 @@ function getTabSections() {
   width: 12px; /* width of the entire scrollbar */
 }
 .object-inspector::-webkit-scrollbar-track {
-  background: orange; /* color of the tracking area */
+  background: rgb(174, 174, 174); /* color of the tracking area */
 }
 .object-inspector::-webkit-scrollbar-thumb {
-  background-color: blue; /* color of the scroll thumb */
+  background-color: #717171; /* color of the scroll thumb */
   border-radius: 20px; /* roundness of the scroll thumb */
-  border: 3px solid orange; /* creates padding around scroll thumb */
+  border: 3px solid rgb(174, 174, 174); /* creates padding around scroll thumb */
 }
 
 .inspector-title {

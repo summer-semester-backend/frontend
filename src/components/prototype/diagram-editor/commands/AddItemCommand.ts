@@ -11,6 +11,7 @@ export default class AddItemCommand implements Command {
   do(): void {
     this.elements.push(this.elementToAdd);
     this.targetPage?.containedIDs.push(`[data-item-id='${this.elementToAdd.id}']`);
+    this.elementToAdd.fatherID = this.targetPage?.id;
   }
 
   undo(): void {

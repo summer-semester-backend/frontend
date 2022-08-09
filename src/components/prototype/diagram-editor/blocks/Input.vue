@@ -8,6 +8,7 @@
       :status="item.status"
       :round="item.round"
       v-model:value="item.value"
+      @click.stop="handleLinkClick"
     >
     </n-input>
   </div>
@@ -16,6 +17,15 @@
 import { InputItem } from '../types';
 
 const { item } = defineProps<{ item: InputItem }>();
+interface LinkClickEvents {
+  (e: 'link-to-click', itemID: string): void;
+}
+const emits = defineEmits<LinkClickEvents>();
+const handleLinkClick = () => {
+  if (item.connection != undefined) {
+    emits('link-to-click', item.connection.to.item);
+  }
+};
 </script>
 
 <style scoped>

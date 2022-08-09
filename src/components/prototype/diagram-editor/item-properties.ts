@@ -9,7 +9,6 @@ export const id$: ObjectProperty = {
   label: 'ID',
   type: PropertyType.TEXT,
   editorFullsize: true,
-  readonly: true,
   formatValue: (obj, prop, value) => value + ' (' + obj.component + ')',
 };
 export const title$: ObjectProperty = { name: 'title', label: '文字', type: PropertyType.TEXT, editorFullsize: true };
@@ -20,6 +19,14 @@ export const fontSize$: ObjectProperty = {
   type: PropertyType.RANGE,
   editorFullsize: true,
   editorOptions: { min: 4, max: 120, step: 1 },
+};
+
+export const fontWeight$: ObjectProperty = {
+  name: 'fontWeight',
+  label: '加粗',
+  type: PropertyType.RANGE,
+  editorFullsize: true,
+  editorOptions: { min: 100, max: 900, step: 1 },
 };
 
 export const textHAlign$: ObjectProperty = {
@@ -204,6 +211,7 @@ export const shapeModel: ObjectInspectorModel = {
           properties: [
             title$,
             fontSize$,
+            fontWeight$,
             textHAlign$,
             textVAlign$,
             separator$,
@@ -239,6 +247,7 @@ export const shapeWithoutRadiusModel: ObjectInspectorModel = {
           properties: [
             title$,
             fontSize$,
+            fontWeight$,
             textHAlign$,
             textVAlign$,
             separator$,
@@ -424,6 +433,7 @@ export const textModel: ObjectInspectorModel = {
           properties: [
             title$,
             fontSize$,
+            fontWeight$,
             textHAlign$,
             textVAlign$,
             separator$,
@@ -490,6 +500,14 @@ export const connectionModel: ObjectInspectorModel = {
               editorFullsize: true,
               editorOptions: { min: 1, max: 10, step: 1 },
             },
+          ],
+        },
+        {
+          name: 'linkAttr',
+          title: '连接',
+          properties: [
+            { name: 'from.item', label: '来自', type: PropertyType.TEXT, editorFullsize: true },
+            { name: 'to.item', label: '去往', type: PropertyType.TEXT, editorFullsize: true },
           ],
         },
       ], // sections
@@ -715,6 +733,7 @@ export const pageModel: ObjectInspectorModel = {
           title: '文本与样式',
           properties: [
             fontSize$,
+            fontWeight$,
             textHAlign$,
             textVAlign$,
             separator$,
