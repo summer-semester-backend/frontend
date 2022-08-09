@@ -10,7 +10,6 @@ const route = useRoute();
 const message = useMessage();
 
 onMounted(() => {
-  console.log(route.params.code + ' test');
   const inviteLink = route.params.code;
 
   acceptInvitation({ inviteCode: route.params.code as string })

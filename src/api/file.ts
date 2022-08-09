@@ -80,3 +80,7 @@ export function copyFile(data: {
 export function readModule(data: { fileID: number | null }) {
   return backend.post('/file/commonRead', data);
 }
+
+export function projectToTeam(data: { fileID: number | null }) {
+  return backend.post('/file/projectToTeam', data);
+}
