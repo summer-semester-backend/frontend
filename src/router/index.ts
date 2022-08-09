@@ -53,6 +53,16 @@ const routes: RouteRecordRaw[] = [
             name: 'teamProject',
             component: () => import('../views/team/TeamProject.vue'),
           },
+          {
+            path: 'doc/',
+            name: 'documentCenter',
+            component: () => import('../views/team/DocumentCenter.vue'),
+          },
+          {
+            path: 'dir/:dirID',
+            name: 'directory',
+            component: () => import('../views/team/DocumentCenter.vue'),
+          },
         ],
       },
     ],
@@ -85,9 +95,14 @@ const routes: RouteRecordRaw[] = [
     component: () => import('../views/workspace/WorkspaceOverview.vue'),
     children: [
       {
-        path: 'doc',
+        path: 'doc/',
         name: 'DocumentList',
-        component: () => import('../views/workspace/DocumentList.vue'),
+        component: () => import('../components/document/Documents.vue'),
+      },
+      {
+        path: 'dir/:dirID',
+        name: 'DirList',
+        component: () => import('../components/document/Documents.vue'),
       },
       {
         path: 'uml',
@@ -107,7 +122,7 @@ const routes: RouteRecordRaw[] = [
     ],
   },
   {
-    path: '/doc/edit/:id',
+    path: '/edit/:id',
     name: 'editor',
     component: () => import('../views/document/DocumentEditor.vue'),
   },

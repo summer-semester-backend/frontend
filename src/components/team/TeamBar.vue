@@ -61,7 +61,7 @@ import { MenuOpenRound, AddCircleOutlineFilled } from '@vicons/material';
 import { useRouter, RouterLink, useRoute } from 'vue-router';
 import { getTeamList } from '@/api/team';
 import { NIcon } from 'naive-ui';
-import { AppstoreAddOutlined, SettingOutlined } from '@vicons/antd';
+import { AppstoreAddOutlined, SettingOutlined, ProfileOutlined } from '@vicons/antd';
 
 function renderIcon(icon) {
   return () => h(NIcon, null, { default: () => h(icon) });
@@ -88,6 +88,11 @@ const menuOptions = [
     icon: renderIcon(AppstoreAddOutlined),
   },
   {
+    label: '文档中心',
+    key: 'documentCenter',
+    icon: renderIcon(ProfileOutlined),
+  },
+  {
     label: '团队设置',
     key: 'teamDetail',
     icon: renderIcon(SettingOutlined),
@@ -112,7 +117,7 @@ const getTeams = () => {
         activeKey.value = 'teamProject';
       } else {
         console.log(options.value);
-        curTeamID.value = parseInt(route.params.teamID);
+        curTeamID.value = parseInt(route.params.teamID.toString());
       }
     })
     .catch(() => {
@@ -123,16 +128,20 @@ const getTeams = () => {
 const handleSelectUpdate = (value) => {
   if (route.name == 'teamProject') {
     window.open('/team/' + value + '/project', '_self');
-  } else {
+  } else if (route.name == 'teamDetail') {
     window.open('/team/' + value + '/', '_self');
+  } else if (route.name == 'documentCenter') {
+    window.open('/team/' + value + '/doc', '_self');
   }
 };
 const jumpTo = () => {};
 const handleMenuUpdate = (value) => {
   if (value == 'teamProject') {
     router.push({ name: 'teamProject', params: { teamID: curTeamID.value } });
-  } else {
+  } else if (value == 'teamDetail') {
     router.push({ name: 'teamDetail', params: { teamID: curTeamID.value } });
+  } else if (value == 'documentCenter') {
+    router.push({ name: 'documentCenter', params: { teamID: curTeamID.value } });
   }
 };
 onMounted(() => {

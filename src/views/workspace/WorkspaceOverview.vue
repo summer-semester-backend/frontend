@@ -19,7 +19,7 @@ onMounted(() => {
     router.back();
   }
   if (route.fullPath.split('/').length === 3) {
-    router.push(`/workspace/${route.params.ProjID}/doc`);
+    router.replace(`/workspace/${route.params.ProjID}/doc`);
   }
 });
 </script>

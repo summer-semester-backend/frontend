@@ -48,10 +48,39 @@ export function clearBin() {
   return backend.post('/file/clearBin');
 }
 
-export function copyFile(data: { fileID: number; fatherID: number; teamID: number | null; newName: string | null }) {
+export function readFileCenter(data: { teamID: number | null; fileID: number | null }) {
+  return backend.post('/file/centerRead', data);
+}
+
+export function getAncestor(data: { fileID: number | null }) {
+  return backend.post('/file/ancestor', data);
+}
+
+export function getCommonModule(data: { fileID: number | null }) {
+  return backend.post('/file/commonTemplate', data);
+}
+
+export function getTeamModule(data: { teamID: number | null; fileID: number | null }) {
+  return backend.post('/file/teamTemplate', data);
+}
+
+export function createTeamModule(data: { fileName: string | null; fileID: number | null; data: string }) {
+  return backend.post('/file/createTemplate', data);
+}
+
+export function copyFile(data: {
+  fatherID: number | null;
+  fileID: number | null;
+  teamID: number | null;
+  newName: string;
+}) {
   return backend.post('/file/copy', data);
 }
 
 export function getPrototypeShareCode(data: { fileID: number }) {
   return backend.post('/file/sharePrototype', data);
+}
+
+export function readModule(data: { fileID: number | null }) {
+  return backend.post('/file/commonRead', data);
 }
