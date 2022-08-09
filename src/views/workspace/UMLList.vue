@@ -307,6 +307,7 @@ const handleClickEdit = (file) => {
   openModelEdit();
 };
 const handleClickCopy = (file) => {
+  console.log(file);
   fileOnOpen.value = file;
   openModelCopy();
 };
@@ -342,9 +343,9 @@ const getFileList = (id: number | null) => {
           });
         }
       })
-      .finally(() => {
-        emits('refresh');
-      });
+
+  }).finally(() => {
+      emits('refresh');
   });
 };
 
@@ -447,6 +448,7 @@ const copy = () => {
     message.warning('文件名不能为空!');
     return;
   }
+  console.log(fileOnOpen.value,projID.value);
   copyFile({fileID: fileOnOpen.value?.fileID ,fatherID: projID.value ,teamID: null, newName: fileNameRef.value})
     .then((res) => {
       if (res.data.result == 0) {
@@ -484,7 +486,6 @@ window.addEventListener('drawioImageCreated', (evt: any) => {
       data: null,
     };
     if (fileEdit.fileID == null || fileEdit.fileName == null) return;
-    console.log(fileOnOpen.value);
     edit(fileEdit);
     // console.log(imageContent);
     // svgDom.innerHTML = imageContent;

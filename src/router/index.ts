@@ -121,6 +121,11 @@ const routes: RouteRecordRaw[] = [
     name: 'NoFound',
     component: () => import('../views/common/noFound.vue'),
   },
+  {
+    path: '/index',
+    name: 'Index',
+    component: () => import('../views/homepage/Index.vue'),
+  },
 ];
 
 const router = createRouter({

@@ -54,7 +54,7 @@
               {{ item.fileName }}
               <template #tooltip>
                 <div style="font-family: 'Mulish'">
-                  File：{{item.fileName}}.svg
+                  File：{{item.fileName}}
                 </div>
               </template>
             </n-ellipsis>
