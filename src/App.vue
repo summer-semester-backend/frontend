@@ -1,6 +1,6 @@
 <template>
   <n-layout has-sider position="absolute">
-    <global-sidebar v-if="!isLoginPage && !isProtoPage && !isNoFoundPage" />
+    <global-sidebar v-if="!isLoginPage && !isProtoPage && !isNoFoundPage && !isIndex" />
     <global-content />
   </n-layout>
 </template>
@@ -20,6 +20,9 @@ const isProtoPage = computed(() => {
 });
 const isNoFoundPage = computed(() => {
   return route.name == 'NoFound';
+});
+const isIndex = computed(() => {
+  return route.name == 'Index';
 });
 backend.interceptors.response.use(
   (response) => {

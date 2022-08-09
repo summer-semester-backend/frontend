@@ -12,7 +12,7 @@ import 'bootstrap';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
 import './assets/scss/style.scss';
-import VueTypedJs from 'vue-typed-js'
+import VueTypedJs from 'vue-typed-js';
 
 async function setupApp() {
   // 引入静态资源

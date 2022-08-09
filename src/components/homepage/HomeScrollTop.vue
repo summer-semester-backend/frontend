@@ -1,42 +1,41 @@
 <template>
-    <div class="rn-back-top"
-         @click="scrollToTop"
-         :class="[visible ? 'd-inline' : 'd-none']">
-        <HomeIcon name="chevron-up" size="27"/>
-    </div>
+  <div class="rn-back-top" @click="scrollToTop" :class="[visible ? 'd-inline' : 'd-none']">
+    <HomeIcon name="chevron-up" size="27" />
+  </div>
 </template>
 
-<script setup>
-import {ref, onMounted,onBeforeUnmount} from 'vue';
+<script setup="js">
+import { ref, onMounted, onBeforeUnmount, onBeforeMount } from 'vue';
 
-const visible = ref(false);
+const visible = ref(true);
 
 const scrollToTop = () => {
-    window.scrollTo({
-        top: 0,
-        behavior: 'smooth'
-    });
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth',
+  });
 };
 
 const toggleVisible = () => {
-    const scrolled = document.documentElement.scrollTop;
-    if (scrolled > 300) {
-        visible = true;
-    } else if (scrolled <= 300) {
-        visible = false;
-    }
+  const scrolled = document.documentElement.scrollTop.value;
+  console.log('1233');
+  if (scrolled > 300) {
+    visible.value = true;
+  } else if (scrolled <= 300) {
+    visible.value = false;
+  }
 };
-
-const create = () => {
-    window.addEventListener('scroll', toggleVisible);
-};
-
+onBeforeMount(() => {
+  console.log('test');
+  window.addEventListener('scroll', toggleVisible);
+});
 onMounted(() => {
-    create();
-    toggleVisible();
+  console.log('test');
+  window.addEventListener('scroll', toggleVisible);
+  toggleVisible();
 });
 
 onBeforeUnmount(() => {
-    window.removeEventListener('scroll', toggleVisible);
+  window.removeEventListener('scroll', toggleVisible);
 });
 </script>

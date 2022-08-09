@@ -1,23 +1,23 @@
 <template>
-    <div class="logo">
-        <router-link :to="props.url">
-            <img class="logo-dark" :src="props.darkLogo" alt="Corporate Logo"/>
-        </router-link>
-    </div>
+  <div class="logo">
+    <router-link :to="props.url">
+      <img class="logo-dark" :src="props.darkLogo" alt="Corporate Logo" />
+    </router-link>
+  </div>
 </template>
 
-<script setup>
-
+<script setup="js">
 const props = defineProps({
-    url: {
-        type: String,
-        default: '/'
-    },
-    darkLogo: {
-        type: String,
-        default: function () {
-            // return require(`@/assets/images/test/logo.png`);
-        }
-    }
+  url: {
+    type: String,
+    default: '/',
+  },
+  darkLogo: {
+    type: String,
+    default: '',
+    // default: function () {
+    //   // return require(`@/assets/images/test/logo.png`);
+    // },
+  },
 });
 </script>
