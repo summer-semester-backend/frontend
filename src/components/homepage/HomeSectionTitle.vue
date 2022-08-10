@@ -3,7 +3,7 @@
     <h4 class="subtitle">
       <span class="theme-gradient" v-html="props.subtitle" />
     </h4>
-    <h2 class="title w-600" v-html="props.title" />
+    <h2 class="title" v-html="props.title" />
     <p v-if="props.description" class="description b1" v-html="props.description" />
   </div>
 
