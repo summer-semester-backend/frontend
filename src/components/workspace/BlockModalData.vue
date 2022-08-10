@@ -49,12 +49,12 @@
             </n-icon>
             <n-ellipsis
               :tooltip="true"
-              style="background-color: #fff; font-size: 1rem; font-weight: 500; margin: 0 24px;max-width: 5vw"
+              style="background-color: #fff; font-size: 14px; font-weight: 500; margin: 0 16px;max-width: 5vw"
             >
               {{ item.fileName }}
               <template #tooltip>
                 <div style="font-family: 'Mulish'">
-                  File：{{item.fileName}}.svg
+                  File：{{item.fileName}}
                 </div>
               </template>
             </n-ellipsis>

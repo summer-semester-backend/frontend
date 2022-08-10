@@ -3,6 +3,7 @@ import { defineStore } from 'pinia';
 
 export const useAuthStore = defineStore('auth', () => {
   const token = ref(localStorage.getItem('token') || '');
+  const avatar = ref(localStorage.getItem('avatar') || '');
   const isLogin = computed(() => {
     return token.value !== '';
   });
@@ -15,5 +16,12 @@ export const useAuthStore = defineStore('auth', () => {
     token.value = '';
   }
 
-  return { token, isLogin, signIn, signOut };
+  function setAvatar(avatarUrl: string) {
+    avatar.value = avatarUrl;
+  }
+  function getAvatar() {
+    return avatar.value;
+  }
+
+  return { token, isLogin, signIn, signOut, setAvatar, getAvatar };
 });

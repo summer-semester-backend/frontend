@@ -43,6 +43,7 @@ import { applyRegisterCode, register } from '@/api/auth';
 import { reactive, ref } from 'vue';
 import type { CountdownProps } from 'naive-ui';
 import { isValid } from 'date-fns';
+import { hex_md5 } from '@/plugins/md5.js'
 const emits = defineEmits(['finish-register']);
 const valid = ref(true);
 const model = reactive({
@@ -75,6 +76,7 @@ const handleSubmit = () => {
     window.$message.warning('两次输入密码不同！');
     return;
   }
+  //register({ username: model.username, email: model.email, password: hex_md5(model.passwd), code: model.code }).then((res) => {//加密
   register({ username: model.username, email: model.email, password: model.passwd, code: model.code }).then((res) => {
     if (res.data.result == 0) {
       window.$message.success('注册成功');

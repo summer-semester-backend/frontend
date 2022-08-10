@@ -54,7 +54,8 @@
       </n-layout-sider>
       <n-layout-content>
         <div class="imgBox">
-          <n-avatar round :size="200" :src="model.avatar" style="border: 2px solid #d9d9d9"> </n-avatar>
+          <n-avatar object-fit="cover" round :size="200" :src="model.avatar" style="border: 2px solid #d9d9d9">
+          </n-avatar>
           <n-button type="info" size="small" class="btn" color="#FFFFFF" text-color="#000" @click="openModel()">
             <template #icon>
               <n-icon size="20">
@@ -113,9 +114,11 @@
 import { ref, computed, reactive, defineProps, onMounted, h } from 'vue';
 import { EditOutlined, CameraOutlined } from '@vicons/antd';
 import { getUserInfo, updateUserInfo, updateUserAva } from '@/api/user';
+import { useAuthStore } from '@/store/auth';
 import { useMessage } from 'naive-ui';
 // import type { FormInst, FormRules, FormItemRule, UploadFileInfo } from 'naive-ui';
 
+const { setAvatar } = useAuthStore();
 const message = useMessage();
 const title = ref('基本信息'); //页面标题
 const formRef = ref(null);
@@ -145,6 +148,8 @@ const handleClick = () => {
 const handleUploadFinish = ({ file, event }) => {
   let ret = JSON.parse(event.currentTarget.response);
   model.value.avatar = ret.url;
+  localStorage.setItem('avatar', ret.url);
+  setAvatar(ret.url);
   updateAva();
   return file;
 };

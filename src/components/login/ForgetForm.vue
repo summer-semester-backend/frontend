@@ -45,6 +45,7 @@ import { applyForgetCode, forgetPassword } from '@/api/auth';
 import { reactive, ref } from 'vue';
 import type { CountdownProps } from 'naive-ui';
 import { ArrowBack } from '@vicons/ionicons5';
+import { hex_md5 } from '@/plugins/md5.js'
 const emits = defineEmits(['finish-forget']);
 const valid = ref(true);
 const model = reactive({
@@ -75,6 +76,7 @@ const handleSubmit = () => {
     window.$message.warning('两次输入密码不同！');
     return;
   }
+  //forgetPassword({ email: model.email, password: hex_md5(model.passwd), code: model.code }).then((res) => {//加密
   forgetPassword({ email: model.email, password: model.passwd, code: model.code }).then((res) => {
     if (res.data.result == 0) {
       window.$message.success('密码修改成功！');
