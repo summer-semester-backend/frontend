@@ -291,12 +291,7 @@ const handleClickEdit = (file: any) => {
   fileNameRef.value = fileOnOpen.value!.fileName;
   openModelEdit();
 };
-<<<<<<< HEAD
-const handleClickCopy = (file) => {
-  console.log(file);
-=======
 const handleClickCopy = (file: any) => {
->>>>>>> dev
   fileOnOpen.value = file;
   openModelCopy();
 };
@@ -318,10 +313,10 @@ const getFileList = (id: number | null) => {
   readFile({
     fileID: id,
     teamID: null,
-  }).then((res) => {
-    files.value = [];
-    res.data.sonList
-      .forEach((item: any) => {
+  })
+    .then((res) => {
+      files.value = [];
+      res.data.sonList.forEach((item: any) => {
         if (item.fileType === 12) {
           files.value.push({
             fileID: item.fileID,
@@ -331,11 +326,11 @@ const getFileList = (id: number | null) => {
             fileImage: item.fileImage,
           });
         }
-      })
-
-  }).finally(() => {
+      });
+    })
+    .finally(() => {
       emits('refresh');
-  });
+    });
 };
 
 const create = () => {
@@ -436,17 +431,13 @@ const copy = () => {
     message.warning('文件名不能为空!');
     return;
   }
-<<<<<<< HEAD
-  console.log(fileOnOpen.value,projID.value);
-  copyFile({fileID: fileOnOpen.value?.fileID ,fatherID: projID.value ,teamID: null, newName: fileNameRef.value})
-=======
+
   copyFile({
     fileID: fileOnOpen.value?.fileID as number,
     fatherID: projID.value as number,
     teamID: null,
     newName: fileNameRef.value,
   })
->>>>>>> dev
     .then((res) => {
       if (res.data.result == 0) {
         window.$message.success('复制成功');

@@ -12,7 +12,7 @@
                 data-aos-delay="150"
                 style="color: #0084a1; font-size: 120px; font-family: 'Inter'; font-weight: 700"
               >
-                云 <span>上</span>
+                云 <span>图</span>
               </h1>
               <p
                 class="description"
@@ -74,14 +74,14 @@
                   <span ref="welcomeMessage"></span>
                 </h2>
                 <p data-aos="fade-up" data-aos-delay="310" style="margin: 0 0 30px; font-size: 16px">
-                  “云上”是本团队开发的一款软工团队协作与管理平台，为校内外中小团队的项目协作开发提供管理服务。
+                  “云图”是本团队开发的一款软工团队协作与管理平台，为校内外中小团队的项目协作开发提供管理服务。
                   该平台用户定位为软工开发团队组织及其成员，具备了完善的团队管理、项目管理等功能，涉及项目产品原型设计、文档共享编辑等。
-                  同时，“云上”关注于站在用户的角度，注重用户的隐私性、操作方便性等。
+                  同时，“云图”关注于站在用户的角度，注重用户的隐私性、操作方便性等。
                 </p>
                 <p data-aos="fade-up" data-aos-delay="340" style="margin: 0 0 30px; font-size: 16px">
                   团队的协作开发通常以项目为单位，Web 项目开发过程通常包含调研需求、需求建模、设计架构、编写代码等步骤。
                   该过程涉及文档编写，设计原型、绘制 UML 等图的步骤，以帮助团队明确需求，且通常以项目文档的形式保存。
-                  “云上”为用户提供诸如上述的项目线上协作功能，可概括为管理项目、设计原型、绘制图（UML
+                  “云图”为用户提供诸如上述的项目线上协作功能，可概括为管理项目、设计原型、绘制图（UML
                   等）、多人在线编辑文档四大功能。
                 </p>
                 <div class="read-more-btn mt--40" data-aos="fade-up" data-aos-delay="370">
@@ -108,7 +108,7 @@
               text-align="center"
               subtitle="我们能为你做什么"
               title="我们提供的服务"
-              description="“云上”包含管理项目、设计原型、绘制图（UML 等）、多人在线编辑文档四大功能"
+              description="“云图”包含管理项目、设计原型、绘制图（UML 等）、多人在线编辑文档四大功能"
               data-aos="fade-up"
             />
           </div>
