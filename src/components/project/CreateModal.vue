@@ -129,7 +129,6 @@ const handleConfirmClick = () => {
             window.$message.success('创建成功');
             projModel.value.fileName = '';
             projModel.value.fileImage = '';
-            projModel.value.teamID = null;
             emits('close');
             emits('refresh');
           } else if (res.data.result == 1) {
@@ -149,7 +148,6 @@ const handleConfirmClick = () => {
 const handleCancleClick = () => {
   projModel.value.fileName = '';
   projModel.value.fileImage = '';
-  projModel.value.teamID = null;
   emits('close');
 };
 
