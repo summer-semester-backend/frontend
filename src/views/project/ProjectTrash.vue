@@ -164,7 +164,7 @@ const teamID = ref<number>();
 const trashs = ref<Project[]>([]);
 const pagination = ref({
   current: 1,
-  pageSize: 10,
+  pageSize: 8,
 });
 
 //显示搜索

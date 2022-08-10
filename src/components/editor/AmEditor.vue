@@ -16,7 +16,7 @@ import type { GroupItemProps } from '@aomao/toolbar-vue';
 import { onMounted, ref, onUnmounted, watch } from 'vue';
 import { OTClient } from './ot';
 import { cards, plugins, pluginConfig } from './config';
-import { onBeforeRouteLeave, useRoute } from 'vue-router';
+import { onBeforeRouteLeave, onBeforeRouteUpdate, useRoute } from 'vue-router';
 import { html2md } from '../../plugins/html2md';
 import { asBlob } from 'html-docx-js-typescript';
 import { saveAs } from 'file-saver';
@@ -167,7 +167,8 @@ const save = async () => {
 //在离开前保存
 const saveBeforeLeave = (e: Event | null) => {
   if (engine.value) {
-    save().then((res) => {
+    save().then(() => {
+      console.log('save', engine.value);
       engine.value?.destroy();
       engine.value = null;
     });
@@ -183,8 +184,6 @@ defineExpose({
 });
 
 const reload = () => {
-  engine.value?.destroy();
-  engine.value = null;
   let useid = localStorage.getItem('userID') || '';
   getUserInfo({ userID: useid })
     .then((res) => {
@@ -205,20 +204,32 @@ const reload = () => {
         })
         .then(() => {
           initEditor();
+          console.log('reload', engine.value);
         });
     });
 };
 
 watch(route, () => {
-  reload();
+  console.log('watchRtoueChange');
+  if (route.params.id) reload();
 });
 
 onMounted(() => {
   reload();
+  console.log('onMounted');
   window.addEventListener('beforeunload', saveBeforeLeave);
 });
-onUnmounted(() => {
+
+onBeforeRouteLeave(() => {
+  console.log('onBeforeRouteLeave');
   saveBeforeLeave(null);
+});
+
+onBeforeRouteUpdate(() => {
+  console.log('onBeforeRouteUpdate');
+  saveBeforeLeave(null);
+});
+onUnmounted(() => {
   window.removeEventListener('beforeunload', saveBeforeLeave);
 });
 </script>
