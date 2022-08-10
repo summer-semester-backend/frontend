@@ -92,7 +92,7 @@ export class SyncManager {
     this.websocket = new WebSocket(this.url);
     this.websocket.onmessage = (ev: MessageEvent<any>) => {
       const message = JSON.parse(ev.data);
-      // console.log(message.operation, message);
+      console.log(message.operation, message);
       switch (message.operation) {
         case 'register':
           this.registerFuncs.forEach((func) => {
@@ -123,6 +123,7 @@ export class SyncManager {
           this.addItemFuncs.forEach((func) => {
             func(message.element, message.targetPageID);
           });
+          break;
         case 'del_item':
           this.deleteItemFuncs.forEach((func) => {
             func(message.targetID);
