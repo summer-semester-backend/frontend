@@ -313,10 +313,10 @@ const getFileList = (id: number | null) => {
   readFile({
     fileID: id,
     teamID: null,
-  }).then((res) => {
-    files.value = [];
-    res.data.sonList
-      .forEach((item: any) => {
+  })
+    .then((res) => {
+      files.value = [];
+      res.data.sonList.forEach((item: any) => {
         if (item.fileType === 12) {
           files.value.push({
             fileID: item.fileID,
@@ -326,11 +326,11 @@ const getFileList = (id: number | null) => {
             fileImage: item.fileImage,
           });
         }
-      })
-      .finally(() => {
-        emits('refresh');
       });
-  });
+    })
+    .finally(() => {
+      emits('refresh');
+    });
 };
 
 const create = () => {
@@ -431,6 +431,7 @@ const copy = () => {
     message.warning('文件名不能为空!');
     return;
   }
+
   copyFile({
     fileID: fileOnOpen.value?.fileID as number,
     fatherID: projID.value as number,
@@ -473,7 +474,6 @@ window.addEventListener('drawioImageCreated', (evt: any) => {
       data: null,
     };
     if (fileEdit.fileID == null || fileEdit.fileName == null) return;
-    console.log(fileOnOpen.value);
     edit(fileEdit);
     // console.log(imageContent);
     // svgDom.innerHTML = imageContent;
