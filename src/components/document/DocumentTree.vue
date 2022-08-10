@@ -6,13 +6,12 @@
       </template>
       <template #header-extra>
         <n-dropdown :options="options" @select="handleCreateSelect" trigger="click">
-          <n-button text @click="newFileAncestor = oriID || -1">
+          <n-button size="small" @click="newFileAncestor = oriID || -1">
             <template #icon>
               <n-icon size="20" class="icon">
-                <AddCircleOutline />
+                <Add />
               </n-icon>
             </template>
-            在此处新建
           </n-button>
         </n-dropdown>
       </template>
@@ -45,7 +44,7 @@
 <script setup lang="ts">
 import { createFile, readFileCenter } from '@/api/file';
 import { ProjectOutlined, TeamOutlined } from '@vicons/antd';
-import { AddCircleOutline, CreateOutline, DocumentTextOutline, FolderOutline } from '@vicons/ionicons5';
+import { Add, AddCircleOutline, CreateOutline, DocumentTextOutline, FolderOutline } from '@vicons/ionicons5';
 import { computed, watch, ref, h } from '@vue/runtime-core';
 import { NButton, NDivider, NDropdown, NIcon, NInput } from 'naive-ui';
 import { useRouter } from 'vue-router';

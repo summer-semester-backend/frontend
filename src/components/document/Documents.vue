@@ -2,9 +2,9 @@
   <ToolBar :ancestors="ancestors" :team-i-d="teamID" :type="teamID == -1 ? 'proj' : 'team'">
     <template #toolbar>
       <n-dropdown :options="options" @select="handleSelect" trigger="click">
-        <n-button text @click="newFileAncestor = fileID">
+        <n-button strong secondary type="info" small size="small" @click="newFileAncestor = fileID">
           <template #icon>
-            <n-icon size="26" class="icon">
+            <n-icon size="20" class="icon">
               <AddCircleOutline />
             </n-icon>
           </template>
@@ -534,7 +534,7 @@ const handleOpen = (row: any) => {
       },
     });
   } else if (row.fileType > 0) {
-    router.push({
+    router.replace({
       name: 'DirList',
       params: {
         dirID: row.fileID,
