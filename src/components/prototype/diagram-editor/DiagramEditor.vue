@@ -1135,7 +1135,7 @@ async function saveAll() {
   //   drawCanvas(page, false);
   // });
   for (var i = 0; i < pages.value.length; i++) {
-    await drawCanvas(pages.value[i], false);
+    await drawCanvas(pages.value[i], true);
   }
 }
 
