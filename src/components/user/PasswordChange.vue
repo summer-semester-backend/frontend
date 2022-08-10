@@ -49,6 +49,7 @@
 import { ref, computed, reactive, defineProps, onMounted, h } from 'vue';
 import { changePassword } from '@/api/auth';
 import { useMessage } from 'naive-ui';
+import { hex_md5 } from '@/plugins/md5.js'
 // import { StarFilled } from "@vicons/antd";
 // import { FormInst, FormRules, FormItemRule, UploadFileInfo } from 'naive-ui';
 const message = useMessage();
@@ -100,7 +101,7 @@ const change = () => {
     message.warning('新旧密码相同！');
     return;
   }
-
+  //changePassword({ password: hex_md5(model.value.password), newPassword: hex_md5(model.value.newPassword) })//加密
   changePassword({ password: model.value.password, newPassword: model.value.newPassword })
     .then((res) => {
       if (res.data.result == 0) {

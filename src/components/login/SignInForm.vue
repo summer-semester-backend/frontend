@@ -18,7 +18,7 @@ import { login } from '@/api/auth';
 import { useAuthStore } from '@/store/auth';
 import { reactive } from 'vue';
 import { useRouter } from 'vue-router';
-
+import { hex_md5 } from '@/plugins/md5.js'
 const emits = defineEmits(['forget']);
 const { signIn } = useAuthStore();
 const router = useRouter();
@@ -29,6 +29,7 @@ const model = reactive({
 });
 
 const handleLogin = () => {
+  //login({ email: model.email, password: hex_md5(model.password) }).then((res) => {//加密
   login({ email: model.email, password: model.password }).then((res) => {
     if (res.data.result == 0) {
       localStorage.setItem('token', res.data.token);
