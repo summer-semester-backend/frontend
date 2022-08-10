@@ -44,7 +44,7 @@ import { reactive, ref } from 'vue';
 import type { CountdownProps } from 'naive-ui';
 import { isValid } from 'date-fns';
 import { hex_md5 } from '@/plugins/md5.js'
-import { complex } from '@/plugins/passVerify.js';
+import { complex ,isEmail} from '@/plugins/passVerify.js';
 const emits = defineEmits(['finish-register']);
 const valid = ref(true);
 const model = reactive({
@@ -55,6 +55,22 @@ const model = reactive({
   confirmpasswd: '',
 });
 const rules = ref({
+  email: [
+    {
+      required: true,
+      // message: '请输入新密码',
+      trigger: ['input', 'blur'],
+
+      validator(rule:any, value:any) {
+        if (!value) {
+          return new Error("请输入邮箱");
+        } else if (!(isEmail(value))) {
+          return new Error("输入正确邮箱格式");
+        }
+        return true;
+      },
+    },
+  ],
   passwd: [
     {
       required: true,

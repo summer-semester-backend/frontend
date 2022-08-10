@@ -46,7 +46,7 @@ import { reactive, ref } from 'vue';
 import type { CountdownProps } from 'naive-ui';
 import { ArrowBack } from '@vicons/ionicons5';
 import { hex_md5 } from '@/plugins/md5.js'
-import { complex } from '@/plugins/passVerify.js';
+import { complex ,isEmail} from '@/plugins/passVerify.js';
 const emits = defineEmits(['finish-forget']);
 const valid = ref(true);
 const model = reactive({
@@ -56,6 +56,22 @@ const model = reactive({
   confirmpasswd: '',
 });
 const rules = ref({
+  email: [
+    {
+      required: true,
+      // message: '请输入新密码',
+      trigger: ['input', 'blur'],
+
+      validator(rule:any, value:any) {
+        if (!value) {
+          return new Error("请输入邮箱");
+        } else if (!(isEmail(value))) {
+          return new Error("输入正确邮箱格式");
+        }
+        return true;
+      },
+    },
+  ],
   passwd: [
     {
       required: true,
@@ -66,7 +82,7 @@ const rules = ref({
         if (!value) {
           return new Error("请输入新密码");
         } else if (!complex(value)) {
-          return new Error("密码大于八位，同时包含大小写");
+          return new Error("密码大于八位，同时包含数字与字母");
         }
         return true;
       },
