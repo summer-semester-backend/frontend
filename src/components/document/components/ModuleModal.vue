@@ -1,5 +1,5 @@
 <template>
-  <n-modal style="width: 70%" :show="isModuleModalShow" preset="card" @close="emits('close')">
+  <n-modal style="width: 75%" :show="isModuleModalShow" preset="card" @close="emits('close')">
     <template #header> 文档模板 </template>
     <template #action>
       <n-grid>
@@ -57,6 +57,7 @@ const newFileName = ref<string>('');
 const getCommonModuleList = (fileID: number | null, dad: any) => {
   getCommonModule({ fileID: fileID }).then((res) => {
     res.data.sonList.forEach((item: any) => {
+      if (item.fileType == 13) return;
       dad.push({
         fileID: item.fileID,
         fileName: item.fileName,
