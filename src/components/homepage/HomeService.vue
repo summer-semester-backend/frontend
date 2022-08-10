@@ -12,7 +12,7 @@
             <h4 class="title">
               <router-link to="/service-details" v-html="service.title" />
             </h4>
-            <p class="description" v-html="service.description" />
+            <p class="description" v-html="service.description" style="font-size:16px"/>
           </div>
           <div class="image">
             <img :src="service.image" alt="Service Images" />

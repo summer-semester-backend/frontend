@@ -117,9 +117,6 @@
 </template>
 
 <script setup>
-// import 'bootstrap/scss/bootstrap.scss';
-// import '@/assets/scss/style.scss';
-// import 'bootstrap';
 import Typed from 'typed.js';
 import { ArrowRightOutlined } from '@vicons/antd';
 import { ref, onMounted } from 'vue';
