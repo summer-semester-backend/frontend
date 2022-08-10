@@ -292,16 +292,21 @@ const refresh = () => {
 };
 
 //按创建时间排序
+const createOrder = ref(1);
 const sortByCreateTime = () => {
+  createOrder.value = createOrder.value * -1;
   props.projects.sort((a, b) => {
-    return formatDate(b.createTime) > formatDate(a.createTime) ? 1 : -1;
+    return (formatDate(b.createTime) > formatDate(a.createTime) ? 1 : -1) * createOrder.value;
   });
 };
 
 //按访问时间排序
+const visitOrder = ref(-1);
 const sortByVisitTime = () => {
+  visitOrder.value = visitOrder.value * -1;
   props.projects.sort((a, b) => {
-    return formatDate(b.lastVisitTime) > formatDate(a.lastVisitTime) ? 1 : -1;
+    console.log(a.fileName, a.lastVisitTime, b.fileName, b.lastVisitTime);
+    return (formatDate(b.lastVisitTime) > formatDate(a.lastVisitTime) ? 1 : -1) * visitOrder.value;
   });
 };
 

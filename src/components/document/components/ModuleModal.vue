@@ -11,16 +11,18 @@
     </template>
     <n-layout has-sider>
       <n-layout-sider bordered content-style="min-height: 70vh">
-        <n-tree
-          block-line
-          :data="treeData"
-          key-field="fileID"
-          label-field="fileName"
-          children-field="sonList"
-          :on-load="handleLoad"
-          :on-update:selected-keys="handleSelect"
-        >
-        </n-tree>
+        <n-scrollbar style="height: 70vh">
+          <n-tree
+            block-line
+            :data="treeData"
+            key-field="fileID"
+            label-field="fileName"
+            children-field="sonList"
+            :on-load="handleLoad"
+            :on-update:selected-keys="handleSelect"
+          >
+          </n-tree>
+        </n-scrollbar>
       </n-layout-sider>
       <n-layout>
         <n-scrollbar x-scrollable style="max-height: 70vh">

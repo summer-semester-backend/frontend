@@ -239,7 +239,8 @@ export function html2md(htmlData) {
   // 代码 <code> ,根据上面的数组恢复code,然后将code替换
   if (codeContent !== null) {
     for (let i = 0; i < codeContent.length; i++) {
-      pureHtml = pureHtml.replace(/\`\#codeContent\#\`/i, clearHtmlTag(codeContent[i]));
+      //console.log(codeContent[i]);
+      pureHtml = pureHtml.replace(/\`\#codeContent\#\`/i, clearHtmlTag(codeContent[i].replace(/(<br>)/gi, '\n')));
     }
   }
   pureHtml = pureHtml.replace(/\<code\>/gi, ' ` ').replace(/\<\/code\>/gi, ' ` ');
@@ -248,8 +249,11 @@ export function html2md(htmlData) {
   if (preContent !== null) {
     for (let k = 0; k < preContent.length; k++) {
       let preLanguage = preContent[k].match(/(?<=language-).*?(?=[\s'"])/i);
+      preContent[k] = preContent[k].replace(/<br>/gi, '\n');
+      console.log('preContent', preContent[k]);
       let preText = clearHtmlTag(preContent[k]);
-      preText = preText.replace(/^1\n2\n(\d+\n)*/, ''); // 去掉行数
+      console.log('preText', preText);
+      //preText = preText.replace(/^1\n2\n(\d+\n)*/, ''); // 去掉行数
 
       preLanguage = preLanguage != null && preLanguage[0] != 'undefined' ? preLanguage[0] + '\n' : '\n';
       pureHtml = pureHtml.replace(/\`\#preContent\#\`/i, preLanguage + preText);
