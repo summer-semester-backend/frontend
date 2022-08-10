@@ -25,6 +25,7 @@ import { getUserInfo } from '@/api/user';
 import { createTeamModule, editFile, readFile } from '@/api/file';
 const container = ref<HTMLDivElement | null>(null);
 const engine = ref<EngineInterface | null>(null);
+const ot = ref<any>();
 const toolbarItems = ref<GroupItemProps[]>([
   ['collapse'],
   ['undo', 'redo', 'paintformat', 'removeformat'],
@@ -69,13 +70,13 @@ const initEditor = () => {
     });
 
     // 协同编辑
-    const ot = new OTClient(engineInstance);
-    ot.connect(
+    ot.value = new OTClient(engineInstance);
+    ot.value.connect(
       `ws://43.138.77.8:8088${'?uid=' + currentMember.value.userID + '&uname=' + currentMember.value.nickname}`,
       fileID.value,
       ''
     );
-    ot.on('ready', (member) => {
+    ot.value.on('ready', (member: any) => {
       console.log('ready', member);
     });
 
@@ -171,6 +172,7 @@ const saveBeforeLeave = (e: Event | null) => {
       console.log('save', engine.value);
       engine.value?.destroy();
       engine.value = null;
+      ot.value.exit();
     });
   }
 };
