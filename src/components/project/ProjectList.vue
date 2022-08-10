@@ -75,7 +75,7 @@
                   <div>项目名称：{{ item.fileName }}</div>
                   <div>所属团队：{{ item.teamName }}</div>
                   <div>创建者：{{ item.userName }}</div>
-                  <div>创建时间：{{ item.createTime.slice(0, 10) }}</div>
+                  <div>创建时间：{{ formatDate(item.createTime) }}</div>
                 </template>
               </n-tooltip>
             </n-gi>
@@ -148,6 +148,7 @@ import {
 } from '@vicons/ionicons5';
 import { copyFile, deleteFile, editFile, readFile } from '@/api/file';
 import { NIcon, NInput } from 'naive-ui';
+import { formatDate } from '@/plugins/date';
 import { useRouter } from 'vue-router';
 interface Project {
   fileID: number;
@@ -310,11 +311,6 @@ const dataFilter = computed(() => {
     return !input.value || data.fileName.toLowerCase().includes(input.value.toLowerCase());
   });
 });
-
-//将"yyyy-mm-dd"格式的字符串转换为日期对象
-const formatDate = (date: string) => {
-  return new Date(Date.parse(date.replace(/-/g, '/')));
-};
 
 //跳转到指定项目
 const jumpToProj = (fileID: number) => {

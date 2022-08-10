@@ -44,6 +44,7 @@ import {
   DocumentTextOutline,
 } from '@vicons/ionicons5';
 import { binList, recoverFile, deleteFile, clearBin } from '@/api/file';
+import { formatDate } from '@/plugins/date';
 import { useRoute } from 'vue-router';
 type Project = {
   fileID: number;
@@ -97,7 +98,7 @@ const columns = ref([
     title: '删除时间',
     key: 'abandonTime',
     sorter: (row1: Project, row2: Project) => (row1.abandonTime > row2.abandonTime ? 1 : -1),
-    render: (row: Project) => h('span', row.abandonTime.slice(0, 10)),
+    render: (row: Project) => h('span', formatDate(row.abandonTime)),
   },
   {
     title: '操作',

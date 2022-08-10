@@ -173,6 +173,9 @@ onMounted(() => {
   } else if (route.params.projID) {
     teamID.value = -1;
     getTeamModuleList(-1, parseInt(route.params.projID.toString()));
+  } else if (route.params.id) {
+    teamID.value = -1;
+    getTeamModuleList(-1, parseInt(route.params.id.toString()));
   } else {
     teamID.value = -1;
   }

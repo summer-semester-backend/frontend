@@ -27,6 +27,7 @@ import { NButton, NIcon, NSpace, NText } from 'naive-ui';
 import { h, ref, computed, onMounted } from 'vue';
 import { Refresh, Trash, Search, EllipsisHorizontal, TrashOutline } from '@vicons/ionicons5';
 import { binList, recoverFile, deleteFile, clearBin } from '@/api/file';
+import { formatDate } from '@/plugins/date';
 import { ToolBar } from './components';
 import { useRoute } from 'vue-router';
 type Trash = {
@@ -71,7 +72,7 @@ const columns = ref([
     title: '删除时间',
     key: 'abandonTime',
     sorter: (row1: Trash, row2: Trash) => (row1.abandonTime > row2.abandonTime ? 1 : -1),
-    render: (row: Trash) => h('span', row.abandonTime == null ? '-' : row.abandonTime?.slice(0, 10)),
+    render: (row: Trash) => h('span', formatDate(row.abandonTime)),
   },
   {
     title: '操作',
