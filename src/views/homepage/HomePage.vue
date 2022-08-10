@@ -142,14 +142,6 @@ import Typed from 'typed.js';
   padding: 0px;
 }
 </style>
-=======
-<style scoped src="bootstrap/scss/bootstrap.scss" lang="scss"></style>
-
-<style scoped src="@/assets/scss/style.scss" lang="scss"></style>
-<!-- <style lang="scss" scoped>
-@import '@/assets/scss/style.scss';
-</style> -->
->>>>>>> 5eaa6b9ea0a8e9761ef56343249063fd9cc267ba
 
 <style scoped src="bootstrap/scss/bootstrap.scss" lang="scss"></style>
 
