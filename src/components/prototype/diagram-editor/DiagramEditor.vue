@@ -1008,7 +1008,6 @@ function trimPageElements() {
     page.containedIDs = page.containedIDs.filter((eleID) => {
       return loadElements.value.findIndex((ele) => `[data-item-id='${ele.id}']` == eleID) != -1;
     });
-    console.log('page.containedIDs', page.containedIDs);
   });
 }
 
@@ -1017,25 +1016,25 @@ var ctx2 = outputCanvas.getContext('2d');
 let previewImages: string[] = [];
 let pageCount = 0;
 let protoData: string;
-async function drawCanvas(drawPage: PageItem, darwPageItems: Array<Item>, output: boolean) {
+async function drawCanvas(output: boolean) {
   let elems: Array<HTMLElement> = [];
-  (drawPage as PageItem).containedIDs.forEach((dataID) => {
+  (currentPage.value as PageItem).containedIDs.forEach((dataID) => {
     var id = dataID.split("'")[1];
     elems.push(document.getElementById(id) as HTMLElement);
   });
   elems.sort((ele1, ele2) => {
     return parseInt(ele2.style.zIndex) - parseInt(ele1.style.zIndex);
   });
-  darwPageItems.sort((ele1, ele2) => {
+  selectedPageItems.value.sort((ele1, ele2) => {
     return ele1.z - ele2.z;
   });
   var len = elems.length;
   var pageAttrs = {
-    w: (drawPage as PageItem).w,
-    h: (drawPage as PageItem).h,
-    x: (drawPage as PageItem).x,
-    y: (drawPage as PageItem).y,
-    pagaName: (drawPage as PageItem).pageName,
+    w: (currentPage.value as PageItem).w,
+    h: (currentPage.value as PageItem).h,
+    x: (currentPage.value as PageItem).x,
+    y: (currentPage.value as PageItem).y,
+    pagaName: (currentPage.value as PageItem).pageName,
   };
   outputCanvas.width = pageAttrs.w;
   outputCanvas.height = pageAttrs.h;
@@ -1048,9 +1047,9 @@ async function drawCanvas(drawPage: PageItem, darwPageItems: Array<Item>, output
     }
     var width = elem.offsetWidth; //获取dom 宽度
     var height = elem.offsetHeight; //获取dom 高度
-    var x = darwPageItems[i].x - pageAttrs.x;
-    var y = darwPageItems[i].y - pageAttrs.y;
-    var yOffset = darwPageItems[i].yOffset;
+    var x = selectedPageItems.value[i].x - pageAttrs.x;
+    var y = selectedPageItems.value[i].y - pageAttrs.y;
+    var yOffset = selectedPageItems.value[i].yOffset;
     canvas.width = width;
     canvas.height = height;
     var opts = {
@@ -1083,7 +1082,7 @@ async function drawCanvas(drawPage: PageItem, darwPageItems: Array<Item>, output
                   var protoID = parseInt(route.params.protoID as string);
                   editFile({
                     fileID: protoID,
-                    fileImage: previewImages[previewImages.length - 1],
+                    fileImage: previewImages[0],
                     previewImages: previewImages,
                     data: protoData,
                   }).then((res) => {
@@ -1111,21 +1110,22 @@ async function drawCanvas(drawPage: PageItem, darwPageItems: Array<Item>, output
 }
 
 function saveToImage() {
+  trimPageElements();
   if (currentPage.value == null) {
     selectPage(pages.value[0]);
   }
-  drawCanvas(currentPage.value as PageItem, selectedPageItems.value, true);
+  drawCanvas(true);
 }
 
 function saveAll() {
+  trimPageElements();
   protoData = JSON.stringify(loadElements.value as Item[]);
   pageCount = 0;
   previewImages.length = 0;
   pages.value.forEach((page) => {
-    var pageItems = loadElements.value.filter((elem) => {
-      return (page as PageItem).containedIDs.includes(`[data-item-id='${elem.id}']`);
-    }) as Item[];
-    drawCanvas(page, pageItems, false);
+    selectPage(page);
+    selectItem(page);
+    drawCanvas(false);
   });
 }
 
@@ -1513,6 +1513,12 @@ function setupKeyboardHandlers() {
     }
   });
 
+  onKey(['c'], (e: KeyboardEvent) => {
+    if (isVirtualCtrl(e)) {
+      copyItem();
+    }
+  });
+
   // Shortcuts to tools selection
   // onKey(['s'], (e: KeyboardEvent) => selectCurrentTool(EditorTool.SELECT)); // S = Select tool
   onKey(['t'], (e: KeyboardEvent) => selectCurrentTool(EditorTool.TEXT)); // T = Text tool
@@ -1558,7 +1564,7 @@ function copyItem() {
   // console.log('Copying item', selectedItem.value);
 
   itemToPaste.value = selectedItem.value;
-
+  itemToPaste.value.id = getUniqueId();
   // TODO:  notify the user visually that the item has been copied
 }
 
