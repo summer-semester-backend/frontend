@@ -30,9 +30,6 @@ const nameColumn = reactive<DataTableBaseColumn>({
   key: 'username',
   filter: 'default',
   filterOptionValue: null,
-  sorter(rowA: any, rowB: any) {
-    return rowA.name.length - rowB.name.length;
-  },
 });
 const buttomColumn = reactive<DataTableBaseColumn>({
   title: '操作',
@@ -90,7 +87,6 @@ const columns = reactive<DataTableColumns>([
         </NButton>
       );
     },
-    sorter: 'default',
   },
   {
     title: '加入状态',
@@ -102,7 +98,6 @@ const columns = reactive<DataTableColumns>([
         </NButton>
       );
     },
-    sorter: 'default',
   },
   buttomColumn,
 ]);

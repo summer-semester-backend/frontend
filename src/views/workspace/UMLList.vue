@@ -111,6 +111,7 @@ import { h, ref, computed, onMounted } from 'vue';
 import { Add, AddCircleOutline, Trash, ArrowRedo, Create, GridOutline, List, Copy } from '@vicons/ionicons5';
 import { UnorderedListOutlined, EditOutlined, FileImageFilled } from '@vicons/antd';
 import { readFile, createFile, editFile, deleteFile, copyFile } from '@/api/file';
+import { formatDate } from '@/plugins/date';
 import { useRoute } from 'vue-router';
 import { ToolBar } from './components';
 import { useMessage } from 'naive-ui';
@@ -216,7 +217,7 @@ const columns = ref([
     title: '最近更新',
     key: 'lastEditTime',
     sorter: (row1: File, row2: File) => (row1.lastEditTime > row2.lastEditTime ? 1 : -1),
-    render: (row: File) => h('span', row.lastEditTime?.slice(0, 10)),
+    render: (row: File) => h('span', formatDate(row.lastEditTime)),
   },
   {
     title: '操作',

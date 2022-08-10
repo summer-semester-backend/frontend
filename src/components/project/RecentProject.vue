@@ -34,7 +34,7 @@
               <div>项目名称：{{ item.fileName }}</div>
               <div>所属团队：{{ item.teamName }}</div>
               <div>创建者：{{ item.userName }}</div>
-              <div>创建时间：{{ item.createTime.slice(0, 10) }}</div>
+              <div>创建时间：{{ formatDate(item.createTime) }}</div>
             </template>
           </n-tooltip>
         </n-gi>
@@ -45,6 +45,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { readFile, recentProjectList } from '@/api/file';
+import { formatDate } from '@/plugins/date';
 import { useRouter } from 'vue-router';
 const router = useRouter();
 const projects = ref([

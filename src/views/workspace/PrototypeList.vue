@@ -66,6 +66,7 @@ import { AddCircleOutline, Trash, ArrowRedo, CreateOutline, Create, GridOutline,
 import { UnorderedListOutlined, EditOutlined, FileImageFilled } from '@vicons/antd';
 import { copyFile, createFile, deleteFile, editFile } from '@/api/file';
 import { readFile } from '@/api/file';
+import { formatDate } from '@/plugins/date';
 import { useRoute } from 'vue-router';
 import { ToolBar } from './components';
 interface File {
@@ -304,7 +305,7 @@ const columns = ref([
     title: '最近更新',
     key: 'lastEditTime',
     sorter: (row1: File, row2: File) => (row1.lastEditTime > row2.lastEditTime ? 1 : -1),
-    render: (row: File) => h('span', row.lastEditTime?.slice(0, 10)),
+    render: (row: File) => h('span', formatDate(row.lastEditTime)),
   },
   {
     title: '操作',

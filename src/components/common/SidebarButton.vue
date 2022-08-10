@@ -25,6 +25,8 @@ const handleDirect = () => {
   router.push({ name: props.routeName });
 };
 const isSelect = computed(() => {
-  return route.fullPath.split('/')[1] == props.rootRoute;
+  let name = route.fullPath.split('/')[1];
+  if (props.rootRoute == 'user') return name == props.rootRoute;
+  else return name == 'team' || name == 'prototype' || name == 'workspace' || name == 'edit';
 });
 </script>

@@ -2,9 +2,9 @@
   <ToolBar :ancestors="ancestors" :team-i-d="teamID" :type="teamID == -1 ? 'proj' : 'team'">
     <template #toolbar>
       <n-dropdown :options="options" @select="handleSelect" trigger="click">
-        <n-button text @click="newFileAncestor = fileID">
+        <n-button strong secondary type="info" small size="small" @click="newFileAncestor = fileID">
           <template #icon>
-            <n-icon size="26" class="icon">
+            <n-icon size="20" class="icon">
               <AddCircleOutline />
             </n-icon>
           </template>
@@ -58,6 +58,7 @@ import {
 import { ProjectOutlined, TeamOutlined } from '@vicons/antd';
 import { copyFile, createFile, deleteFile, editFile, getAncestor } from '@/api/file';
 import { readFile, readFileCenter } from '@/api/file';
+import { formatDate } from '@/plugins/date';
 import { onBeforeRouteUpdate, useRoute } from 'vue-router';
 import { ToolBar } from './components';
 import router from '@/router';
@@ -129,7 +130,7 @@ const columns = ref([
     title: '最近更新',
     key: 'lastEditTime',
     sorter: (row1: File, row2: File) => (row1.lastEditTime > row2.lastEditTime ? 1 : -1),
-    render: (row: File) => h('span', row.lastEditTime?.slice(0, 10)),
+    render: (row: File) => h('span', formatDate(row.lastEditTime)),
   },
   {
     title: '操作',
@@ -534,7 +535,7 @@ const handleOpen = (row: any) => {
       },
     });
   } else if (row.fileType > 0) {
-    router.push({
+    router.replace({
       name: 'DirList',
       params: {
         dirID: row.fileID,

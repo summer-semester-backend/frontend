@@ -4,18 +4,18 @@
       <template #toolbar>
         <n-button v-if="!isInputShow" @click="showInput" quaternary circle>
           <template #icon>
-            <n-icon size="18" color="rgb(100,100,100)"><search /></n-icon>
+            <n-icon size="20" color="rgb(100,100,100)"><search /></n-icon>
           </template>
         </n-button>
         <n-input v-model:value="input" v-else round placeholder="搜索名称" @blur="hideInput" style="width: 200px">
           <template #suffix>
-            <n-icon size="18" :component="Search" />
+            <n-icon size="20" :component="Search" />
           </template>
         </n-input>
         <n-dropdown :options="operates" @select="handleSelect">
           <n-button quaternary circle
             ><template #icon>
-              <n-icon size="18" color="rgb(100,100,100)"><ellipsis-horizontal /></n-icon> </template
+              <n-icon size="20" color="rgb(100,100,100)"><ellipsis-horizontal /></n-icon> </template
           ></n-button>
         </n-dropdown>
       </template>
@@ -75,7 +75,7 @@
                   <div>项目名称：{{ item.fileName }}</div>
                   <div>所属团队：{{ item.teamName }}</div>
                   <div>创建者：{{ item.userName }}</div>
-                  <div>创建时间：{{ item.createTime.slice(0, 10) }}</div>
+                  <div>创建时间：{{ formatDate(item.createTime) }}</div>
                 </template>
               </n-tooltip>
             </n-gi>
@@ -148,6 +148,7 @@ import {
 } from '@vicons/ionicons5';
 import { copyFile, deleteFile, editFile, readFile } from '@/api/file';
 import { NIcon, NInput } from 'naive-ui';
+import { formatDate } from '@/plugins/date';
 import { useRouter } from 'vue-router';
 interface Project {
   fileID: number;
@@ -310,11 +311,6 @@ const dataFilter = computed(() => {
     return !input.value || data.fileName.toLowerCase().includes(input.value.toLowerCase());
   });
 });
-
-//将"yyyy-mm-dd"格式的字符串转换为日期对象
-const formatDate = (date: string) => {
-  return new Date(Date.parse(date.replace(/-/g, '/')));
-};
 
 //跳转到指定项目
 const jumpToProj = (fileID: number) => {
