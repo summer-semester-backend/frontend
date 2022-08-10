@@ -14,6 +14,13 @@ import { useAuthStore } from '@/store/auth';
 const { signOut } = useAuthStore();
 const route = useRoute();
 const router = useRouter();
+const notShow = computed(() => {
+  return route.name == 'login' || route.name == 'Prototype' || route.name == 'NoFound';
+});
+const isIndex = computed(() => {
+  return route.name == 'Index';
+});
+
 const isLoginPage = computed(() => {
   return route.name == 'login';
 });
@@ -23,15 +30,16 @@ const isProtoPage = computed(() => {
 const isNoFoundPage = computed(() => {
   return route.name == 'NoFound';
 });
-const isIndex = computed(() => {
-  return route.name == 'Index';
-});
+
 backend.interceptors.response.use(
   (response) => {
     if (response.data.result == 10) {
-      window.$message.error('登录认证失败');
+      window.$message.error('登录认证失败！');
       signOut();
       router.push({ name: 'login' });
+    } else if (response.data.result == 11) {
+      window.$message.error(response.data.message);
+      router.push({ name: 'NoFound' });
     } else if (response.data.result != 0) {
       if (response.data.result == 1) {
         window.$message.warning(response.data.message);

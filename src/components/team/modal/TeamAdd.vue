@@ -11,7 +11,7 @@
     @close="handleClose"
   >
     <n-divider style="margin: 15px auto" />
-    <n-input v-model:value="newTeamName" type="text" placeholder="请输入团队名称"> </n-input>
+    <n-input v-model:value="newTeamName" type="text" placeholder="请输入团队名称" maxlength="10" show-count> </n-input>
     <n-input
       v-model:value="newTeamProfile"
       type="textarea"

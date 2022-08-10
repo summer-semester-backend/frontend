@@ -13,15 +13,16 @@ import Engine from '@aomao/engine';
 import type { EngineInterface } from '@aomao/engine';
 import AmToolbar from '@aomao/toolbar-vue';
 import type { GroupItemProps } from '@aomao/toolbar-vue';
-import { onMounted, ref, onUnmounted } from 'vue';
+import { onMounted, ref, onUnmounted, watch } from 'vue';
 import { OTClient } from './ot';
 import { cards, plugins, pluginConfig } from './config';
-import { onBeforeRouteLeave, useRoute } from 'vue-router';
+import { onBeforeRouteLeave, onBeforeRouteUpdate, useRoute } from 'vue-router';
 import { html2md } from '../../plugins/html2md';
 import { asBlob } from 'html-docx-js-typescript';
 import { saveAs } from 'file-saver';
 import html2pdf from 'html2pdf.js';
 import { getUserInfo } from '@/api/user';
+import { createTeamModule, editFile, readFile } from '@/api/file';
 const container = ref<HTMLDivElement | null>(null);
 const engine = ref<EngineInterface | null>(null);
 const toolbarItems = ref<GroupItemProps[]>([
@@ -35,10 +36,24 @@ const toolbarItems = ref<GroupItemProps[]>([
   ['link', 'quote', 'hr'],
 ]);
 const fileID = ref<string | null>(null);
-const route = useRoute();
+var route = useRoute();
+const isView = ref<boolean>(false);
 const currentMember = ref({
   nickname: '',
   userID: '',
+});
+const fileInfo = ref<{
+  fileID: number | null;
+  fileName: string | null;
+  fileImage: string | null;
+  fatherID: number | null;
+  data: string | null;
+}>({
+  fileID: null,
+  fileName: null,
+  fileImage: null,
+  fatherID: null,
+  data: null,
 });
 //初始化编辑器
 const initEditor = () => {
@@ -61,10 +76,12 @@ const initEditor = () => {
       ''
     );
     ot.on('ready', (member) => {
-      if (member) {
-        localStorage.setItem('member', JSON.stringify(member));
-      }
+      console.log('ready', member);
     });
+
+    //设置值
+    engineInstance.setHtml(fileInfo.value.data || '');
+
     engine.value = engineInstance;
   } else {
     window.$message.error('文件打开失败，请退出重试');
@@ -127,32 +144,92 @@ const exportWord = async (title: string) => {
   });
 };
 
+//保存为模板
+const saveModule = (fileID: number | null, fileName: string) => {
+  createTeamModule({ fileID: fileID, fileName: fileName, data: engine.value?.getHtml() || '' }).then((res) => {
+    if (res.data.result == 0) window.$message.success('保存成功');
+  });
+};
+
+//保存到服务器
+const save = async () => {
+  return editFile({
+    fileID: fileInfo.value.fileID || -1,
+    fileName: fileInfo.value.fileName,
+    data: engine.value?.getHtml() || '',
+    fatherID: fileInfo.value.fatherID,
+    fileImage: fileInfo.value.fileImage,
+  }).then((res) => {
+    if (res.data.result == 0) console.log('保存成功');
+  });
+};
+
+//在离开前保存
+const saveBeforeLeave = (e: Event | null) => {
+  if (engine.value) {
+    save().then(() => {
+      console.log('save', engine.value);
+      engine.value?.destroy();
+      engine.value = null;
+    });
+  }
+};
+
 defineExpose({
   exportMd,
   exportPdf,
   exportHtml,
   exportWord,
+  saveModule,
 });
 
-onMounted(() => {
+const reload = () => {
   let useid = localStorage.getItem('userID') || '';
   getUserInfo({ userID: useid })
     .then((res) => {
       if (res.data.result == 0) {
         currentMember.value.nickname = res.data.data.nickname;
         currentMember.value.userID = useid;
-        fileID.value = route.params.id.toString();
       }
     })
     .then(() => {
-      initEditor();
+      fileID.value = route.params.id.toString();
+      readFile({ fileID: parseInt(fileID.value), teamID: -1 })
+        .then((res) => {
+          fileInfo.value.fileID = res.data.fileID;
+          fileInfo.value.fileName = res.data.fileName;
+          fileInfo.value.fileImage = res.data.fileImage;
+          fileInfo.value.fatherID = res.data.fatherID;
+          fileInfo.value.data = res.data.data;
+        })
+        .then(() => {
+          initEditor();
+          console.log('reload', engine.value);
+        });
     });
+};
+
+watch(route, () => {
+  console.log('watchRtoueChange');
+  if (route.params.id) reload();
+});
+
+onMounted(() => {
+  reload();
+  console.log('onMounted');
+  window.addEventListener('beforeunload', saveBeforeLeave);
+});
+
+onBeforeRouteLeave(() => {
+  console.log('onBeforeRouteLeave');
+  saveBeforeLeave(null);
+});
+
+onBeforeRouteUpdate(() => {
+  console.log('onBeforeRouteUpdate');
+  saveBeforeLeave(null);
 });
 onUnmounted(() => {
-  if (engine.value) engine.value.destroy();
-});
-onBeforeRouteLeave((to, from, next) => {
-  if (engine.value) engine.value.destroy();
-  next();
+  window.removeEventListener('beforeunload', saveBeforeLeave);
 });
 </script>

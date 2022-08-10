@@ -103,15 +103,14 @@
       <n-input v-model:value="fileNameRef" placeholder="请输入文件名" clearable style="width: 350px" />
     </n-space>
   </n-modal>
-
 </template>
 
 <script setup lang="ts">
 import { NButton, NIcon, NSpace, useDialog } from 'naive-ui';
 import { h, ref, computed, onMounted } from 'vue';
-import { Add,AddCircleOutline, Trash, ArrowRedo, Create ,GridOutline,List} from '@vicons/ionicons5';
-import { UnorderedListOutlined,EditOutlined,FileImageFilled} from '@vicons/antd';
-import { readFile, createFile, editFile, deleteFile ,copyFile} from '@/api/file';
+import { Add, AddCircleOutline, Trash, ArrowRedo, Create, GridOutline, List, Copy } from '@vicons/ionicons5';
+import { UnorderedListOutlined, EditOutlined, FileImageFilled } from '@vicons/antd';
+import { readFile, createFile, editFile, deleteFile, copyFile } from '@/api/file';
 import { useRoute } from 'vue-router';
 import { ToolBar } from './components';
 import { useMessage } from 'naive-ui';
@@ -179,15 +178,14 @@ const closeModelEdit = () => {
 };
 //复制
 const showModelCopy = ref(false);
-const openModelCopy  = () => {
-  fileNameRef.value = fileOnOpen.value?.fileName + "-副本";
+const openModelCopy = () => {
+  fileNameRef.value = fileOnOpen.value?.fileName + '-副本';
   showModelCopy.value = true;
 };
 const closeModelCopy = () => {
   showModelCopy.value = false;
   fileNameRef.value = '';
 };
-
 
 const route = useRoute();
 const message = useMessage();
@@ -206,6 +204,9 @@ const columns = ref([
   {
     title: '文件名称',
     key: 'fileName',
+    render(row: any) {
+      return h(NButton, { text: true, onClick: () => handleClickOpen(row) }, { default: row.fileName });
+    },
   },
   {
     title: '创建者',
@@ -241,22 +242,6 @@ const columns = ref([
         h(
           NButton,
           {
-            type: 'success',
-            size: 'small',
-            strong: true,
-            secondary: true,
-            onClick(e) {
-              handleClickOpen(row);
-            },
-          },
-          {
-            default: '打开',
-            icon: h(NIcon, { component: ArrowRedo }),
-          }
-        ),
-        h(
-          NButton,
-          {
             type: 'warning',
             size: 'small',
             strong: true,
@@ -283,7 +268,7 @@ const columns = ref([
           },
           {
             default: '复制',
-            icon: h(NIcon, { component: Create }),
+            icon: h(NIcon, { component: Copy }),
           }
         ),
       ]);
@@ -296,23 +281,27 @@ const files = ref<File[]>([]);
 const fileOnOpen = ref<File | null>(null);
 
 const emits = defineEmits(['refresh']);
-const handleClickOpen = (file) => {
+const handleClickOpen = (file: any) => {
   fileOnOpen.value = file;
   // console.log(fileOnOpen.value.fileImage);
-  openDeskWithFile(fileOnOpen.value.fileImage);
+  openDeskWithFile(fileOnOpen.value!.fileImage);
 };
-const handleClickEdit = (file) => {
+const handleClickEdit = (file: any) => {
   fileOnOpen.value = file;
-  fileNameRef.value = fileOnOpen.value.fileName;
+  fileNameRef.value = fileOnOpen.value!.fileName;
   openModelEdit();
 };
+<<<<<<< HEAD
 const handleClickCopy = (file) => {
   console.log(file);
+=======
+const handleClickCopy = (file: any) => {
+>>>>>>> dev
   fileOnOpen.value = file;
   openModelCopy();
 };
 
-const handleClickDelete = (file) => {
+const handleClickDelete = (file: any) => {
   dialog.warning({
     title: '警告',
     content: '你确定要删除这个文件吗？',
@@ -443,13 +432,21 @@ const deleFlie = (fileID: number) => {
 };
 
 const copy = () => {
-  if (fileNameRef.value == null || fileNameRef.value == '')
-  {
+  if (fileNameRef.value == null || fileNameRef.value == '') {
     message.warning('文件名不能为空!');
     return;
   }
+<<<<<<< HEAD
   console.log(fileOnOpen.value,projID.value);
   copyFile({fileID: fileOnOpen.value?.fileID ,fatherID: projID.value ,teamID: null, newName: fileNameRef.value})
+=======
+  copyFile({
+    fileID: fileOnOpen.value?.fileID as number,
+    fatherID: projID.value as number,
+    teamID: null,
+    newName: fileNameRef.value,
+  })
+>>>>>>> dev
     .then((res) => {
       if (res.data.result == 0) {
         window.$message.success('复制成功');
@@ -463,7 +460,7 @@ const copy = () => {
     .catch((err) => {
       console.log(err);
     });
-}
+};
 
 onMounted(() => {
   projID.value = parseInt(route.params.ProjID.toString());

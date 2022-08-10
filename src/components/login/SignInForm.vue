@@ -33,10 +33,10 @@ const handleLogin = () => {
     if (res.data.result == 0) {
       localStorage.setItem('token', res.data.token);
       localStorage.setItem('userID', res.data.userID);
-      localStorage.setItem('userName', res.data.username);
+      localStorage.setItem('avatar', res.data.avatar);
       signIn(res.data.token);
       window.$message.info('登录成功');
-      console.log(localStorage.getItem('inviteLink'));
+      // console.log(localStorage.getItem('inviteLink'));
       if (localStorage.getItem('inviteLink')) {
         router.push({ name: 'AttendTeam', params: { code: localStorage.getItem('inviteLink') } });
       } else {

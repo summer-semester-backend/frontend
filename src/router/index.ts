@@ -7,23 +7,6 @@ const routes: RouteRecordRaw[] = [
     redirect: 'login',
   },
   {
-    path: '/project',
-    name: 'project',
-    component: () => import('../views/project/ProjectOverview.vue'),
-    children: [
-      {
-        path: 'desktop',
-        name: 'ProjectDesktop',
-        component: () => import('../views/project/ProjectDesktop.vue'),
-      },
-      {
-        path: 'trash',
-        name: 'ProjectTrash',
-        component: () => import('../views/project/ProjectTrash.vue'),
-      },
-    ],
-  },
-  {
     path: '/prototype/:protoID',
     name: 'Prototype',
     component: () => import('../views/prototype/ProtoWorkSpace.vue'),
@@ -53,6 +36,21 @@ const routes: RouteRecordRaw[] = [
             name: 'teamProject',
             component: () => import('../views/team/TeamProject.vue'),
           },
+          {
+            path: 'doc/',
+            name: 'documentCenter',
+            component: () => import('../views/team/DocumentCenter.vue'),
+          },
+          {
+            path: 'dir/:dirID',
+            name: 'directory',
+            component: () => import('../views/team/DocumentCenter.vue'),
+          },
+          {
+            path: 'trash',
+            name: 'teamTrash',
+            component: () => import('../views/project/ProjectTrash.vue'),
+          },
         ],
       },
     ],
@@ -77,6 +75,11 @@ const routes: RouteRecordRaw[] = [
         name: 'UserDefault',
         redirect: '/user/personInfo',
       },
+      {
+        path: 'desktop',
+        name: 'ProjectDesktop',
+        component: () => import('../views/project/ProjectDesktop.vue'),
+      },
     ],
   },
   {
@@ -85,9 +88,14 @@ const routes: RouteRecordRaw[] = [
     component: () => import('../views/workspace/WorkspaceOverview.vue'),
     children: [
       {
-        path: 'doc',
+        path: 'doc/',
         name: 'DocumentList',
-        component: () => import('../views/workspace/DocumentList.vue'),
+        component: () => import('../components/document/Documents.vue'),
+      },
+      {
+        path: 'dir/:dirID',
+        name: 'DirList',
+        component: () => import('../components/document/Documents.vue'),
       },
       {
         path: 'uml',
@@ -107,7 +115,7 @@ const routes: RouteRecordRaw[] = [
     ],
   },
   {
-    path: '/doc/edit/:id',
+    path: '/edit/:id',
     name: 'editor',
     component: () => import('../views/document/DocumentEditor.vue'),
   },

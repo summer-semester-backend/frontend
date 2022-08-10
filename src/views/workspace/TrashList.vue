@@ -12,12 +12,11 @@
             <n-icon size="18" :component="Search" />
           </template>
         </n-input>
-        <n-dropdown :options="options" @select="handleSelect">
-          <n-button quaternary circle
-            ><template #icon>
-              <n-icon size="18" color="rgb(100,100,100)"><ellipsis-horizontal /></n-icon> </template
-          ></n-button>
-        </n-dropdown>
+        <n-button quaternary @click="handleClear"
+          ><template #icon>
+            <n-icon size="18" color="rgb(100,100,100)"><trash /></n-icon> </template
+          >清空回收站</n-button
+        >
       </template>
     </ToolBar>
     <n-data-table :columns="columns" :data="dataFilter" :pagination="pagination" :bordered="false" />
@@ -57,6 +56,8 @@ const columns = ref([
     render: (row: any) =>
       h(NText, {}, () => {
         switch (row.fileType) {
+          case 2:
+            return '文件夹';
           case 12:
             return 'UML图';
           case 13:
@@ -152,25 +153,29 @@ const hideInput = () => {
   isInputShow.value = false;
 };
 //选择操作
-const handleSelect = (key: string | number) => {
-  console.log(key);
-  if (key === 'delete') {
-    console.log('delete');
-    clearBin().then((res) => {
-      if (res.data.result == 0) {
-        window.$message.success(res.data.message);
-        getProjectList(projID.value);
-      } else if (res.data.result == 1) {
-        window.$message.warning(res.data.message);
-      } else if (res.data.result == 2) {
-        window.$message.error(res.data.message);
-      }
-    });
-  }
+const handleClear = () => {
+  window.$dialog.error({
+    title: '提示',
+    content: '是否彻底删除所有文件？',
+    positiveText: '确定',
+    negativeText: '取消',
+    onPositiveClick: () => {
+      clearBin({ fileID: projID.value, teamID: -1 }).then((res) => {
+        if (res.data.result == 0) {
+          window.$message.success(res.data.message);
+          getProjectList(projID.value);
+        } else if (res.data.result == 1) {
+          window.$message.warning(res.data.message);
+        } else if (res.data.result == 2) {
+          window.$message.error(res.data.message);
+        }
+      });
+    },
+  });
 };
 
 const getProjectList = (id: number) => {
-  binList({ fileID: id })
+  binList({ fileID: id, teamID: -1 })
     .then((res) => {
       trashs.value = res.data.list;
     })

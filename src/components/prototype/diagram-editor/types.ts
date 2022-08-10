@@ -22,14 +22,17 @@ export interface Frame extends Rect {
 
 export interface DiagramElement {
   id: string; // The unique element ID
+  fatherID?: string;
   title: string; // The element title / label
   z: number; // The element z-index
   isPage: boolean; // whether used as page
+  yOffset: number;
 
   backgroundColor: string; // The element background color (item background, connection stroke color)
   textColor: string; // The element text color (text inside the element, etc.)
   opacity: number; // Opacity (0=full transparent, 100=full opaque). Default = 100
 
+  fontWeight: number; // text font weight
   fontSize: number; // The element text font size
   shadow: boolean; // Show/hide element shadow
 
@@ -57,6 +60,7 @@ export interface Item extends DiagramElement {
   textVAlign: TextVAlign;
 
   border: ItemBorder;
+  connection?: ItemConnection;
 }
 
 export enum TextHAlign {
@@ -177,8 +181,8 @@ import {
 import { PushOutline } from '@vicons/ionicons5';
 
 export const toolDefinitions: ToolDefinition[] = [
-  { type: EditorTool.SELECT, title: 'Select', group: ToolBoxGroup.TOOL, icon: 'ads_click' },
-  { type: EditorTool.CONNECTION, title: 'Connection', group: ToolBoxGroup.TOOL, icon: 'share', itemType: 'Connection' },
+  { type: EditorTool.SELECT, title: '选择', group: ToolBoxGroup.TOOL, icon: 'ads_click' },
+  { type: EditorTool.CONNECTION, title: '连接', group: ToolBoxGroup.TOOL, icon: 'link', itemType: 'Connection' },
   {
     type: EditorTool.TEXT,
     title: '文字',
@@ -260,7 +264,7 @@ export const toolDefinitions: ToolDefinition[] = [
     iconComponent: StarOutline,
   },
   // Icon
-  { type: EditorTool.ICON, title: 'Icon', group: ToolBoxGroup.ICON, icon: 'portrait', itemType: 'Icon' },
+  { type: EditorTool.ICON, title: '图标', group: ToolBoxGroup.ICON, icon: 'portrait', itemType: 'Icon' },
   // Page
   { type: EditorTool.PAGE, title: '页面', group: ToolBoxGroup.CONTAINER, icon: 'rectangle', itemType: 'Page' },
   // { type: EditorTool.WIDGET, title: 'Widgets', group: ToolBoxGroup.CONTAINER, icon: 'view_in_ar' },

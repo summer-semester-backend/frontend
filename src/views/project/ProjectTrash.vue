@@ -1,5 +1,5 @@
 <template>
-  <div id="content">
+  <div style="padding: 35px 60px">
     <Header title="回收站">
       <template #toolbar>
         <n-button v-if="!isInputShow" @click="showInput" quaternary circle>
@@ -12,15 +12,21 @@
             <n-icon size="18" :component="Search" />
           </template>
         </n-input>
-        <n-dropdown :options="options" @select="handleSelect">
-          <n-button quaternary circle
-            ><template #icon>
-              <n-icon size="18" color="rgb(100,100,100)"><ellipsis-horizontal /></n-icon> </template
-          ></n-button>
-        </n-dropdown>
+        <n-button @click="handleClear" quaternary
+          ><template #icon>
+            <n-icon size="18" color="rgb(100,100,100)"><trash-outline /></n-icon> </template
+          >清空回收站</n-button
+        >
       </template>
       <template #content>
-        <n-data-table :columns="columns" :data="dataFilter" :pagination="pagination" :bordered="false" />
+        <n-tabs size="small" animated v-model:value="tabName">
+          <n-tab-pane name="proj" tab="项目">
+            <n-data-table :columns="columns" :data="dataFilter" :pagination="pagination" :bordered="false" />
+          </n-tab-pane>
+          <n-tab-pane name="doc" tab="文档">
+            <n-data-table :columns="columns" :data="dataFilter" :pagination="pagination" :bordered="false" />
+          </n-tab-pane>
+        </n-tabs>
       </template>
     </Header>
   </div>
@@ -28,17 +34,29 @@
 <script setup lang="ts">
 import { NButton, NIcon, NSpace } from 'naive-ui';
 import { h, ref, computed, onMounted } from 'vue';
-import { Refresh, Trash, Search, EllipsisHorizontal } from '@vicons/ionicons5';
+import {
+  Refresh,
+  TrashOutline,
+  Trash,
+  Search,
+  EllipsisHorizontal,
+  FolderOutline,
+  DocumentTextOutline,
+} from '@vicons/ionicons5';
 import { binList, recoverFile, deleteFile, clearBin } from '@/api/file';
+import { useRoute } from 'vue-router';
 type Project = {
   fileID: number;
+  fileType: number;
   fileName: string;
-  teamName: string;
+  userName: string;
   abandonTime: string;
 };
 
+const route = useRoute();
 const isInputShow = ref(false); //是否显示搜索框
 const input = ref(''); //搜索关键字
+const tabName = ref('proj');
 const options = ref([
   {
     label: '清空回收站',
@@ -47,12 +65,33 @@ const options = ref([
 ]);
 const columns = ref([
   {
-    title: '项目名称',
+    title: () => (tabName.value == 'proj' ? '项目名称' : '文档名称'),
     key: 'fileName',
+    render: (row: any) =>
+      h(
+        NSpace,
+        {
+          size: 4,
+        },
+        [
+          h(NIcon, {
+            size: '18',
+            component: () => {
+              switch (row.fileType) {
+                case 2:
+                  return h(FolderOutline);
+                case 14:
+                  return h(DocumentTextOutline);
+              }
+            },
+          }),
+          h('span', {}, row.fileName),
+        ]
+      ),
   },
   {
-    title: '所属团队',
-    key: 'teamName',
+    title: '创建者',
+    key: 'userName',
   },
   {
     title: '删除时间',
@@ -121,10 +160,11 @@ const columns = ref([
     },
   },
 ]);
+const teamID = ref<number>();
 const trashs = ref<Project[]>([]);
 const pagination = ref({
   current: 1,
-  pageSize: 10,
+  pageSize: 8,
 });
 
 //显示搜索
@@ -135,26 +175,30 @@ const showInput = () => {
 const hideInput = () => {
   isInputShow.value = false;
 };
-//选择操作
-const handleSelect = (key: string | number) => {
-  console.log(key);
-  if (key === 'delete') {
-    console.log('delete');
-    clearBin().then((res) => {
-      if (res.data.result == 0) {
-        window.$message.success(res.data.message);
-        getProjectList();
-      } else if (res.data.result == 1) {
-        window.$message.warning(res.data.message);
-      } else if (res.data.result == 2) {
-        window.$message.error(res.data.message);
-      }
-    });
-  }
+//清空回收站
+const handleClear = () => {
+  window.$dialog.error({
+    title: '提示',
+    content: '是否彻底删除所有项目和文件？',
+    positiveText: '确定',
+    negativeText: '取消',
+    onPositiveClick: () => {
+      clearBin({ fileID: -1, teamID: teamID.value || -1 }).then((res) => {
+        if (res.data.result == 0) {
+          window.$message.success(res.data.message);
+          getProjectList();
+        } else if (res.data.result == 1) {
+          window.$message.warning(res.data.message);
+        } else if (res.data.result == 2) {
+          window.$message.error(res.data.message);
+        }
+      });
+    },
+  });
 };
 
 const getProjectList = () => {
-  binList({ fileID: null })
+  binList({ fileID: -1, teamID: teamID.value || -1 })
     .then((res) => {
       trashs.value = res.data.list;
     })
@@ -163,19 +207,18 @@ const getProjectList = () => {
     });
 };
 onMounted(() => {
+  teamID.value = parseInt(route.params.teamID.toString());
   getProjectList();
 });
 
 //搜索
 const dataFilter = computed(() => {
   return trashs.value.filter((data) => {
-    return !input.value || data.fileName.toLowerCase().includes(input.value.toLowerCase());
+    return (
+      (tabName.value == 'proj' ? data.fileType == 1 : data.fileType > 1) &&
+      (!input.value || data.fileName.toLowerCase().includes(input.value.toLowerCase()))
+    );
   });
 });
 </script>
-<style scope lang="less">
-#content {
-  padding: 35px 60px;
-  position: relative;
-}
-</style>
+<style scope lang="less"></style>

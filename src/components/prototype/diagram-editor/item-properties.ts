@@ -9,7 +9,6 @@ export const id$: ObjectProperty = {
   label: 'ID',
   type: PropertyType.TEXT,
   editorFullsize: true,
-  readonly: true,
   formatValue: (obj, prop, value) => value + ' (' + obj.component + ')',
 };
 export const title$: ObjectProperty = { name: 'title', label: '文字', type: PropertyType.TEXT, editorFullsize: true };
@@ -20,6 +19,14 @@ export const fontSize$: ObjectProperty = {
   type: PropertyType.RANGE,
   editorFullsize: true,
   editorOptions: { min: 4, max: 120, step: 1 },
+};
+
+export const fontWeight$: ObjectProperty = {
+  name: 'fontWeight',
+  label: '加粗',
+  type: PropertyType.RANGE,
+  editorFullsize: true,
+  editorOptions: { min: 100, max: 900, step: 1 },
 };
 
 export const textHAlign$: ObjectProperty = {
@@ -84,6 +91,55 @@ export const opacity$: ObjectProperty = {
   type: PropertyType.RANGE,
   editorFullsize: true,
   editorOptions: { min: 0, max: 100, step: 1 },
+};
+
+export const clipType$: ObjectProperty = {
+  name: 'clipType',
+  label: '剪裁',
+  type: PropertyType.ICON_LIST,
+  editorFullsize: true,
+  editorOptions: {
+    items: [
+      { name: ClipType.NONE, icon: 'image' },
+      { name: ClipType.RECT, icon: 'rectangle' },
+      { name: ClipType.POLYGON, icon: 'timeline' },
+      { name: ClipType.ELLIPSE, icon: 'circle' },
+    ],
+  },
+};
+export const fit$: ObjectProperty = {
+  name: 'fit',
+  label: '适应',
+  type: PropertyType.ICON_LIST,
+  editorFullsize: true,
+  editorOptions: {
+    items: [
+      { name: 'none', text: 'None' },
+      { name: 'contain', text: 'Contain' },
+      { name: 'cover', text: 'Cover' },
+      { name: 'fill', text: 'Fill' },
+    ],
+  },
+};
+export const flip$: ObjectProperty = {
+  name: 'flip',
+  label: '翻转',
+  type: PropertyType.ICON_LIST,
+  editorFullsize: true,
+  editorOptions: {
+    items: [
+      { name: 'none', text: 'None' },
+      { name: 'horizontal', text: 'Horizontal' },
+      { name: 'vertical', text: 'Vertical' },
+      { name: 'both', text: 'Both' },
+    ],
+  },
+};
+
+export const locationSection$ = {
+  name: 'rect',
+  title: '矩形操作',
+  properties: [clipType$, fit$, flip$],
 };
 
 export const borderSection$ = {
@@ -157,7 +213,7 @@ const otherTab: InspectorTab = {
         separator$,
         {
           name: 'id',
-          label: 'DEBUG',
+          label: '属性',
           type: PropertyType.TEXT,
           editorFullsize: true,
           readonly: true,
@@ -204,6 +260,7 @@ export const shapeModel: ObjectInspectorModel = {
           properties: [
             title$,
             fontSize$,
+            fontWeight$,
             textHAlign$,
             textVAlign$,
             separator$,
@@ -214,6 +271,7 @@ export const shapeModel: ObjectInspectorModel = {
             shadow$,
           ],
         },
+        locationSection$,
         borderSection$,
         {
           // Position & size
@@ -239,6 +297,7 @@ export const shapeWithoutRadiusModel: ObjectInspectorModel = {
           properties: [
             title$,
             fontSize$,
+            fontWeight$,
             textHAlign$,
             textVAlign$,
             separator$,
@@ -247,8 +306,23 @@ export const shapeWithoutRadiusModel: ObjectInspectorModel = {
             opacity$,
             locked$,
             shadow$,
+            {
+              name: 'clipType',
+              label: '剪裁',
+              type: PropertyType.ICON_LIST,
+              editorFullsize: true,
+              editorOptions: {
+                items: [
+                  { name: ClipType.NONE, icon: 'image' },
+                  { name: ClipType.RECT, icon: 'rectangle' },
+                  { name: ClipType.POLYGON, icon: 'timeline' },
+                  { name: ClipType.ELLIPSE, icon: 'circle' },
+                ],
+              },
+            },
           ],
         },
+        locationSection$,
         borderWithoutRadiusSection$,
         {
           // Position & size
@@ -410,6 +484,7 @@ export const textModel: ObjectInspectorModel = {
           properties: [
             title$,
             fontSize$,
+            fontWeight$,
             textHAlign$,
             textVAlign$,
             separator$,
@@ -420,7 +495,6 @@ export const textModel: ObjectInspectorModel = {
             shadow$,
           ],
         },
-        borderSection$,
         {
           // Position & size
           name: 'pos_size',
@@ -477,6 +551,14 @@ export const connectionModel: ObjectInspectorModel = {
               editorFullsize: true,
               editorOptions: { min: 1, max: 10, step: 1 },
             },
+          ],
+        },
+        {
+          name: 'linkAttr',
+          title: '连接',
+          properties: [
+            { name: 'from.item', label: '来自', type: PropertyType.TEXT, editorFullsize: true },
+            { name: 'to.item', label: '去往', type: PropertyType.TEXT, editorFullsize: true },
           ],
         },
       ], // sections
@@ -546,7 +628,7 @@ export const iconModel: ObjectInspectorModel = {
               editorFullsize: true,
               readonly: true,
               formatValue: (obj: any, prop: ObjectProperty, value: any) =>
-                `<a href='https://fonts.google.com/icons?icon.set=Material+Icons&icon.style=Outlined' target='_blank' style='color: #4af;'>See available icons</a>`,
+                `<a href='https://fonts.google.com/icons?icon.set=Material+Icons&icon.style=Outlined' target='_blank' style='color: #4af;'>查看全部可用图标</a>`,
             },
             separator$,
             { name: 'textColor', label: '颜色', type: PropertyType.COLOR, editorRightAlign: true },
@@ -702,6 +784,7 @@ export const pageModel: ObjectInspectorModel = {
           title: '文本与样式',
           properties: [
             fontSize$,
+            fontWeight$,
             textHAlign$,
             textVAlign$,
             separator$,

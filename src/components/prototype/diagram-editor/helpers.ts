@@ -101,6 +101,7 @@ export function createPageItem(): PageItem {
 export function createItem(item?: DeepPartial<Item>): Item {
   return {
     id: getUniqueId(),
+    isPage: false,
     title: 'Item',
     component: 'Rectangle',
 
@@ -144,7 +145,7 @@ export function createItem(item?: DeepPartial<Item>): Item {
 export function createConnection(fromID: string, toID: string, c?: DeepPartial<ItemConnection>): ItemConnection {
   return {
     id: getUniqueId(),
-
+    isPage: false,
     component: 'Connection',
 
     from: {
@@ -159,9 +160,9 @@ export function createConnection(fromID: string, toID: string, c?: DeepPartial<I
       marker: c?.to?.marker || ConnectionMarker.NONE,
     },
 
-    type: c?.type || ConnectionType.LINE,
-    style: c?.style || ConnectionStyle.SOLID,
-    thick: c?.thick || 1,
+    type: c?.type || ConnectionType.CURVE,
+    style: c?.style || ConnectionStyle.DASHED,
+    thick: c?.thick || 3,
 
     backgroundColor: c?.backgroundColor || '#18181c',
   } as ItemConnection;
@@ -205,6 +206,7 @@ export function registerDefaultItemTypes() {
     id: '',
     title: '',
     isPage: false,
+    yOffset: 0,
 
     x: 100,
     y: 100,
@@ -224,6 +226,7 @@ export function registerDefaultItemTypes() {
     backgroundColor: 'white',
     textColor: 'black',
     fontSize: 14,
+    fontWeight: 400,
 
     locked: false,
 
@@ -255,10 +258,16 @@ export function registerDefaultItemTypes() {
     {
       ...defaults,
       title: 'Hello World',
+      yOffset: 0,
       backgroundColor: 'transparent',
       textColor: 'black',
 
       component: type,
+      border: {
+        width: 0,
+        style: ConnectionStyle.SOLID,
+        color: 'black',
+      },
     },
     textModel
   );
@@ -377,6 +386,7 @@ export function registerDefaultItemTypes() {
       component: type,
       title: 'portrait', // icon name
       supportsRoundable: true,
+      yOffset: 15,
 
       backgroundColor: 'transparent',
       fontSize: 60,

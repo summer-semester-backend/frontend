@@ -1,50 +1,146 @@
 <template>
   <ToolBar title="原型">
     <template #toolbar>
-      <n-button text @click="handleCreate">
-        <n-icon size="26" class="icon">
-          <AddCircleOutline />
-        </n-icon>
-      </n-button>
+      <n-space>
+        <n-button text @click="setBlockModel">
+          <n-icon size="26" class="icon">
+            <GridOutline />
+          </n-icon>
+        </n-button>
+        <n-button text @click="setListModel">
+          <n-icon size="26" class="icon">
+            <UnorderedListOutlined />
+          </n-icon>
+        </n-button>
+        <n-button :disabled="showListRef" strong secondary type="info" small size="small" @click="changeButtonState">
+          <template #icon>
+            <n-icon size="20" class="icon">
+              <EditOutlined />
+            </n-icon>
+          </template>
+          {{ buttonText }}
+        </n-button>
+        <n-dropdown :options="options" @select="handleSelect" trigger="click">
+          <n-button strong secondary type="info" small size="small">
+            <template #icon>
+              <n-icon size="20" class="icon">
+                <AddCircleOutline />
+              </n-icon>
+            </template>
+            新建
+          </n-button>
+        </n-dropdown>
+      </n-space>
     </template>
   </ToolBar>
-  <n-data-table :columns="columns" :data="files" :pagination="pagination" :bordered="false" />
+  <!--列表视图-->
+  <n-data-table v-if="showListRef" :columns="columns" :data="files" :pagination="pagination" :bordered="false" />
+  <!--块状视图-->
+  <BlockModalData
+    v-if="!showListRef"
+    :files="files"
+    :paginationBlock="paginationBlock"
+    :editButtonRef="editButtonRef"
+    :fileType="13"
+    @handleClickOpen="handleClickOpen"
+    @handleClickDelete="handleClickDelete"
+    @handleClickEdit="handleClickEdit"
+    @handleClickCopy="handleClickCopy"
+    @openModel="handleClickCreate"
+  >
+    <template #icon>
+      <FileImageFilled color="#E26E0D" />
+    </template>
+  </BlockModalData>
+  <ProtoModuleModal
+    :is-module-modal-show="isModuleModalShow"
+    @close="isModuleModalShow = false"
+    @refresh="reload"
+  ></ProtoModuleModal>
 </template>
 
 <script setup lang="ts">
 import { NButton, NDivider, NIcon, NInput, NSpace } from 'naive-ui';
 import { h, ref, computed, onMounted } from 'vue';
-import { AddCircleOutline, Trash, ArrowRedo, CreateOutline, Create } from '@vicons/ionicons5';
-import { createFile, deleteFile, editFile } from '@/api/file';
+import { AddCircleOutline, Trash, ArrowRedo, CreateOutline, Create, GridOutline, Copy } from '@vicons/ionicons5';
+import { UnorderedListOutlined, EditOutlined, FileImageFilled } from '@vicons/antd';
+import { copyFile, createFile, deleteFile, editFile } from '@/api/file';
 import { readFile } from '@/api/file';
-import { useRoute, useRouter } from 'vue-router';
+import { useRoute } from 'vue-router';
 import { ToolBar } from './components';
 interface File {
   fileID: number;
   fileName: string;
   userName: string;
   lastEditTime: string;
+  fileImage: string;
 }
-const router = useRouter();
+const options = ref([
+  {
+    label: '空白原型',
+    key: 'empty',
+  },
+  {
+    label: '模板原型',
+    key: 'module',
+  },
+]);
+const handleSelect = (key: string) => {
+  switch (key) {
+    case 'empty':
+      handleClickCreate();
+      break;
+    case 'module':
+      isModuleModalShow.value = true;
+      break;
+  }
+};
+
 const route = useRoute();
 const projID = ref<number | null>(null);
 const pagination = ref({
   current: 1,
   pageSize: 8,
 });
+const paginationBlock = ref({
+  current: 1,
+  pageSize: 18,
+});
 const newFileName = ref('');
-const files = ref();
+const files = ref<File[]>([]);
+//当前操作的文件(至少drawio需要这个)
+const fileOnOpen = ref<File | null>(null);
+
+//编辑按钮状态切换
+const buttonText = ref('编辑');
+const editButtonRef = ref(false);
+const changeButtonState = () => {
+  if (editButtonRef.value == false) {
+    editButtonRef.value = true;
+    buttonText.value = '取消编辑';
+  } else {
+    editButtonRef.value = false;
+    buttonText.value = '编辑';
+  }
+};
+
+// 展示模式切换
+const showListRef = ref(false);
+const isModuleModalShow = ref(false);
+const setListModel = () => {
+  showListRef.value = true;
+};
+const setBlockModel = () => {
+  showListRef.value = false;
+};
+
 //删除文件
-const deleFlie = (fileID: number) => {
-  deleteFile({ fileID: fileID })
+const handleClickDelete = (item: any) => {
+  deleteFile({ fileID: item.fileID })
     .then((res) => {
       if (res.data.result == 0) {
         window.$message.success('删除成功');
         getFileList(projID.value);
-      } else if (res.data.result == 1) {
-        window.$message.warning(res.data.message);
-      } else if (res.data.result == 2) {
-        window.$message.error(res.data.message);
       }
     })
     .catch((err) => {
@@ -52,7 +148,7 @@ const deleFlie = (fileID: number) => {
     });
 };
 //修改项目名称
-const handleEdit = (item: any) => {
+const handleClickEdit = (item: any) => {
   window.$dialog.info({
     title: '修改文件名称',
     content: () => {
@@ -102,7 +198,7 @@ const handleEdit = (item: any) => {
   });
 };
 //新建文件
-const handleCreate = () => {
+const handleClickCreate = () => {
   window.$dialog.info({
     title: '新建文件',
     content: () => {
@@ -146,10 +242,59 @@ const handleCreate = () => {
     onNegativeClick: () => {},
   });
 };
+//复制文件
+const handleClickCopy = (item: any) => {
+  newFileName.value = item.fileName + '-副本';
+  window.$dialog.info({
+    title: '复制文件',
+    content: () => {
+      return h('div', {}, [
+        h(NDivider, { style: 'margin-top: 10px;' }),
+        h(NInput, {
+          style: 'width: 100%;',
+          value: newFileName.value,
+          onInput: (e: any) => {
+            console.log(e);
+            newFileName.value = e;
+          },
+        }),
+      ]);
+    },
+    positiveText: '确定',
+    negativeText: '取消',
+    maskClosable: false,
+    onPositiveClick: () => {
+      if (newFileName.value.length > 0) {
+        copyFile({
+          fileID: item.fileID as number,
+          fatherID: projID.value as number,
+          teamID: null,
+          newName: newFileName.value,
+        }).then((res) => {
+          if (res.data.result == 0) {
+            window.$message.success('复制成功');
+            getFileList(projID.value);
+          }
+        });
+      } else {
+        window.$message.warning('请输入文件名称');
+      }
+    },
+    onNegativeClick: () => {},
+  });
+};
+//打开文件
+const handleClickOpen = (item: any) => {
+  window.open(`/prototype/${item.fileID}`, '_blank');
+};
+
 const columns = ref([
   {
     title: '文件名称',
     key: 'fileName',
+    render(row: any) {
+      return h(NButton, { text: true, onClick: () => handleClickOpen(row) }, { default: row.fileName });
+    },
   },
   {
     title: '创建者',
@@ -180,7 +325,7 @@ const columns = ref([
                 positiveText: '确定',
                 negativeText: '取消',
                 onPositiveClick: () => {
-                  deleFlie(row.fileID);
+                  handleClickDelete(row.fileID);
                 },
                 onNegativeClick: () => {},
               });
@@ -194,23 +339,40 @@ const columns = ref([
         h(
           NButton,
           {
-            type: 'success',
+            type: 'warning',
             size: 'small',
             strong: true,
             secondary: true,
             onClick(e) {
-              window.open(`/prototype/${row.fileID}`, '_blank');
+              handleClickEdit(row);
             },
           },
           {
-            default: '打开',
-            icon: h(NIcon, { component: ArrowRedo }),
+            default: '修改',
+            icon: h(NIcon, { component: Create }),
+          }
+        ),
+        h(
+          NButton,
+          {
+            type: 'info',
+            size: 'small',
+            strong: true,
+            secondary: true,
+            onClick(e) {
+              handleClickCopy(row);
+            },
+          },
+          {
+            default: '复制',
+            icon: h(NIcon, { component: Copy }),
           }
         ),
       ]);
     },
   },
 ]);
+
 const getFileList = (id: number | null) => {
   readFile({
     fileID: id,
@@ -220,20 +382,23 @@ const getFileList = (id: number | null) => {
     files.value = [];
     res.data.sonList.forEach((item: any) => {
       if (item.fileType === 13) {
-        files.value.push({
+        files.value?.push({
           fileID: item.fileID,
           fileName: item.fileName,
           userName: item.userName,
           lastEditTime: item.lastEditTime,
+          fileImage: item.fileImage,
         });
       }
     });
   });
 };
-onMounted(() => {
+
+function reload() {
   projID.value = parseInt(route.params.ProjID.toString());
   getFileList(projID.value);
-});
+}
+onMounted(reload);
 </script>
 
 <style scoped></style>

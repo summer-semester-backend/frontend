@@ -1,6 +1,6 @@
 <template>
-  <n-space align="center" justify="center">
-    <n-text class="pt-2">正在编辑：</n-text>
+  <n-space v-if="showEditing" align="center" justify="start" class="ml-2 pt-2">
+    <n-text class="pt-2 text-15px text-light-50">正在编辑：</n-text>
     <n-avatar-group :options="options" :size="30" :max="4">
       <template #avatar="{ option: { name, src } }">
         <n-tooltip>
@@ -18,9 +18,10 @@
     </n-avatar-group>
   </n-space>
 </template>
+
 <script setup lang="ts">
-import { getUserInfo } from '@/api/user';
-import { onMounted, ref } from 'vue';
+import { getUserAvatar, getUserInfo } from '@/api/user';
+import { computed, onBeforeMount, onBeforeUnmount, onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import { syncManager } from './SyncManager';
 const route = useRoute();
@@ -36,18 +37,49 @@ const createDropdownOptions = (options: Array<{ name: string; avatar: string }>)
     label: option.name,
   }));
 
+const showEditing = computed(() => {
+  return options.value.length != 0;
+});
+
+const userMap = new Map<number, string>();
+onBeforeMount(() => {
+  syncManager.openWebSocket();
+});
+
 onMounted(() => {
-  var user = parseInt(localStorage.getItem('userID') as string);
+  var userIDString = localStorage.getItem('userID');
+  var user: number;
+  if (userIDString) {
+    user = parseInt(userIDString as string);
+  } else {
+    user = -1;
+    options.value.length = 0;
+  }
+  console.log('proto userID', user);
   var file = parseInt(route.params.protoID as string);
   console.log('use syncManager');
   syncManager.registerOpen(user, file);
-  syncManager.registerClose(user, file);
+  syncManager.registerClose();
   syncManager.registerRegisterFunc((userID: number, fileID: number) => {
-    getUserInfo({ userID: userID.toString() }).then((res) => {
-      if (res.data.result == 0) {
-        options.value.push({ name: res.data.data.username, src: res.data.data.avatar });
-      }
-    });
+    if (userID != -1) {
+      window.$message.info('加入新用户!');
+      getUserAvatar({ userID: userID }).then((res) => {
+        if (res.data.result == 0) {
+          userMap.set(userID, res.data.username);
+          options.value.push({ name: res.data.username, src: res.data.avatar });
+        }
+      });
+    }
   });
+  syncManager.registerLeaveFunc((userID: number, fileID: number) => {
+    var userIndex = options.value.findIndex((ele) => {
+      return userMap.get(userID) == ele.name;
+    });
+    options.value.splice(userIndex, 1);
+  });
+});
+
+onBeforeUnmount(() => {
+  syncManager.closeWebSocket();
 });
 </script>

@@ -2,7 +2,7 @@
   <div id="workBar">
     <div id="barBox">
       <div id="leftOptions">
-        <n-icon style="z-index: 2" size="25" @click="$router.push({ path: '/project/desktop' })">
+        <n-icon style="z-index: 2" size="25" @click="$router.back()">
           <KeyboardArrowLeftOutlined />
         </n-icon>
         <n-image
@@ -16,9 +16,16 @@
             <div class="topTest">
               {{ currentProject.projName }}
             </div>
-            <n-icon size="20" color="#bfbfbf">
-              <InformationCircleOutline />
-            </n-icon>
+            <n-popover trigger="click" placement="bottom-start">
+              <template #trigger>
+                <n-icon size="20" color="#bfbfbf" @click="getTeamInfo">
+                  <InformationCircleOutline />
+                </n-icon>
+              </template>
+              <div>项目名称：{{ currentProject.projName }}</div>
+              <div>所属团队：{{ teamDetail.teamName }}</div>
+              <div style="max-width: 200px">团队简介： {{ teamDetail.summary }}</div>
+            </n-popover>
           </div>
           <div class="bottomData">
             <n-tabs
@@ -39,8 +46,43 @@
           </div>
         </div>
       </div>
-      <div></div>
+      <div id="rightData">
+        <n-avatar-group :options="users" :size="35" :max="4" @click="emit('showUsers')" id="avatars">
+          <template #avatar="{ option: { name, src } }">
+            <n-popover>
+              <template #trigger>
+                <n-avatar :src="src" />
+              </template>
+              {{ name }}
+            </n-popover>
+          </template>
+          <template #rest="{ options: restOptions, rest }">
+            <n-dropdown :options="createDropdownOptions(restOptions)" placement="top">
+              <n-avatar>+{{ rest }}</n-avatar>
+            </n-dropdown>
+          </template>
+        </n-avatar-group>
+        <n-button type="primary" size="small" style="font-size: 13px" @click="open"> 邀请 </n-button>
+      </div>
     </div>
+
+    <n-modal
+      v-model:show="show"
+      id="copy"
+      preset="dialog"
+      title="通过链接邀请成员"
+      size="medium"
+      positive-text="复制"
+      negative-text="取消"
+      :data-clipboard-text="code"
+      @positive-click="handlePositiveClick"
+    >
+      <n-divider style="margin: 15px auto" />
+      <n-space>
+        链接（7天内有效）
+        <n-input v-model:value="code" type="text" placeholder="" style="width: 375px" :disabled="true" />
+      </n-space>
+    </n-modal>
   </div>
 </template>
 
@@ -49,13 +91,50 @@ import { KeyboardArrowLeftOutlined } from '@vicons/material';
 import { CaretDown, InformationCircleOutline } from '@vicons/ionicons5';
 import { ref, h, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
-import { readFile } from '@/api/file';
+import { readFile, projectToTeam } from '@/api/file';
+import Clipboard from 'clipboard';
+import { useMessage } from 'naive-ui';
+import { inviteTeamMember, getTeamDetail } from '@/api/team';
+
+const message = useMessage();
+
+const show = ref(false);
+const code = ref('');
+const handlePositiveClick = () => {
+  var clipboard = new Clipboard('#copy');
+
+  clipboard.on('success', (e) => {
+    message.success('复制成功');
+    // 释放内存
+    clipboard.destroy();
+  });
+  clipboard.on('error', (e) => {
+    // 不支持复制
+    message.error('该浏览器不支持自动复制');
+    // 释放内存
+    clipboard.destroy();
+  });
+};
+
+function open() {
+  inviteTeamMember({ teamID: props.teamID as string }).then((res) => {
+    if (res.data.result == 0) {
+      code.value = window.location.origin + '/attendTeam/' + res.data.inviteCode;
+    }
+  });
+  show.value = true;
+}
+
 const router = useRouter();
 const route = useRoute();
+const emit = defineEmits(['showUsers']);
+
 const currentProject = ref({
   projName: '',
   projImage: '',
 });
+
+const props = defineProps<{ users: Array<any>; teamID: string }>();
 
 const tabValue = ref('doc');
 
@@ -63,6 +142,19 @@ const renderDoc = () => h('div', { style: 'font-size:14px;' }, '文档');
 const renderPrototype = () => h('div', { style: 'font-size:14px;' }, '原型');
 const renderUml = () => h('div', { style: 'font-size:14px;' }, 'UML图');
 const renderRecycleBin = () => h('div', { style: 'font-size:14px;' }, '回收站');
+
+const teamDetail = ref({
+  teamName: '',
+  summary: '',
+});
+
+const getTeamInfo = () => {
+  getTeamDetail({ teamID: props.teamID as string }).then((res) => {
+    console.log(res);
+    teamDetail.value.teamName = res.data.teamname;
+    teamDetail.value.summary = res.data.summary;
+  });
+};
 
 const getProjInfo = (id: number | null) => {
   readFile({ fileID: id, teamID: -1 }).then((res) => {
@@ -73,16 +165,21 @@ const getProjInfo = (id: number | null) => {
   });
 };
 
+const createDropdownOptions = (options: Array<{ name: string; src: string }>) =>
+  options.map((option) => ({
+    key: option.name,
+    label: option.name,
+  }));
+
 const handleUpdateTab = (value: string) => {
   tabValue.value = value;
   const projID = parseInt(route.params.ProjID.toString());
-  router.push(`/workspace/${projID}/${value}`);
+  router.replace(`/workspace/${projID}/${value}`);
 };
 onMounted(() => {
   getProjInfo(parseInt(route.params.ProjID.toString()));
   if (route.fullPath.split('/').length == 4) {
     tabValue.value = route.fullPath.split('/')[3];
-    console.log(tabValue.value);
   }
 });
 </script>
@@ -137,5 +234,18 @@ onMounted(() => {
 .bottomData {
   font-size: 14px;
   width: 265px;
+}
+
+#rightData {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 0px;
+  gap: 15px;
+  padding-right: 20px;
+}
+
+#avatars {
+  cursor: pointer;
 }
 </style>

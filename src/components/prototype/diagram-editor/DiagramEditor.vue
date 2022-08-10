@@ -1,373 +1,396 @@
 <template>
-  <div class="flex h-full">
-    <div class="basis-1/7 min-w-50 h-full bg-[#494949]">
-      <div class="m-2">
+  <div class="h-full">
+    <div class="flex h-full">
+      <div class="min-w-60 h-full bg-[#494949]">
         <n-config-provider :theme="darkTheme" :theme-overrides="prototypeWorkspaceConfig">
+          <SyncEditMembers v-if="isSyncManagerInitialized" />
           <PageBox
             @page-create="handleCreatePage"
             @page-selected="handleSelectPage"
+            :editable="editable"
             :pages="pages"
-            :selected-page="currentPage?.id as string"
+            :selected-page="currentPageID"
           />
-          <ToolBox @tool-selected="handleToolBoxSelect" />
+          <ToolBox v-if="editable" @tool-selected="handleToolBoxSelect" @icon-selected="handleIconSelected" />
         </n-config-provider>
       </div>
-    </div>
-    <div class="basis-5/7 h-full">
-      <div class="editor-container">
-        <!-- Rulers -->
-        <Guides
-          v-show="guidesVisible"
-          class="ruler ruler-horizontal"
-          :showGuides="showGuides"
-          @changeGuides="hGuideValues = $event.guides"
-          type="horizontal"
-          ref="hGuides"
-          :zoom="zoomFactor"
-          :snapThreshold="5"
-          :unit="zoomFactor >= 1 ? 50 : Math.floor(50 / zoomFactor)"
-          :rulerStyle="{ left: '30px', width: 'calc(100% - 30px)', height: '30px' }"
-          :style="{ width: '100%', height: '30px' }"
-        />
-        <Guides
-          v-show="guidesVisible"
-          class="ruler ruler-vertical"
-          :showGuides="showGuides"
-          @changeGuides="vGuideValues = $event.guides"
-          type="vertical"
-          ref="vGuides"
-          :zoom="zoomFactor"
-          :snapThreshold="5"
-          :unit="zoomFactor >= 1 ? 50 : Math.floor(50 / zoomFactor)"
-          :rulerStyle="{ top: '30px', height: 'calc(100% - 30px)', width: '30px' }"
-          :style="{ height: '100%', width: '30px', top: '-30px' }"
-        />
-        <div v-show="guidesVisible" class="rulers-left-top-box"></div>
+      <div class="w-full h-full">
+        <div class="editor-container">
+          <!-- Rulers -->
+          <Guides
+            v-show="guidesVisible"
+            class="ruler ruler-horizontal"
+            className="custom-color"
+            :showGuides="showGuides"
+            @changeGuides="hGuideValues = $event.guides"
+            type="horizontal"
+            ref="hGuides"
+            :zoom="zoomFactor"
+            :snapThreshold="5"
+            :unit="zoomFactor >= 1 ? 50 : Math.floor(50 / zoomFactor)"
+            :rulerStyle="{ left: '30px', width: 'calc(100% - 30px)', height: '30px' }"
+            :style="{ width: '100%', height: '30px' }"
+          />
+          <Guides
+            v-show="guidesVisible"
+            class="ruler ruler-vertical"
+            :showGuides="showGuides"
+            @changeGuides="vGuideValues = $event.guides"
+            type="vertical"
+            ref="vGuides"
+            :zoom="zoomFactor"
+            :snapThreshold="5"
+            :unit="zoomFactor >= 1 ? 50 : Math.floor(50 / zoomFactor)"
+            :rulerStyle="{ top: '30px', height: 'calc(100% - 30px)', width: '30px' }"
+            :style="{ height: '100%', width: '30px', top: '-30px' }"
+          />
+          <div v-show="guidesVisible" class="rulers-left-top-box"></div>
 
-        <!-- Editor Canvas -->
-        <VueInfiniteViewer
-          ref="viewer"
-          class="viewer"
-          :useMouseDrag="shiftPressed"
-          :useWheelScroll="true"
-          :zoom="zoomFactor"
-          :zoomOffsetX="mouseCoords.x"
-          :zoomOffsetY="mouseCoords.y"
-          :style="{ cursor: currentTool == EditorTool.SELECT ? 'auto' : 'crosshair' }"
-          @wheel="onScroll"
-          @scroll="onScroll"
-          @dragover.stop="onDragOver($event)"
-          @click.stop="editable && !shiftPressed && onCanvasClick($event)"
-          @drop.stop="onCanvasClick($event)"
-        >
-          <div
-            ref="viewport"
-            :class="{ viewport: true, 'viewport-area': viewportSize }"
+          <!-- Editor Canvas -->
+          <VueInfiniteViewer
+            ref="viewer"
+            class="viewer"
+            :useMouseDrag="shiftPressed"
+            :useWheelScroll="true"
+            :zoom="zoomFactor"
+            :zoomOffsetX="mouseCoords.x"
+            :zoomOffsetY="mouseCoords.y"
             :style="{
-              width: viewportSize ? viewportSize[0] + 'px' : '100%',
-              height: viewportSize ? viewportSize[1] + 'px' : '100%',
+              cursor: currentTool == EditorTool.SELECT ? 'auto' : 'crosshair',
+              top: editable ? '30px' : '0px',
+              left: editable ? '30px' : '0px',
+              width: editable ? 'calc(100% - 30px)' : '100%',
+              height: editable ? 'calc(100% - 30px)' : '100%',
             }"
+            @wheel="onScroll"
+            @scroll="onScroll"
+            @dragover.stop="onDragOver($event)"
+            @click.stop="editable && !shiftPressed && onCanvasClick($event)"
+            @drop.stop="onCanvasClick($event)"
           >
-            <!-- Render Connections (default component='Connection') -->
-            <component
-              v-for="(c, i) in connections"
-              :is="c.component"
-              :key="c.id"
-              :from="getItemById(items, c.from.item)!"
-              :to="getItemById(items, c.to.item)!"
-              :connection="c"
-              :style="{ zIndex: c.z }"
-              :selected="c.id === selectedItem?.id"
-              @selected.stop="selectItem(c)"
-            />
-
-            <!-- Use to render a connection line during a new connection creation -->
-            <RawConnection
-              v-if="creatingConnection && connectionInfo.startItem"
-              :x1="getHandlePosition(connectionInfo.startItem, connectionInfo.startPoint).x"
-              :y1="getHandlePosition(connectionInfo.startItem, connectionInfo.startPoint).y"
-              :x2="mouseCoords.x"
-              :y2="mouseCoords.y"
-              :type="ConnectionType.LINE"
-              style="z-index: -100000"
-              selected
-            />
-            <!-- Render Items -->
             <div
-              v-for="(item, i) in items"
-              class="item"
-              :key="item.id"
-              :data-item-id="item.id"
-              :class="{ target: item.id === selectedItem?.id, locked: item.locked === true }"
-              :style="getItemStyle(item)"
-              @click.stop="!creatingConnection && editable && selectItem(item)"
-              @dblclick.stop="!creatingConnection && editable && inlineEdit(item)"
-              @mousedown.stop="!creatingConnection && editable && selectItem(item, $event)"
-              @mouseover.stop="creatingConnection && onMouseOver(item, $event)"
-              @mouseleave.stop="creatingConnection && onMouseLeave(item, $event)"
+              ref="viewport"
+              :class="{ viewport: true, 'viewport-area': viewportSize }"
+              :style="{
+                width: '100%',
+                height: '100%',
+              }"
             >
-              <component :is="item.component" :item="item" />
+              <!-- Render Connections (default component='Connection') -->
+              <component
+                v-for="(c, i) in connections"
+                :is="c.component"
+                :key="c.id"
+                :from="getItemById(items, c.from.item)!"
+                :to="getItemById(items, c.to.item)!"
+                :connection="c"
+                :style="{ zIndex: c.z }"
+                :selected="c.id === selectedItem?.id"
+                @selected="selectItem(c)"
+              />
 
-              <!-- Item decorators (delete, locked, size info) -->
+              <!-- Use to render a connection line during a new connection creation -->
+              <RawConnection
+                v-if="creatingConnection && connectionInfo.startItem"
+                :x1="getHandlePosition(connectionInfo.startItem, connectionInfo.startPoint).x"
+                :y1="getHandlePosition(connectionInfo.startItem, connectionInfo.startPoint).y"
+                :x2="mouseCoords.x"
+                :y2="mouseCoords.y"
+                :type="ConnectionType.CURVE"
+                style="z-index: -100000"
+                selected
+              />
+              <!-- Render Items -->
               <div
-                class="decorator decorator-delete"
-                v-if="!creatingConnection && editable && item.id === selectedItem?.id && (selectedItem as Item)?.locked !== true"
-                :style="{ zoom: 1 / zoomFactor }"
-                @click.stop="deleteItem"
-                title="delete item"
+                v-for="(item, i) in items"
+                class="item"
+                :key="item.id"
+                :data-item-id="item.id"
+                :class="{ target: item.id === selectedItem?.id, locked: item.locked === true }"
+                :style="getItemStyle(item)"
+                @click.stop="!creatingConnection && editable && selectItem(item)"
+                @dblclick.stop="!creatingConnection && editable && inlineEdit(item)"
+                @mousedown.stop="!creatingConnection && editable && selectItem(item, $event)"
+                @mouseover.stop="creatingConnection && onMouseOver(item, $event)"
+                @mouseleave.stop="creatingConnection && onMouseLeave(item, $event)"
               >
-                &times;
-              </div>
-              <div
-                class="decorator decorator-locked"
-                v-if="!creatingConnection && editable && item.id === selectedItem?.id"
-                :style="{ zoom: 1 / zoomFactor }"
-                v-show="item.locked === true"
-                title="locked"
-              >
-                &#x1F512;
-              </div>
-              <div
-                class="decorator decorator-size"
-                v-if="!creatingConnection && editable && item.id === selectedItem?.id"
-                :style="{ zoom: 1 / zoomFactor }"
-              >
-                X: {{ item.x }} &nbsp; Y: {{ item.y }} &nbsp; W: {{ item.w }} &nbsp; H: {{ item.h }} &nbsp;{{
-                  item.r !== 0 ? ' R: ' + item.r + '°' : ''
-                }}
-              </div>
+                <component :is="item.component" :item="item" :id="item.id" @link-to-click="handleLinkToClick" />
 
-              <!-- Connection Handles - When the item is rotated, only the center handle is active -->
-              <div
-                class="connection-handle connection-handle-left"
-                v-if="item.r === 0 && editable && creatingConnection && item.hover === true"
-                :style="{ zoom: 1 / zoomFactor }"
-                @click="connectionHandleClick(item, ConnectionHandle.LEFT)"
-              ></div>
-              <div
-                class="connection-handle connection-handle-right"
-                v-if="item.r === 0 && editable && creatingConnection && item.hover === true"
-                :style="{ zoom: 1 / zoomFactor }"
-                @click="connectionHandleClick(item, ConnectionHandle.RIGHT)"
-              ></div>
-              <div
-                class="connection-handle connection-handle-top"
-                v-if="item.r === 0 && editable && creatingConnection && item.hover === true"
-                :style="{ zoom: 1 / zoomFactor }"
-                @click="connectionHandleClick(item, ConnectionHandle.TOP)"
-              ></div>
-              <div
-                class="connection-handle connection-handle-bottom"
-                v-if="item.r === 0 && editable && creatingConnection && item.hover === true"
-                :style="{ zoom: 1 / zoomFactor }"
-                @click="connectionHandleClick(item, ConnectionHandle.BOTTOM)"
-              ></div>
-              <div
-                class="connection-handle connection-handle-center"
-                v-if="editable && creatingConnection && item.hover === true"
-                :style="{ zoom: 1 / zoomFactor }"
-                @click="connectionHandleClick(item, ConnectionHandle.CENTER)"
-              ></div>
-            </div>
-            <!-- item -->
+                <!-- Item decorators (delete, locked, size info) -->
+                <div
+                  class="decorator decorator-delete"
+                  v-if="!creatingConnection && editable && item.id === selectedItem?.id && (selectedItem as Item)?.locked !== true"
+                  :style="{ zoom: 1 / zoomFactor }"
+                  @click.stop="deleteItem"
+                  title="delete item"
+                >
+                  &times;
+                </div>
+                <div
+                  class="decorator decorator-locked"
+                  v-if="!creatingConnection && editable && item.id === selectedItem?.id"
+                  :style="{ zoom: 1 / zoomFactor }"
+                  v-show="item.locked === true"
+                  title="locked"
+                >
+                  &#x1F512;
+                </div>
+                <div
+                  class="decorator decorator-size"
+                  v-if="!creatingConnection && editable && item.id === selectedItem?.id"
+                  :style="{ zoom: 1 / zoomFactor }"
+                >
+                  X: {{ item.x }} &nbsp; Y: {{ item.y }} &nbsp; W: {{ item.w }} &nbsp; H: {{ item.h }} &nbsp;{{
+                    item.r !== 0 ? ' R: ' + item.r + '°' : ''
+                  }}
+                </div>
 
-            <!-- Manage drag / resize / rotate / rounding of selected item -->
-            <Moveable
-              ref="moveable"
-              :target="
+                <!-- Connection Handles - When the item is rotated, only the center handle is active -->
+                <div
+                  class="connection-handle connection-handle-left"
+                  v-if="item.r === 0 && editable && creatingConnection && item.hover === true"
+                  :style="{ zoom: 1 / zoomFactor }"
+                  @click="connectionHandleClick(item, ConnectionHandle.LEFT)"
+                ></div>
+                <div
+                  class="connection-handle connection-handle-right"
+                  v-if="item.r === 0 && editable && creatingConnection && item.hover === true"
+                  :style="{ zoom: 1 / zoomFactor }"
+                  @click="connectionHandleClick(item, ConnectionHandle.RIGHT)"
+                ></div>
+                <div
+                  class="connection-handle connection-handle-top"
+                  v-if="item.r === 0 && editable && creatingConnection && item.hover === true"
+                  :style="{ zoom: 1 / zoomFactor }"
+                  @click="connectionHandleClick(item, ConnectionHandle.TOP)"
+                ></div>
+                <div
+                  class="connection-handle connection-handle-bottom"
+                  v-if="item.r === 0 && editable && creatingConnection && item.hover === true"
+                  :style="{ zoom: 1 / zoomFactor }"
+                  @click="connectionHandleClick(item, ConnectionHandle.BOTTOM)"
+                ></div>
+                <div
+                  class="connection-handle connection-handle-center"
+                  v-if="editable && creatingConnection && item.hover === true"
+                  :style="{ zoom: 1 / zoomFactor }"
+                  @click="connectionHandleClick(item, ConnectionHandle.CENTER)"
+                ></div>
+              </div>
+              <!-- item -->
+
+              <!-- Manage drag / resize / rotate / rounding of selected item -->
+              <Moveable
+                v-if="editable"
+                ref="moveable"
+                :target="
                 isItem(selectedItem)
                   ? isPage(selectedItem)
                     ? currentPageTargets
-                    : [`[data-item-id='${selectedItem.id}']`]
+                    : [`[data-item-id='${(selectedItem as DiagramElement).id}']`]
                   : []
               "
-              :zoom="1 / zoomFactor"
-              :origin="false"
-              :stopPropagation="true"
-              :throttleDrag="1"
-              :throttleResize="1"
-              :throttleRotate="shiftPressed ? 45 : 1"
-              :keepRatio="shiftPressed"
-              :snappable="showGuides"
-              :snapGap="true"
-              :snapThreshold="5"
-              :snapDirections="{ top: true, bottom: true, left: true, right: true, center: true, middle: true }"
-              :elementSnapDirections="{ top: true, bottom: true, left: true, right: true, center: true, middle: true }"
-              :isDisplayInnerSnapDigit="true"
-              :horizontalGuidelines="
-                showGuides
-                  ? viewportSize
-                    ? [0, viewportSize[1] / 2, viewportSize[1], ...hGuideValues]
-                    : hGuideValues
-                  : []
-              "
-              :verticalGuidelines="
-                showGuides
-                  ? viewportSize
-                    ? [0, viewportSize[0] / 2, viewportSize[0], ...vGuideValues]
-                    : vGuideValues
-                  : []
-              "
-              :elementGuidelines="showGuides ? elementGuidelines() : []"
-              :clippable="isItem(selectedItem) && selectedItem.clipType !== ClipType.NONE"
-              :clipArea="false"
-              :clipRelative="false"
-              :dragWithClip="true"
-              :clipSnapThreshold="5"
-              :defaultClipPath="isItem(selectedItem) ? selectedItem.clipType : ClipType.NONE"
-              :roundable="selectedItemActive && (selectedItem as Item)?.supportsRoundable === true"
-              :draggable="selectedItemActive"
-              :rotatable="selectedItemActive"
-              :resizable="selectedItemActive && (selectedItem as Item)?.supportsResizable === true"
-              @dragStart="onDragStart"
-              @drag="onDrag"
-              @dragEnd="onDragEnd"
-              @dragGroupStart="onDragGroupStart"
-              @dragGroup="onDragGroup"
-              @dragGroupEnd="onDragGroupEnd"
-              @resizeStart="onResizeStart"
-              @resize="onResize"
-              @resizeEnd="onResizeEnd"
-              @rotateStart="onRotateStart"
-              @rotate="onRotate"
-              @rotateEnd="onRotateEnd"
-              @roundStart="onRoundStart"
-              @round="onRound"
-              @roundEnd="onRoundEnd"
-              @clipStart="onClipStart"
-              @clip="onClip"
-              @clipEnd="onClipEnd"
+                :zoom="1 / zoomFactor"
+                :origin="false"
+                :stopPropagation="true"
+                :throttleDrag="1"
+                :throttleResize="1"
+                :throttleRotate="shiftPressed ? 45 : 1"
+                :keepRatio="shiftPressed"
+                :snappable="showGuides"
+                :snapGap="true"
+                :snapThreshold="5"
+                :snapDirections="{ top: true, bottom: true, left: true, right: true, center: true, middle: true }"
+                :elementSnapDirections="{
+                  top: true,
+                  bottom: true,
+                  left: true,
+                  right: true,
+                  center: true,
+                  middle: true,
+                }"
+                :isDisplayInnerSnapDigit="true"
+                :horizontalGuidelines="
+                  showGuides
+                    ? viewportSize
+                      ? [0, viewportSize[1] / 2, viewportSize[1], ...hGuideValues]
+                      : hGuideValues
+                    : []
+                "
+                :verticalGuidelines="
+                  showGuides
+                    ? viewportSize
+                      ? [0, viewportSize[0] / 2, viewportSize[0], ...vGuideValues]
+                      : vGuideValues
+                    : []
+                "
+                :elementGuidelines="showGuides ? elementGuidelines() : []"
+                :clippable="isItem(selectedItem) && selectedItem.clipType !== ClipType.NONE"
+                :clipArea="false"
+                :clipRelative="false"
+                :dragWithClip="true"
+                :clipSnapThreshold="5"
+                :defaultClipPath="isItem(selectedItem) ? selectedItem.clipType : ClipType.NONE"
+                :roundable="selectedItemActive && (selectedItem as Item)?.supportsRoundable === true"
+                :draggable="selectedItemActive"
+                :rotatable="selectedItemActive"
+                :resizable="selectedItemActive && (selectedItem as Item)?.supportsResizable === true"
+                @dragStart="onDragStart"
+                @drag="onDrag"
+                @dragEnd="onDragEnd"
+                @dragGroupStart="onDragGroupStart"
+                @dragGroup="onDragGroup"
+                @dragGroupEnd="onDragGroupEnd"
+                @resizeStart="onResizeStart"
+                @resize="onResize"
+                @resizeEnd="onResizeEnd"
+                @rotateStart="onRotateStart"
+                @rotate="onRotate"
+                @rotateEnd="onRotateEnd"
+                @roundStart="onRoundStart"
+                @round="onRound"
+                @roundEnd="onRoundEnd"
+                @clipStart="onClipStart"
+                @clip="onClip"
+                @clipEnd="onClipEnd"
+              />
+            </div>
+            <!-- viewport -->
+          </VueInfiniteViewer>
+
+          <div
+            class="toolbars-container"
+            :style="{ top: showRulers && editable ? '40px' : '10px', left: showRulers && editable ? '40px' : '10px' }"
+          >
+            <!-- Editor Toolbar -->
+            <ToolsToolbar
+              v-if="editable"
+              :customWidgets="customWidgets"
+              :selectedTool="currentTool"
+              @toolSelected="selectCurrentTool"
             />
-          </div>
-          <!-- viewport -->
-        </VueInfiniteViewer>
+            <div class="toolbar-separator"></div>
+            <ZoomToolbar
+              ref="zoomToolbar"
+              :editable="editable"
+              :show-mode-change="showModeChange"
+              :zoomManager="zoomManager"
+              @zoomChanged="onZoomChanged"
+              @mode-changed="onModeChanged"
+            />
+            <div class="toolbar-separator"></div>
+            <div v-if="editable" class="toolbar">
+              <button class="toolbar-item" @click="undo" :disabled="!historyManager.canUndo()" title="Undo">
+                <EditorIcon icon="undo" />
+              </button>
+              <button class="toolbar-item" @click="redo" :disabled="!historyManager.canRedo()" title="Redo">
+                <EditorIcon icon="redo" />
+              </button>
 
-        <div
-          class="toolbars-container"
-          :style="{ top: showRulers && editable ? '40px' : '10px', left: showRulers && editable ? '40px' : '10px' }"
-        >
-          <!-- Editor Toolbar -->
-          <ToolsToolbar
-            v-if="editable"
-            :customWidgets="customWidgets"
-            :selectedTool="currentTool"
-            @toolSelected="selectCurrentTool"
-          />
-          <div class="toolbar-separator"></div>
-          <ZoomToolbar ref="zoomToolbar" :zoomManager="zoomManager" @zoomChanged="onZoomChanged" />
-          <div class="toolbar-separator"></div>
-          <div v-if="editable" class="toolbar">
-            <button class="toolbar-item" @click="undo" :disabled="!historyManager.canUndo()" title="Undo">
-              <EditorIcon icon="undo" />
-            </button>
-            <button class="toolbar-item" @click="redo" :disabled="!historyManager.canRedo()" title="Redo">
-              <EditorIcon icon="redo" />
-            </button>
+              <div class="toolbar-item-separator"></div>
+              <button class="toolbar-item" @click="deleteItem" :disabled="!selectedItemActive" title="Delete">
+                <EditorIcon icon="delete" />
+              </button>
 
-            <div class="toolbar-item-separator"></div>
-            <button class="toolbar-item" @click="deleteItem" :disabled="!selectedItemActive" title="Delete">
-              <EditorIcon icon="delete" />
-            </button>
+              <div class="toolbar-item-separator"></div>
+              <button class="toolbar-item" @click="copyItem" :disabled="!isItem(selectedItem)" title="Copy">
+                <EditorIcon icon="content_copy" />
+              </button>
+              <button class="toolbar-item" @click="cutItem" :disabled="!isItem(selectedItem)" title="Cut">
+                <EditorIcon icon="content_cut" />
+              </button>
+              <button class="toolbar-item" @click="pasteItem" :disabled="itemToPaste === null" title="Paste">
+                <EditorIcon icon="content_paste" />
+              </button>
 
-            <div class="toolbar-item-separator"></div>
-            <button class="toolbar-item" @click="copyItem" :disabled="!isItem(selectedItem)" title="Copy">
-              <EditorIcon icon="content_copy" />
-            </button>
-            <button class="toolbar-item" @click="cutItem" :disabled="!isItem(selectedItem)" title="Cut">
-              <EditorIcon icon="content_cut" />
-            </button>
-            <button class="toolbar-item" @click="pasteItem" :disabled="itemToPaste === null" title="Paste">
-              <EditorIcon icon="content_paste" />
-            </button>
-
-            <div class="toolbar-item-separator"></div>
-            <button class="toolbar-item" @click="sendToBack" :disabled="!selectedItemActive" title="Send to back">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 1024 1024"
-                :style="{ transform: 'scale(1.0)', opacity: selectedItemActive ? 1 : 0.3 }"
-              >
-                <path
-                  fill="gray"
-                  d="M469.333333 128a42.666667 42.666667 0 0 1 42.666667 42.666667v85.333333h213.333333a42.666667 42.666667 0 0 1 42.666667 42.666667v213.333333h85.333333a42.666667 42.666667 0 0 1 42.666667 42.666667v298.666666a42.666667 42.666667 0 0 1-42.666667 42.666667h-298.666666a42.666667 42.666667 0 0 1-42.666667-42.666667v-85.333333H298.666667a42.666667 42.666667 0 0 1-42.666667-42.666667v-213.333333H170.666667a42.666667 42.666667 0 0 1-42.666667-42.666667V170.666667a42.666667 42.666667 0 0 1 42.666667-42.666667h298.666666z m213.333334 213.333333h-170.666667v128a42.666667 42.666667 0 0 1-42.666667 42.666667H341.333333v170.666667h170.666667v-128a42.666667 42.666667 0 0 1 42.666667-42.666667h128V341.333333z"
-                />
-              </svg>
-            </button>
-            <button class="toolbar-item" @click="bringToFront" :disabled="!selectedItemActive" title="Bring to front">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                :style="{ transform: 'scale(1.0)', opacity: selectedItemActive ? 1 : 0.3 }"
-                viewBox="0 0 24 24"
-              >
-                <g>
-                  <path fill="none" d="M0 0H24V24H0z" />
+              <div class="toolbar-item-separator"></div>
+              <button class="toolbar-item" @click="sendToBack" :disabled="!selectedItemActive" title="Send to back">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 1024 1024"
+                  :style="{ transform: 'scale(1.0)', opacity: selectedItemActive ? 1 : 0.3 }"
+                >
                   <path
                     fill="gray"
-                    d="M11 3c.552 0 1 .448 1 1v2h5c.552 0 1 .448 1 1v5h2c.552 0 1 .448 1 1v7c0 .552-.448 1-1 1h-7c-.552 0-1-.448-1-1v-2H7c-.552 0-1-.448-1-1v-5H4c-.552 0-1-.448-1-1V4c0-.552.448-1 1-1h7zm5 5H8v8h8V8z"
+                    d="M469.333333 128a42.666667 42.666667 0 0 1 42.666667 42.666667v85.333333h213.333333a42.666667 42.666667 0 0 1 42.666667 42.666667v213.333333h85.333333a42.666667 42.666667 0 0 1 42.666667 42.666667v298.666666a42.666667 42.666667 0 0 1-42.666667 42.666667h-298.666666a42.666667 42.666667 0 0 1-42.666667-42.666667v-85.333333H298.666667a42.666667 42.666667 0 0 1-42.666667-42.666667v-213.333333H170.666667a42.666667 42.666667 0 0 1-42.666667-42.666667V170.666667a42.666667 42.666667 0 0 1 42.666667-42.666667h298.666666z m213.333334 213.333333h-170.666667v128a42.666667 42.666667 0 0 1-42.666667 42.666667H341.333333v170.666667h170.666667v-128a42.666667 42.666667 0 0 1 42.666667-42.666667h128V341.333333z"
                   />
-                </g>
-              </svg>
-            </button>
-            <button class="toolbar-item" @click="saveProto" title="SavePrototype">
-              <EditorIcon icon="save" />
-            </button>
-            <button class="toolbar-item" @click="saveToImage" title="SaveImage">
-              <EditorIcon icon="perm_media" />
-            </button>
+                </svg>
+              </button>
+              <button class="toolbar-item" @click="bringToFront" :disabled="!selectedItemActive" title="Bring to front">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  :style="{ transform: 'scale(1.0)', opacity: selectedItemActive ? 1 : 0.3 }"
+                  viewBox="0 0 24 24"
+                >
+                  <g>
+                    <path fill="none" d="M0 0H24V24H0z" />
+                    <path
+                      fill="gray"
+                      d="M11 3c.552 0 1 .448 1 1v2h5c.552 0 1 .448 1 1v5h2c.552 0 1 .448 1 1v7c0 .552-.448 1-1 1h-7c-.552 0-1-.448-1-1v-2H7c-.552 0-1-.448-1-1v-5H4c-.552 0-1-.448-1-1V4c0-.552.448-1 1-1h7zm5 5H8v8h8V8z"
+                    />
+                  </g>
+                </svg>
+              </button>
+              <button class="toolbar-item" @click="saveAll" title="SavePrototype">
+                <EditorIcon icon="save" />
+              </button>
+              <button class="toolbar-item" @click="saveToImage" title="SaveImage">
+                <EditorIcon icon="perm_media" />
+              </button>
+            </div>
+            <div class="toolbar-separator"></div>
+            <div v-if="editable" class="toolbar">
+              <button
+                class="toolbar-item"
+                @click="showRulers = !showRulers"
+                title="Show / Hide rulers"
+                :style="{ backgroundColor: showRulers ? '#4af' : '', color: showRulers ? 'white' : '' }"
+              >
+                <EditorIcon icon="straighten" />
+              </button>
+              <button
+                class="toolbar-item"
+                @click="showGuides = !showGuides"
+                title="Show / Hide alignment guidelines"
+                :style="{ backgroundColor: showGuides ? '#4af' : '', color: showGuides ? 'white' : '' }"
+              >
+                <EditorIcon icon="border_style" />
+              </button>
+              <button
+                class="toolbar-item"
+                @click="showInspector = !showInspector"
+                itle="Show / Hide inspector"
+                :style="{ backgroundColor: showInspector ? '#4af' : '', color: showInspector ? 'white' : '' }"
+              >
+                <EditorIcon icon="brush" />
+              </button>
+              <button
+                class="toolbar-item"
+                @click="showKeyboard = !showKeyboard"
+                title="Show / Hide keyboards shortcuts"
+                :style="{ backgroundColor: showKeyboard ? '#4af' : '', color: showKeyboard ? 'white' : '' }"
+              >
+                <EditorIcon icon="keyboard_hide" />
+              </button>
+            </div>
           </div>
-          <div class="toolbar-separator"></div>
-          <div v-if="editable" class="toolbar">
-            <button
-              class="toolbar-item"
-              @click="showRulers = !showRulers"
-              title="Show / Hide rulers"
-              :style="{ backgroundColor: showRulers ? '#4af' : '', color: showRulers ? 'white' : '' }"
-            >
-              <EditorIcon icon="straighten" />
-            </button>
-            <button
-              class="toolbar-item"
-              @click="showGuides = !showGuides"
-              title="Show / Hide alignment guidelines"
-              :style="{ backgroundColor: showGuides ? '#4af' : '', color: showGuides ? 'white' : '' }"
-            >
-              <EditorIcon icon="border_style" />
-            </button>
-            <button
-              class="toolbar-item"
-              @click="showInspector = !showInspector"
-              itle="Show / Hide inspector"
-              :style="{ backgroundColor: showInspector ? '#4af' : '', color: showInspector ? 'white' : '' }"
-            >
-              <EditorIcon icon="brush" />
-            </button>
-            <button
-              class="toolbar-item"
-              @click="showKeyboard = !showKeyboard"
-              title="Show / Hide keyboards shortcuts"
-              :style="{ backgroundColor: showKeyboard ? '#4af' : '', color: showKeyboard ? 'white' : '' }"
-            >
-              <EditorIcon icon="keyboard_hide" />
-            </button>
-          </div>
-        </div>
 
-        <KeyboardHelp
-          v-if="showKeyboard"
-          style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-order: 1000"
-        />
+          <KeyboardHelp
+            v-if="showKeyboard"
+            style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-order: 1000"
+          />
+        </div>
+        <!-- editor-container -->
       </div>
-      <!-- editor-container -->
-    </div>
-    <div class="flex flex-col basis-1/7 min-w-50 bg-[#494949] h-full">
-      <n-config-provider :theme="darkTheme" :theme-overrides="prototypeWorkspaceConfig">
-        <SyncEditMembers v-if="isSyncManagerInitialized" />
-        <ObjectInspector
-          :schema="selectedItem ? getItemBlueprint(selectedItem.component)[1] : null"
-          :object="selectedItem"
-          @property-changed="onPropertyChange"
-        />
-      </n-config-provider>
+      <div v-if="editable" class="flex flex-col w-90 bg-[#494949] h-full">
+        <n-config-provider class="h-full" :theme="darkTheme" :theme-overrides="prototypeWorkspaceConfig">
+          <ObjectInspector
+            :schema="objectInspectorSchema"
+            :object="selectedItem"
+            @property-changed="onPropertyChange"
+          />
+        </n-config-provider>
+      </div>
     </div>
   </div>
 </template>
@@ -425,20 +448,19 @@ import ClipCommand from './commands/ClipCommand';
 import DeleteCommand from './commands/DeleteCommand';
 import KeyboardHelp from './components/KeyboardHelp.vue';
 import { DefaultZoomManager, IZoomManager } from './ZoomManager';
-import * as htmlToImage from 'html-to-image';
-import FileSaver, { saveAs } from 'file-saver';
 import { useRoute } from 'vue-router';
 import ZoomToolbarVue from './components/ZoomToolbar.vue';
 import { editFile, readFile } from '@/api/file';
+import html2canvas from 'html2canvas';
 import { createSyncManager, syncManager, isSyncManagerInitialized, OperationType } from './synchronous/SyncManager';
 import { wsurl } from '@/api/utils/request';
 import { darkTheme } from 'naive-ui';
 import { prototypeWorkspaceConfig } from '@/config/color';
+import { uploadImage } from '@/api/assets';
 export type Item = _Item & { hover?: boolean };
 // The component props and events
 // ------------------------------------------------------------------------------------------------------------------------
 export interface DiagramEditorProps {
-  editable?: boolean;
   customWidgets?: boolean;
   viewportSize?: [number, number];
 }
@@ -452,8 +474,7 @@ export interface DiagramEditorEvents {
 }
 
 // Define props
-const { editable, viewportSize } = withDefaults(defineProps<DiagramEditorProps>(), {
-  editable: true,
+const { viewportSize } = withDefaults(defineProps<DiagramEditorProps>(), {
   customWidgets: false,
 });
 
@@ -479,9 +500,13 @@ onBeforeMount(() => {
   loadProto();
 });
 
+// watch(()=>selectedItem.value)
+
 // Set the handlers to manage keyboard shortcuts
 setupKeyboardHandlers();
 
+const editable = ref(true);
+const showModeChange = ref(true);
 // The component state
 // ------------------------------------------------------------------------------------------------------------------------
 const zoomManager = ref<IZoomManager>(new DefaultZoomManager());
@@ -496,7 +521,7 @@ const zoomToolbar = ref<InstanceType<typeof ZoomToolbarVue> | null>(null);
 const hGuides = ref();
 const vGuides = ref();
 const showRulers = ref(true);
-const guidesVisible = computed(() => showRulers.value && editable);
+const guidesVisible = computed(() => showRulers.value && editable.value);
 const hGuideValues = ref<number[]>([]); // Horizontal guides added by the user
 const vGuideValues = ref<number[]>([]); // Vertical guides added by the user
 const showGuides = ref(true); // Show or hide all the guides
@@ -515,16 +540,30 @@ const selectedItemActive = computed(() => {
   return isItem(selectedItem.value) ? !selectedItem.value.locked === true : true;
 });
 
+const objectInspectorSchema = computed(() => {
+  return selectedItem.value ? getItemBlueprint(selectedItem.value.component)[1] : null;
+});
+
 const shiftPressed = useKeyModifier('Shift');
 const historyManager = ref(new HistoryManager());
 const currentTool = ref(EditorTool.SELECT);
+const currentIcon = ref('');
 
 const creatingConnection = computed<boolean>(() => currentTool.value === EditorTool.CONNECTION);
 
-const items = computed(() => loadElements.value.filter((e) => isItem(e)) as Item[]);
+const items = computed(() => {
+  return loadElements.value.filter((e) => isItem(e)) as Item[];
+});
 const connections = computed(() => loadElements.value.filter((e) => isConnection(e)) as ItemConnection[]);
 const pages = ref<Array<PageItem>>([]);
 const currentPage = ref<PageItem | null>(null);
+const currentPageID = computed(() => {
+  if (currentPage.value == null) {
+    return '';
+  } else {
+    return currentPage.value.id;
+  }
+});
 
 const itemToPaste = ref(null as Item | null);
 const inlineEditing = ref(false);
@@ -552,21 +591,13 @@ const mouseCoords = ref<Position>({ x: 0, y: 0 });
 const route = useRoute();
 const handleToolBoxSelect = (selected: EditorTool) => {
   currentTool.value = selected;
+  currentIcon.value = '';
 };
 
-function saveToImage() {
-  let dom = document.createElement('div');
-  // let elems = Array.from(document.getElementsByClassName('screenshot') as HTMLCollectionOf<Element>);
-  // elems.forEach((elem) => {
-  //   var node = elem.cloneNode();
-  //   dom.appendChild(node);
-  // });
-
-  var canvas = document.getElementsByClassName('viewport-area')[0] as HTMLElement;
-  htmlToImage.toPng(canvas).then((canvas) => {
-    FileSaver.saveAs(canvas, 'test.png');
-  });
-}
+const handleIconSelected = (icon: string) => {
+  currentTool.value = EditorTool.ICON;
+  currentIcon.value = icon;
+};
 
 function onDragOver(e: any) {
   if (!viewport.value) return;
@@ -681,7 +712,11 @@ function onDrag(e: any): void {
     selectedItem.value.x = Math.floor(e.beforeTranslate[0]);
     selectedItem.value.y = Math.floor(e.beforeTranslate[1]);
     e.target.style.transform = e.transform;
-    syncManager.sendMessage(OperationType.MOVE, { x: selectedItem.value.x, y: selectedItem.value.y });
+    syncManager.sendMessage(OperationType.MOVE, {
+      targetID: selectedItem.value.id,
+      x: selectedItem.value.x,
+      y: selectedItem.value.y,
+    });
   }
 }
 
@@ -693,6 +728,11 @@ function onDragGroup(e: { events: any }): void {
       selectedPageItems.value[i].x = Math.floor(e.beforeTranslate[0]);
       selectedPageItems.value[i].y = Math.floor(e.beforeTranslate[1]);
       e.target.style.transform = e.transform;
+      syncManager.sendMessage(OperationType.MOVE, {
+        targetID: selectedPageItems.value[i].id,
+        x: selectedPageItems.value[i].x,
+        y: selectedPageItems.value[i].y,
+      });
     }
   });
 }
@@ -729,11 +769,72 @@ function onDragGroupEnd(e: { events: any }): void {
 // Handle Move Sync
 // ---------------------------------------------------------------------------------------------------------------------
 
-function handleMoveSync() {
+function handleSync() {
   syncManager.registerMoveFunc((targetID: string, x: number, y: number) => {
     var element = loadElements.value.find((elem) => elem.id == targetID);
-    (element as Item).x = x;
-    (element as Item).y = y;
+    if (element != null) {
+      (element as Item).x = x;
+      (element as Item).y = y;
+    }
+    if (selectedItem.value != null) {
+      selectNone();
+    }
+  });
+  syncManager.registerResizeFunc((targetID: string, x: number, y: number, w: number, h: number) => {
+    var element = loadElements.value.find((elem) => elem.id == targetID);
+    if (element != null) {
+      (element as Item).x = x;
+      (element as Item).y = y;
+      (element as Item).w = w;
+      (element as Item).h = h;
+    }
+    if (selectedItem.value != null) {
+      selectNone();
+    }
+  });
+  syncManager.registerAddItemFunc((element: DiagramElement, targetPageID: string) => {
+    if (element.isPage) {
+      var newPageName = (element as PageItem).pageName;
+      var resolution = (element as PageItem).w + 'x' + (element as PageItem).h;
+      addPage(newPageName, resolution);
+      focusPage(currentPage.value as PageItem);
+    } else {
+      var page = loadElements.value.find((elem) => elem.id == targetPageID) as PageItem;
+      historyManager.value.execute(new AddItemCommand(loadElements.value, element as Item, page));
+    }
+    if (selectedItem.value != null) {
+      selectNone();
+    }
+  });
+  syncManager.registerDeleteItemFunc((targetID: string) => {
+    var element = loadElements.value.find((elem) => elem.id == targetID);
+    if (element?.isPage) {
+      var index = pages.value.findIndex((ele) => ele.id == targetID);
+      pages.value.splice(index, 1);
+      currentPage.value = null;
+      currentPageTargets.value = [];
+      var containedIDs = (selectedItem.value as PageItem).containedIDs;
+      var deleteItems = loadElements.value.filter((ele) => {
+        return containedIDs.includes(`[data-item-id='${ele.id}']`);
+      });
+      deleteItems.forEach((ele) => {
+        historyManager.value.execute(new DeleteCommand(loadElements.value, ele));
+      });
+    } else {
+      historyManager.value.execute(new DeleteCommand(loadElements.value, element as Item));
+    }
+    if (selectedItem.value != null) {
+      selectNone();
+    }
+  });
+  syncManager.registerModifyFunc((element: DiagramElement) => {
+    selectedItem.value = element;
+    var trueElementIndex = loadElements.value.findIndex((elem) => elem.id == element.id);
+    loadElements.value.splice(trueElementIndex, 1, element);
+    nextTick(() => moveable.value?.updateRect());
+    if (selectedItem.value != null) {
+      selectNone();
+    }
   });
 }
 
@@ -757,6 +858,14 @@ function onResize(e: any): void {
   selectedItem.value.y = Math.floor(e.drag.beforeTranslate[1]);
   selectedItem.value.w = Math.floor(e.width);
   selectedItem.value.h = Math.floor(e.height);
+
+  syncManager.sendMessage(OperationType.RESIZE, {
+    targetID: selectedItem.value.id,
+    x: selectedItem.value.x,
+    y: selectedItem.value.y,
+    w: selectedItem.value.w,
+    h: selectedItem.value.h,
+  });
 
   e.target.style.transform = e.drag.transform;
   e.target.style.width = `${Math.floor(e.width)}px`;
@@ -885,67 +994,201 @@ function bringToFront(): void {
 
 /** Save the scene into a json file */
 function saveProto(): void {
-  var protoData = JSON.stringify(loadElements.value as Item[]);
+  protoData = JSON.stringify(loadElements.value as Item[]);
   // localStorage.setItem('proto', protoData);
   var protoID = parseInt(route.params.protoID as string);
   editFile({ fileID: protoID, data: protoData }).then((res) => {
-    window.$message.info('已保存');
+    window.$message.info('已保存原型');
+  });
+}
+
+var outputCanvas = document.createElement('canvas');
+var ctx2 = outputCanvas.getContext('2d');
+let previewImages: string[] = [];
+let pageCount = 0;
+let protoData: string;
+async function drawCanvas(drawPage: PageItem, darwPageItems: Array<Item>, output: boolean) {
+  let elems: Array<HTMLElement> = [];
+  (drawPage as PageItem).containedIDs.forEach((dataID) => {
+    var id = dataID.split("'")[1];
+    elems.push(document.getElementById(id) as HTMLElement);
+  });
+  elems.sort((ele1, ele2) => {
+    return parseInt(ele2.style.zIndex) - parseInt(ele1.style.zIndex);
+  });
+  darwPageItems.sort((ele1, ele2) => {
+    return ele1.z - ele2.z;
+  });
+  var len = elems.length;
+  var pageAttrs = {
+    w: (drawPage as PageItem).w,
+    h: (drawPage as PageItem).h,
+    x: (drawPage as PageItem).x,
+    y: (drawPage as PageItem).y,
+    pagaName: (drawPage as PageItem).pageName,
+  };
+  outputCanvas.width = pageAttrs.w;
+  outputCanvas.height = pageAttrs.h;
+  var index = 0;
+  await elems.forEach((elem: any, i: number) => {
+    var canvas = document.createElement('canvas');
+    var context = canvas.getContext('2d');
+    if (context != null) {
+      context.fillStyle = 'rgba(255, 255, 255, 0)';
+    }
+    var width = elem.offsetWidth; //获取dom 宽度
+    var height = elem.offsetHeight; //获取dom 高度
+    var x = darwPageItems[i].x - pageAttrs.x;
+    var y = darwPageItems[i].y - pageAttrs.y;
+    var yOffset = darwPageItems[i].yOffset;
+    canvas.width = width;
+    canvas.height = height;
+    var opts = {
+      scale: 1, // 添加的scale 参数
+      canvas: canvas, //自定义 canvas
+      logging: true, //日志开关
+      width: width, //dom 原始宽度
+      height: height, //dom 原始高度
+      y: yOffset,
+      useCORS: true,
+      withCredentials: true,
+      allowTaint: true,
+      backgroundColor: null,
+    };
+    html2canvas(elem, opts).then((canvas) => {
+      if (ctx2 != null) {
+        ctx2.drawImage(canvas, x, y, canvas.width, canvas.height);
+        index++;
+        // console.log(index);
+        if (index == len) {
+          outputCanvas.toBlob((blob) => {
+            // 上传图片
+            let imageFile = new File([blob as Blob], pageAttrs.pagaName, { lastModified: Date.now() });
+            uploadImage(imageFile)
+              .then((res) => {
+                previewImages.push(res.data.url);
+              })
+              .finally(() => {
+                if (++pageCount == pages.value.length) {
+                  var protoID = parseInt(route.params.protoID as string);
+                  editFile({
+                    fileID: protoID,
+                    fileImage: previewImages[previewImages.length - 1],
+                    previewImages: previewImages,
+                    data: protoData,
+                  }).then((res) => {
+                    if (res.data.result == 0) {
+                      window.$message.info('已保存全部');
+                    }
+                  });
+                }
+              });
+            if (output) {
+              var imgUrl = window.URL.createObjectURL(blob as Blob);
+              // 利用浏览器下载器下载图片
+              let a = document.createElement('a');
+              a.href = imgUrl;
+
+              a.setAttribute('download', pageAttrs.pagaName);
+              a.click();
+              a.remove();
+            }
+          });
+        }
+      }
+    });
+  });
+}
+
+function saveToImage() {
+  if (currentPage.value == null) {
+    selectPage(pages.value[0]);
+  }
+  drawCanvas(currentPage.value as PageItem, selectedPageItems.value, true);
+}
+
+function saveAll() {
+  protoData = JSON.stringify(loadElements.value as Item[]);
+  pageCount = 0;
+  previewImages.length = 0;
+  pages.value.forEach((page) => {
+    var pageItems = loadElements.value.filter((elem) => {
+      return (page as PageItem).containedIDs.includes(`[data-item-id='${elem.id}']`);
+    }) as Item[];
+    drawCanvas(page, pageItems, false);
   });
 }
 
 function loadProto() {
   var protoID = parseInt(route.params.protoID as string);
-  readFile({ fileID: protoID, teamID: null })
-    .then((res) => {
-      if (res.data.data != null) {
-        loadElements.value = JSON.parse(res.data.data) as DiagramElement[];
-      } else {
-        loadElements.value = [
-          // createPageItem()
-        ];
-      }
+  var shareCode = route.query.shareCode;
+  console.log('shareCode', shareCode);
+  if (shareCode === undefined) {
+    readFile({ fileID: protoID, teamID: null })
+      .then((res) => {
+        try {
+          loadElements.value = JSON.parse(res.data.data) as DiagramElement[];
+        } catch (e) {
+          addPage('首页', '1080x720');
+        }
+      })
+      .finally(protoFunctionInit);
+  } else {
+    editable.value = false;
+    showModeChange.value = false;
+    readFile({ fileID: protoID, teamID: null, shareCode: shareCode as string })
+      .then((res) => {
+        try {
+          loadElements.value = JSON.parse(res.data.data) as DiagramElement[];
+        } catch (e) {
+          addPage('首页', '1080x720');
+        }
+      })
+      .finally(protoFunctionInit);
+  }
+  // var protoData = localStorage.getItem('proto') as string;
+  // loadElements.value = JSON.parse(protoData) as DiagramElement[];
+}
+
+function protoFunctionInit() {
+  pages.value = loadElements.value.filter((ele) => ele.isPage == true) as PageItem[];
+  selectPage(pages.value[0]);
+  originGroup = new Array<Frame>(loadElements.value.length)
+    .fill({
+      x: 0,
+      y: 0,
+      w: 0,
+      h: 0,
+      z: 0,
+      r: 0,
+      borderRadius: 0,
+      opacity: 1,
+      clipType: ClipType.NONE,
+      clipStyle: '',
     })
-    .finally(() => {
-      pages.value = loadElements.value.filter((ele) => ele.isPage == true) as PageItem[];
-      selectPage(pages.value[0]);
-      originGroup = new Array<Frame>(loadElements.value.length)
-        .fill({
-          x: 0,
-          y: 0,
-          w: 0,
-          h: 0,
-          z: 0,
-          r: 0,
-          borderRadius: 0,
-          opacity: 1,
-          clipType: ClipType.NONE,
-          clipStyle: '',
-        })
-        .map((item: Frame) => ({
-          x: 0,
-          y: 0,
-          w: 0,
-          h: 0,
-          z: 0,
-          r: 0,
-          borderRadius: 0,
-          opacity: 1,
-          clipType: ClipType.NONE,
-          clipStyle: '',
-        }));
-      createSyncManager(wsurl, loadElements.value);
-      handleMoveSync();
-    });
+    .map((item: Frame) => ({
+      x: 0,
+      y: 0,
+      w: 0,
+      h: 0,
+      z: 0,
+      r: 0,
+      borderRadius: 0,
+      opacity: 1,
+      clipType: ClipType.NONE,
+      clipStyle: '',
+    }));
+  createSyncManager(wsurl, loadElements.value);
+  handleSync();
 }
 
 function handleCreatePage(newPageName: string, pageResolution: string) {
   addPage(newPageName, pageResolution);
   focusPage(currentPage.value as PageItem);
+  syncManager.sendMessage(OperationType.ADD_ITEM, { element: currentPage.value });
 }
 
 function addPage(newPageName: string, pageResolution: string): void {
-  // TODO: page ID and save proto
-  saveProto();
   // Clicking the canvas with other tools => create a new item of related type
   const toolDef = getToolDefinition(EditorTool.PAGE);
   const properties = getItemBlueprint(toolDef.itemType!)[0];
@@ -970,6 +1213,7 @@ function addPage(newPageName: string, pageResolution: string): void {
   currentPage.value = newItem;
   pages.value.push(currentPage.value as PageItem);
   emit('add-item', newItem);
+  saveProto();
 }
 
 /** Delete current selected item / connection */
@@ -980,13 +1224,29 @@ function deleteItem() {
       pages.value.splice(index, 1);
       currentPage.value = null;
       currentPageTargets.value = [];
+      var containedIDs = (selectedItem.value as PageItem).containedIDs;
+      //console.log(containedIDs);
+      var deleteItems = loadElements.value.filter((ele) => {
+        return containedIDs.includes(`[data-item-id='${ele.id}']`);
+      });
+      //console.log(deleteItems);
+      deleteItems.forEach((ele) => {
+        syncManager.sendMessage(OperationType.DELETE_ITEM, { targetID: (ele as DiagramElement).id });
+        historyManager.value.execute(new DeleteCommand(loadElements.value, ele));
+      });
+    } else {
+      syncManager.sendMessage(OperationType.DELETE_ITEM, { targetID: (selectedItem.value as DiagramElement).id });
+      historyManager.value.execute(new DeleteCommand(loadElements.value, selectedItem.value));
+      emit('delete-item', selectedItem.value);
+      selectNone();
     }
-    historyManager.value.execute(new DeleteCommand(loadElements.value, selectedItem.value));
-    emit('delete-item', selectedItem.value);
-    selectNone();
   }
 
   if (isConnection(selectedItem.value)) {
+    var fromID = (selectedItem.value as ItemConnection).from.item;
+    var element = loadElements.value.find((elem) => elem.id == fromID);
+    (element as Item).connection = undefined;
+    syncManager.sendMessage(OperationType.DELETE_ITEM, { targetID: (selectedItem.value as DiagramElement).id });
     historyManager.value.execute(new DeleteCommand(loadElements.value, selectedItem.value));
     emit('delete-connection', selectedItem.value);
     selectNone();
@@ -1043,7 +1303,7 @@ function selectCurrentTool(tool: EditorTool): void {
 
 /** Handle the clik in the overall canvas */
 function onCanvasClick(e: any): void {
-  console.log('onCanvasClick', e);
+  //console.log('onCanvasClick', e);
 
   // Was just clicking the scrollbar for scrolling?
   if (e.target?.classList?.contains('infinite-viewer-scroll-thumb')) return;
@@ -1051,7 +1311,7 @@ function onCanvasClick(e: any): void {
   // Current tool is 'select' => clicking the canvas unselect all
   if (currentTool.value === EditorTool.SELECT) {
     if (!selectedItem.value?.isPage) {
-      console.log('Unselecting all');
+      //console.log('Unselecting all');
       selectNone();
     }
     // selectNone();
@@ -1072,9 +1332,11 @@ function onCanvasClick(e: any): void {
     id: getUniqueId(),
     x: mouseCoords.value.x,
     y: mouseCoords.value.y,
+    title: currentIcon.value,
   });
   console.log('creating new item', toolDef, toolDef.itemType, newItem);
   historyManager.value.execute(new AddItemCommand(loadElements.value, newItem, currentPage.value));
+  syncManager.sendMessage(OperationType.ADD_ITEM, { element: newItem, targetPageID: currentPage.value?.id });
   emit('add-item', newItem);
   currentTool.value = EditorTool.SELECT;
 }
@@ -1101,9 +1363,12 @@ function connectionHandleClick(item: Item, point: ConnectionHandle) {
     createConnection(ci.startItem.id, ci.endItem.id, { from: { handle: ci.startPoint }, to: { handle: ci.endPoint } })
   );
 
+  // set start item the new connection properties;
+  ci.startItem.connection = newConnection;
+
   ci.startItem = null;
   ci.endItem = null;
-
+  syncManager.sendMessage(OperationType.ADD_ITEM, { element: newConnection });
   historyManager.value.execute(new AddConnectionCommand(loadElements.value, newConnection));
   emit('add-connection', newConnection);
 }
@@ -1112,16 +1377,22 @@ function onPropertyChange(p: ObjectProperty, newValue: any) {
   //console.log('onPropertyChange', p, 'New value:', newValue);
   // TODO: create a history command for this change so the action is undoable (for that we need the 'oldValue' as well)
   // historyManager.value.execute(new PropertyChangeCommand(selectedItem.value, oldValue, newValue));
-
+  syncManager.sendMessage(OperationType.MODIFY, { element: selectedItem.value });
   nextTick(() => moveable.value?.updateRect());
 }
 
 /** Handle zoom changes from the zoom toolbar */
 function onZoomChanged(newZoomFactor: number, scrollViewerToCenter?: boolean) {
-  console.log('onZoomChanged', newZoomFactor, scrollViewerToCenter);
+  //console.log('onZoomChanged', newZoomFactor, scrollViewerToCenter);
   zoomFactor.value = newZoomFactor;
 
   if (scrollViewerToCenter === true) nextTick(() => viewer.value?.scrollCenter());
+}
+
+function onModeChanged() {
+  editable.value = !editable.value;
+  focusPage(currentPage.value as PageItem);
+  selectNone();
 }
 
 /** Handle scroll to page */
@@ -1138,18 +1409,30 @@ function handleSelectPage(page: PageItem) {
   });
 }
 
-function focusPage(page: PageItem) {
-  window.$message.info('聚焦' + page.pageName);
-  const left = page.x - 100;
-  const top = page.y - 100;
-  viewer.value?.scrollTo(left, top);
-  zoomToolbar.value?.zoomReset();
-  console.log('page info', currentPage.value, currentPageTargets.value);
+function focusPage(page: Item) {
+  if (isPage(page)) {
+    window.$message.info('聚焦' + (page as PageItem).pageName);
+    const left = page.x - 100;
+    const top = page.y - 100;
+    viewer.value?.scrollTo(left, top);
+    zoomToolbar.value?.zoomReset();
+  }
+  // console.log('page info', currentPage.value, currentPageTargets.value);
+}
+
+function handleLinkToClick(itemID: string) {
+  console.log('handleLinkToClick');
+  if (!editable.value) {
+    var element = loadElements.value.find((elem) => elem.id == itemID) as Item;
+    focusPage(element);
+  }
 }
 
 function selectPage(page: PageItem) {
   currentPage.value = page;
-  currentPageTargets.value = page.containedIDs;
+  if (page != null) {
+    currentPageTargets.value = page.containedIDs;
+  }
 }
 
 /** Setup all the keyboard shortcuts */
@@ -1179,7 +1462,7 @@ function setupKeyboardHandlers() {
 
   // Delete / backspace to delete selected item
   onKey(['Backspace', 'Delete'], (e: KeyboardEvent) => {
-    console.log('Pressed delete', e);
+    // console.log('Pressed delete', e);
     if (selectedItem.value) deleteItem();
   });
 
@@ -1195,7 +1478,7 @@ function setupKeyboardHandlers() {
   onKey(['ArrowLeft', 'ArrowRight', 'ArrowDown', 'ArrowUp'], (e: KeyboardEvent) => {
     if (!selectedItem.value) return;
 
-    console.log('Pressed arrow key', e);
+    // console.log('Pressed arrow key', e);
 
     const item = selectedItem.value as Item;
 
@@ -1245,7 +1528,7 @@ function setupKeyboardHandlers() {
 
   onKey(['Escape'], (e: KeyboardEvent) => {
     if (creatingConnection.value === true) {
-      console.log('ESC pressed: cancelling connection creation');
+      // console.log('ESC pressed: cancelling connection creation');
       connectionInfo.startItem = null;
       connectionInfo.endItem = null;
       selectCurrentTool(EditorTool.SELECT);
@@ -1263,7 +1546,7 @@ function deepCloneItem(item: any): any {
 function copyItem() {
   if (!isItem(selectedItem.value)) return;
 
-  console.log('Copying item', selectedItem.value);
+  // console.log('Copying item', selectedItem.value);
 
   itemToPaste.value = selectedItem.value;
 
@@ -1273,14 +1556,14 @@ function copyItem() {
 function cutItem() {
   if (!isItem(selectedItem.value)) return;
 
-  console.log('Cutting item', selectedItem.value);
+  // console.log('Cutting item', selectedItem.value);
   itemToPaste.value = selectedItem.value;
   deleteItem();
 }
 
 function pasteItem() {
   if (!itemToPaste.value) return;
-  console.log('Paste item', selectedItem.value);
+  // console.log('Paste item', selectedItem.value);
 
   const newItem = deepCloneItem(itemToPaste.value) as Item;
 
@@ -1357,11 +1640,6 @@ function inlineEdit(item: Item) {
 .viewer {
   box-sizing: border-box;
   position: absolute;
-  top: 30px;
-  left: 30px;
-  width: calc(100% - 30px);
-  height: calc(100% - 30px);
-  background-color: rgb(237, 237, 237);
   user-select: none;
   background-image: linear-gradient(90deg, rgba(140, 140, 140, 0.15) 10%, rgba(0, 0, 0, 0) 10%),
     linear-gradient(rgba(140, 140, 140, 0.15) 10%, rgba(0, 0, 0, 0) 10%);
@@ -1403,7 +1681,7 @@ function inlineEdit(item: Item) {
   left: 0px;
   width: 30px;
   height: 30px;
-  background-color: #18181c;
+  background-color: #494949;
 }
 
 .toolbars-container {

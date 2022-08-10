@@ -37,7 +37,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, h } from 'vue';
+import { ref, h, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import Vue3DraggableResizable from 'vue3-draggable-resizable';
 import 'vue3-draggable-resizable/dist/Vue3DraggableResizable.css';
@@ -60,6 +60,12 @@ const handleUpdateTab = (value: string) => {
 
 const renderSignInTabPane = () => h('div', { style: 'font-weight: bold;' }, '登录');
 const renderSignUpTabPane = () => h('div', { style: 'font-weight: bold;' }, '注册');
+
+onMounted(() => {
+  if (localStorage.getItem('token')) {
+    router.push({ name: 'ProjectDesktop' });
+  }
+});
 </script>
 
 <style scoped>
