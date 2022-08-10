@@ -9,6 +9,7 @@ export enum OperationType {
   MOVE = 'move',
   RESIZE = 'resize',
   MODIFY = 'modify',
+  CLOSE_SHARE = 'close_share',
 }
 // handle recevie
 export type RegisterFunc = (userID: number, fileID: number) => any;
@@ -128,6 +129,9 @@ export class SyncManager {
           this.deleteItemFuncs.forEach((func) => {
             func(message.targetID);
           });
+          break;
+        case 'close_share':
+          this.websocket.close();
           break;
       }
     };

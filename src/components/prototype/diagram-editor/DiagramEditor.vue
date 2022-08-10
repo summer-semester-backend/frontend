@@ -994,11 +994,21 @@ function bringToFront(): void {
 
 /** Save the scene into a json file */
 function saveProto(): void {
+  trimPageElements();
   protoData = JSON.stringify(loadElements.value as Item[]);
   // localStorage.setItem('proto', protoData);
   var protoID = parseInt(route.params.protoID as string);
   editFile({ fileID: protoID, data: protoData }).then((res) => {
     window.$message.info('已保存原型');
+  });
+}
+
+function trimPageElements() {
+  pages.value.forEach((page) => {
+    page.containedIDs = page.containedIDs.filter((eleID) => {
+      return loadElements.value.findIndex((ele) => `[data-item-id='${ele.id}']` == eleID) != -1;
+    });
+    console.log('page.containedIDs', page.containedIDs);
   });
 }
 
@@ -1153,7 +1163,7 @@ function loadProto() {
 function protoFunctionInit() {
   pages.value = loadElements.value.filter((ele) => ele.isPage == true) as PageItem[];
   selectPage(pages.value[0]);
-  originGroup = new Array<Frame>(loadElements.value.length)
+  originGroup = new Array<Frame>(loadElements.value.length + 100)
     .fill({
       x: 0,
       y: 0,

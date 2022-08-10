@@ -10,9 +10,9 @@ export default class AddItemCommand implements Command {
 
   do(): void {
     this.elements.push(this.elementToAdd);
+    console.log('additem', this.elementToAdd);
     if (!isConnection(this.elementToAdd)) {
       this.targetPage?.containedIDs.push(`[data-item-id='${this.elementToAdd.id}']`);
-      this.elementToAdd.fatherID = this.targetPage?.id;
     }
   }
 
