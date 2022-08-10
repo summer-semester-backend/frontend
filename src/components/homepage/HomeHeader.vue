@@ -19,7 +19,10 @@
             <div class="header-right">
               <!-- Start Header Btn -->
               <div class="header-btn">
-                <a :class="data.buyButtonClass" href="#" style="color: white; width: 120px"> 登录 / 注册 </a>
+                <!-- <a :class="data.buyButtonClass" href="#" style="color: white; width: 120px"> </a> -->
+                <router-link :class="data.buyButtonClass" to="/login" style="color: white; width: 120px">
+                  登录 / 注册
+                </router-link>
               </div>
               <!-- End Header Btn  -->
             </div>

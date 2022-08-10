@@ -58,7 +58,7 @@
         <div class="row row--30 align-items-center">
           <div class="col-lg-5">
             <div class="thumbnail" data-aos="fade-up" data-aos-delay="250">
-              <img class="w-100" src="../../assets/images/about/about-1.png" alt="About Images" />
+              <img style="width: 450px; margin-left: 30px" src="../../assets/images/about/about-4.png" />
             </div>
           </div>
           <div class="col-lg-7 mt_md--40 mt_sm--40">
@@ -85,7 +85,7 @@
                   等）、多人在线编辑文档四大功能。
                 </p>
                 <div class="read-more-btn mt--40" data-aos="fade-up" data-aos-delay="370">
-                  <router-link class="btn-default" to="/about">
+                  <router-link class="btn-default" to="/">
                     <span style="color: #fff; font-size: 16px">更多信息</span>
                   </router-link>
                 </div>
