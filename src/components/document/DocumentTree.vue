@@ -1,6 +1,9 @@
 <template>
   <div>
-    <n-card title="文件列表">
+    <n-card>
+      <template #header>
+        {{ fatherName == 'root' ? '文档中心' : fatherName }}
+      </template>
       <n-scrollbar style="height: 70vh">
         <n-tree
           :data="treeData"
@@ -9,7 +12,6 @@
           children-field="sonList"
           :on-load="handleLoad"
           :on-update:selected-keys="handleSelect"
-          :cancelable="false"
           :default-selected-keys="[parseInt($route.params.id.toString())]"
         ></n-tree>
       </n-scrollbar>
@@ -40,11 +42,12 @@ var oriID = computed(() => {
   return props.fatherID;
 });
 watch(oriID, (newVal, oldVal) => {
-  getFileList(newVal, -1, treeData.value, true);
+  if (oldVal == -1) getFileList(newVal, -1, treeData.value, true);
 });
 //定义变量
 const treeData = ref<File[]>([]);
 const fatherID = ref();
+const fatherName = ref('');
 const router = useRouter();
 //获取文件列表
 const getFileList = (fileID: number | null, teamID: number | null, dad: File[], isEnter: boolean) => {
@@ -55,6 +58,7 @@ const getFileList = (fileID: number | null, teamID: number | null, dad: File[], 
     .then((res) => {
       if (isEnter) {
         fatherID.value = res.data.fatherID;
+        fatherName.value = res.data.fileName;
       }
       res.data.sonList.forEach((item: any) => {
         if (item.fileType > 2 && item.fileType != 14) return;
@@ -117,7 +121,7 @@ const handleSelect = (keys: Array<any>, rows: Array<any>) => {
   if (keys.length == 0) return;
   if (rows[0].fileType == -1) {
     treeData.value = [];
-    getFileList(fatherID.value, -1, treeData.value, false);
+    getFileList(fatherID.value, -1, treeData.value, true);
   } else if (rows[0].fileType == 14) {
     router.replace({
       name: 'editor',
