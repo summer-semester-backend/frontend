@@ -2,7 +2,20 @@
   <n-layout-sider :width="80" bordered>
     <n-layout-header class="mt-2" position="absolute">
       <n-space vertical>
-        <n-avatar round class="flex m-auto"></n-avatar>
+        <div
+          style="
+            width: 100%;
+            display: flex;
+            align-items: center;
+            flex-direction: row;
+            justify-content: center;
+            margin-top: 20px;
+            margin-bottom: 15px;
+          "
+        >
+          <n-image :src="logo" preview-disabled></n-image>
+        </div>
+
         <sidebar-button button-name="个人" route-name="ProjectDesktop" root-route="user">
           <person-circle-outline />
         </sidebar-button>
@@ -26,6 +39,7 @@ import { ProjectOutlined } from '@vicons/antd';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '@/store/auth';
 import { computed } from 'vue';
+import logo from '/resource/logo2.png';
 
 const { signOut, getAvatar } = useAuthStore();
 

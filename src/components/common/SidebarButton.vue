@@ -4,7 +4,7 @@
       :type="isSelect ? 'info' : 'default'"
       size="large"
       :bordered="false"
-      class="flex rounded-xl mx-2 my-4 h-14"
+      class="flex rounded-xl mx-2 my-2 h-14"
       @click="handleDirect"
     >
       <div class="flex h-10 items-center flex-col">
