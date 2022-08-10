@@ -15,7 +15,13 @@
             <p class="description" v-html="service.description" style="font-size: 16px" />
           </div>
           <div class="image">
-            <img :src="service.image" alt="Service Images" />
+            <n-image
+              object-fit="cover"
+              style="width: 350px; height: 180px; justify-content: center"
+              preview-disabled
+              :src="service.image"
+              alt="Service Images"
+            ></n-image>
           </div>
         </div>
       </div>
@@ -26,6 +32,8 @@
 <script setup="js">
 import { ref, onMounted, onBeforeUnmount, computed } from 'vue';
 import img1 from '@/assets/images/test/uml.png';
+import img2 from '@/assets/images/test/doc.png';
+import img3 from '@/assets/images/test/prototype.png';
 
 const props = defineProps({
   serviceStyle: {
@@ -39,7 +47,7 @@ const props = defineProps({
 
 const serviceList = ref([
   {
-    image: img1,
+    image: img3,
     title: '原型设计',
     description: '具有丰富的组件库，支持多人同步编辑，便于与团队成员协同工作。',
   },
@@ -50,7 +58,7 @@ const serviceList = ref([
   },
   {
     // image: require('@/assets/images/test/uml.png'),
-    image: img1,
+    image: img2,
     title: '文档编写',
     description: '支持多人同步编辑，自动存储，文件夹功能，是项目协作必不可少到一环。',
   },
