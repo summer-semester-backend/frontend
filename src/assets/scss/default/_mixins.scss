@@ -1,10 +1,10 @@
-@mixin clearfix() {
-	&::after {
-		content: "";
-		clear: both;
-		display: table;
-	}
-}
+// @mixin clearfix() {
+// 	&::after {
+// 		content: "";
+// 		clear: both;
+// 		display: table;
+// 	}
+// }
 
 @mixin config-bg-colors($prefix, $bg-color-...) {
 	@each $i in $bg-color- {
@@ -14,17 +14,17 @@
 	}
 }
 
-@mixin placeholder {
-    &::-webkit-input-placeholder {
-        @content;
-    }
-    &:-moz-placeholder {
-        @content;
-    }
-    &::-moz-placeholder { 
-        @content;
-    }
-    &:-ms-input-placeholder {
-        @content;
-    }
-}
+// @mixin placeholder {
+//     &::-webkit-input-placeholder {
+//         @content;
+//     }
+//     &:-moz-placeholder {
+//         @content;
+//     }
+//     &::-moz-placeholder { 
+//         @content;
+//     }
+//     &:-ms-input-placeholder {
+//         @content;
+//     }
+// }

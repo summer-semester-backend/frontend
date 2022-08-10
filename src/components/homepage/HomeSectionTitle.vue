@@ -3,7 +3,7 @@
     <h4 class="subtitle">
       <span class="theme-gradient" v-html="props.subtitle" />
     </h4>
-    <h2 class="title " v-html="props.title" />
+    <h2 class="title" v-html="props.title" />
     <p v-if="props.description" class="description b1" v-html="props.description" />
   </div>
 
@@ -45,8 +45,3 @@ const checkTextAlign = computed(() => {
   else return '';
 });
 </script>
-
-<style scoped>
-@import 'animate.css';
-@import 'aos/dist/aos.css';
-</style>
