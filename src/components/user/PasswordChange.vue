@@ -50,6 +50,7 @@ import { ref, computed, reactive, defineProps, onMounted, h } from 'vue';
 import { changePassword } from '@/api/auth';
 import { useMessage } from 'naive-ui';
 import { hex_md5 } from '@/plugins/md5.js'
+import { complex } from '@/plugins/passVerify.js';
 // import { StarFilled } from "@vicons/antd";
 // import { FormInst, FormRules, FormItemRule, UploadFileInfo } from 'naive-ui';
 const message = useMessage();
@@ -71,15 +72,33 @@ const rules = ref({
   newPassword: [
     {
       required: true,
-      message: '请输入新密码',
+      // message: '请输入新密码',
       trigger: ['input', 'blur'],
+
+      validator(rule, value) {
+        if (!value) {
+          return new Error("请输入新密码");
+        } else if (!complex(value)) {
+          return new Error("密码大于八位，同时包含大小写");
+        }
+        return true;
+      },
     },
   ],
   newPasswordCheck: [
     {
       required: true,
-      message: '请确认密码',
+      // message: '请确认密码',
       trigger: ['input', 'blur'],
+
+      validator(rule, value) {
+        if (!value) {
+          return new Error("请确认密码");
+        } else if (!complex(value)) {
+          return new Error("密码大于八位，同时包含大小写");
+        }
+        return true;
+      },
     },
   ],
 });
@@ -99,6 +118,11 @@ const change = () => {
   }
   if (model.value.newPassword == model.value.password) {
     message.warning('新旧密码相同！');
+    return;
+  }
+  if(!complex(model.value.newPassword))
+  {
+    message.warning('更改的密码大于八位，同时包含大小写！');
     return;
   }
   //changePassword({ password: hex_md5(model.value.password), newPassword: hex_md5(model.value.newPassword) })//加密
