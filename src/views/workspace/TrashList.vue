@@ -4,17 +4,17 @@
       <template #toolbar>
         <n-button v-if="!isInputShow" @click="showInput" quaternary circle>
           <template #icon>
-            <n-icon size="18" color="rgb(100,100,100)"><search /></n-icon>
+            <n-icon size="20" color="rgb(100,100,100)"><search /></n-icon>
           </template>
         </n-button>
         <n-input v-model:value="input" v-else round placeholder="搜索名称" @blur="hideInput" style="width: 200px">
           <template #suffix>
-            <n-icon size="18" :component="Search" />
+            <n-icon size="20" :component="Search" />
           </template>
         </n-input>
         <n-button quaternary @click="handleClear"
           ><template #icon>
-            <n-icon size="18" color="rgb(100,100,100)"><trash /></n-icon> </template
+            <n-icon size="20" color="rgb(100,100,100)"><trash-outline /></n-icon> </template
           >清空回收站</n-button
         >
       </template>
@@ -25,7 +25,7 @@
 <script setup lang="ts">
 import { NButton, NIcon, NSpace, NText } from 'naive-ui';
 import { h, ref, computed, onMounted } from 'vue';
-import { Refresh, Trash, Search, EllipsisHorizontal } from '@vicons/ionicons5';
+import { Refresh, Trash, Search, EllipsisHorizontal, TrashOutline } from '@vicons/ionicons5';
 import { binList, recoverFile, deleteFile, clearBin } from '@/api/file';
 import { ToolBar } from './components';
 import { useRoute } from 'vue-router';
