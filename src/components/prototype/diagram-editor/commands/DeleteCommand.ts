@@ -11,7 +11,7 @@ export default class DeleteCommand implements Command {
 
   do(): void {
     this.deleteElement(this.elementToDelete);
-    if (!isConnection(this.elementToDelete) && !this.elementToDelete.isPage) {
+    if (!isConnection(this.elementToDelete)) {
       var fatherPage = this.elements.find((ele) => {
         return (ele.id = this.elementToDelete.fatherID!);
       });
@@ -31,7 +31,7 @@ export default class DeleteCommand implements Command {
 
   undo(): void {
     this.elements.push(this.elementToDelete);
-    if (!isConnection(this.elementToDelete) && !this.elementToDelete.isPage) {
+    if (!isConnection(this.elementToDelete)) {
       var fatherPage = this.elements.find((ele) => {
         return (ele.id = this.elementToDelete.fatherID!);
       });

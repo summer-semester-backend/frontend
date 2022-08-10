@@ -47,6 +47,7 @@ declare module 'vue' {
     PersonInfo: typeof import('./src/components/user/PersonInfo.vue')['default']
     ProjectBar: typeof import('./src/components/project/ProjectBar.vue')['default']
     ProjectList: typeof import('./src/components/project/ProjectList.vue')['default']
+    ProtoModuleModal: typeof import('./src/components/prototype/modal/ProtoModuleModal.vue')['default']
     Radio: typeof import('./src/components/prototype/diagram-editor/blocks/Radio.vue')['default']
     RangeEditor: typeof import('./src/components/prototype/inspector/property-editors/RangeEditor.vue')['default']
     RawConnection: typeof import('./src/components/prototype/diagram-editor/blocks/RawConnection.vue')['default']

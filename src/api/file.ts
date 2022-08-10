@@ -40,6 +40,7 @@ export function editFile(data: {
   fileImage?: string | null;
   fatherID?: number | null;
   data?: string | null;
+  previewImages?: string[];
 }) {
   return backend.post('/file/write', data);
 }
@@ -58,6 +59,10 @@ export function getAncestor(data: { fileID: number | null }) {
 
 export function getCommonModule(data: { fileID: number | null }) {
   return backend.post('/file/commonTemplate', data);
+}
+
+export function getProtoCommonModule() {
+  return backend.post('/file/commonPrototypeTemplate');
 }
 
 export function getTeamModule(data: { teamID: number | null; fileID: number | null }) {
