@@ -501,6 +501,7 @@ export const textModel: ObjectInspectorModel = {
             shadow$,
           ],
         },
+        borderSection$,
         {
           // Position & size
           name: 'pos_size',

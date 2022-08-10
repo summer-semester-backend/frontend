@@ -10,7 +10,11 @@
     <div v-if="showModeChange" class="btn" @click="shareLink" title="分享预览">
       <EditorIcon icon="share" />
     </div>
+    <div v-if="showModeChange" class="btn" @click="closeLink" title="关闭预览">
+      <EditorIcon icon="person_off" />
+    </div>
   </div>
+
   <n-modal
     v-model:show="show"
     id="copy"
@@ -34,8 +38,9 @@
 import { ref } from 'vue';
 import { IZoomManager } from '../ZoomManager';
 import Clipboard from 'clipboard';
-import { getPrototypeShareCode } from '@/api/file';
-import { routeLocationKey, useRoute } from 'vue-router';
+import { closeSharePrototype, getPrototypeShareCode } from '@/api/file';
+import { useRoute } from 'vue-router';
+import { OperationType, syncManager } from '../synchronous/SyncManager';
 // The component props and events
 // ------------------------------------------------------------------------------------------------------------------------
 interface ToolbarProps {
@@ -94,6 +99,14 @@ function shareLink() {
       show.value = true;
     }
   });
+}
+
+function closeLink() {
+  let currentFileID = route.params.protoID as string;
+  closeSharePrototype({ fileID: parseInt(currentFileID) }).then((res) => {
+    window.$message.info('已关闭所有分享链接');
+  });
+  syncManager.sendMessage(OperationType.CLOSE_SHARE, { teamID: currentFileID });
 }
 defineExpose({ zoomReset });
 </script>

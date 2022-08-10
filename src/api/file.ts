@@ -86,6 +86,10 @@ export function getPrototypeShareCode(data: { fileID: number }) {
   return backend.post('/file/sharePrototype', data);
 }
 
+export function closeSharePrototype(data: { fileID: number }) {
+  return backend.post('/file/closeSharePrototype', data);
+}
+
 export function readModule(data: { fileID: number | null }) {
   return backend.post('/file/commonRead', data);
 }
