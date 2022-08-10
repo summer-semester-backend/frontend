@@ -85,8 +85,8 @@
                   等）、多人在线编辑文档四大功能。
                 </p>
                 <div class="read-more-btn mt--40" data-aos="fade-up" data-aos-delay="370">
-                  <router-link class="btn-default" to="/">
-                    <span style="color: #fff; font-size: 16px">更多信息</span>
+                  <router-link class="btn-default" to="/index">
+                    <span style="color: #fff; font-size: 16px">敬请期待</span>
                   </router-link>
                 </div>
               </div>

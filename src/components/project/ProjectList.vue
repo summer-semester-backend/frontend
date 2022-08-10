@@ -298,7 +298,7 @@ const createOrder = ref(1);
 const sortByCreateTime = () => {
   createOrder.value = createOrder.value * -1;
   props.projects.sort((a, b) => {
-    return (formatDate(b.createTime) > formatDate(a.createTime) ? 1 : -1) * createOrder.value;
+    return (b.createTime > a.createTime ? 1 : -1) * createOrder.value;
   });
 };
 
@@ -308,7 +308,7 @@ const sortByVisitTime = () => {
   visitOrder.value = visitOrder.value * -1;
   props.projects.sort((a, b) => {
     console.log(a.fileName, a.lastVisitTime, b.fileName, b.lastVisitTime);
-    return (formatDate(b.lastVisitTime) > formatDate(a.lastVisitTime) ? 1 : -1) * visitOrder.value;
+    return (b.lastVisitTime > a.lastVisitTime ? 1 : -1) * visitOrder.value;
   });
 };
 
