@@ -111,7 +111,9 @@
                 style="justify-content: center"
                 v-model:page="page"
                 size="large"
-                :page-count="parseInt((dataFilter.length / pageSize + 1).toString())"
+                :page-count="
+                  parseInt(((dataFilter.length - 1 < 0 ? 0 : dataFilter.length - 1) / pageSize + 1).toString())
+                "
             /></n-gi>
             <n-gi></n-gi>
           </n-grid>
