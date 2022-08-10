@@ -1216,6 +1216,7 @@ function deleteItem() {
     var fromID = (selectedItem.value as ItemConnection).from.item;
     var element = loadElements.value.find((elem) => elem.id == fromID);
     (element as Item).connection = undefined;
+    syncManager.sendMessage(OperationType.DELETE_ITEM, { targetID: (selectedItem.value as DiagramElement).id });
     historyManager.value.execute(new DeleteCommand(loadElements.value, selectedItem.value));
     emit('delete-connection', selectedItem.value);
     selectNone();
@@ -1337,7 +1338,7 @@ function connectionHandleClick(item: Item, point: ConnectionHandle) {
 
   ci.startItem = null;
   ci.endItem = null;
-
+  syncManager.sendMessage(OperationType.ADD_ITEM, { element: newConnection });
   historyManager.value.execute(new AddConnectionCommand(loadElements.value, newConnection));
   emit('add-connection', newConnection);
 }
@@ -1390,6 +1391,7 @@ function focusPage(page: Item) {
 }
 
 function handleLinkToClick(itemID: string) {
+  console.log('handleLinkToClick');
   if (!editable.value) {
     var element = loadElements.value.find((elem) => elem.id == itemID) as Item;
     focusPage(element);

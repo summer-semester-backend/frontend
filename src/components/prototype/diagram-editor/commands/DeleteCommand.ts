@@ -11,13 +11,15 @@ export default class DeleteCommand implements Command {
 
   do(): void {
     this.deleteElement(this.elementToDelete);
-    var fatherPage = this.elements.find((ele) => {
-      return (ele.id = this.elementToDelete.fatherID!);
-    });
-    var index = (fatherPage as PageItem).containedIDs.findIndex(
-      (ele) => ele == `[data-item-id='${this.elementToDelete.id}']`
-    );
-    (fatherPage as PageItem).containedIDs.splice(index, 1);
+    if (!isConnection(this.elementToDelete) && !this.elementToDelete.isPage) {
+      var fatherPage = this.elements.find((ele) => {
+        return (ele.id = this.elementToDelete.fatherID!);
+      });
+      var index = (fatherPage as PageItem).containedIDs.findIndex(
+        (ele) => ele == `[data-item-id='${this.elementToDelete.id}']`
+      );
+      (fatherPage as PageItem).containedIDs.splice(index, 1);
+    }
     // Delete linked connections
     this.deletedConnections = [
       ...this.elements.filter(
@@ -29,7 +31,13 @@ export default class DeleteCommand implements Command {
 
   undo(): void {
     this.elements.push(this.elementToDelete);
-
+    if (!isConnection(this.elementToDelete) && !this.elementToDelete.isPage) {
+      var fatherPage = this.elements.find((ele) => {
+        return (ele.id = this.elementToDelete.fatherID!);
+      });
+      (fatherPage as PageItem).containedIDs.push(`[data-item-id='${this.elementToDelete.id}']`);
+      this.elementToDelete.fatherID = (fatherPage as PageItem).id;
+    }
     // Re-add linked connections
     for (let c of this.deletedConnections) this.elements.push(c);
   }

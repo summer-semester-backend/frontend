@@ -1,4 +1,4 @@
-import { DiagramElement, Item, PageItem } from '../types';
+import { DiagramElement, isConnection, Item, PageItem } from '../types';
 
 import Command from './Command';
 
@@ -10,13 +10,20 @@ export default class AddItemCommand implements Command {
 
   do(): void {
     this.elements.push(this.elementToAdd);
-    this.targetPage?.containedIDs.push(`[data-item-id='${this.elementToAdd.id}']`);
-    this.elementToAdd.fatherID = this.targetPage?.id;
+    if (!isConnection(this.elementToAdd) && !this.elementToAdd.isPage) {
+      this.targetPage?.containedIDs.push(`[data-item-id='${this.elementToAdd.id}']`);
+      this.elementToAdd.fatherID = this.targetPage?.id;
+    }
   }
 
   undo(): void {
     this.deleteElement(this.elementToAdd);
-    this.targetPage?.containedIDs.splice(this.targetPage?.containedIDs.indexOf(this.elementToAdd.id), 1);
+    if (!isConnection(this.elementToAdd) && !this.elementToAdd.isPage) {
+      this.targetPage?.containedIDs.splice(
+        this.targetPage?.containedIDs.indexOf(`[data-item-id='${this.elementToAdd.id}']`),
+        1
+      );
+    }
   }
 
   deleteElement(el: DiagramElement) {
