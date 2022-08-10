@@ -340,11 +340,11 @@ export interface InputItem extends Item {
 
 export interface ButtonItem extends Item {
   value: string;
-  disabled: boolean;
+  isPrimary: boolean;
   bordered: boolean;
   circle: boolean;
-  type: 'default' | 'tertiary' | 'primary' | 'success' | 'info' | 'warning' | 'error';
-  color: string | undefined;
+  useColor: boolean;
+  color: string;
 }
 
 export interface RadioItem extends Item {

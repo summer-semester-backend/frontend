@@ -442,11 +442,10 @@ export function registerDefaultItemTypes() {
       title: 'button',
       supportsRoundable: true,
       value: '按钮',
-      disabled: false,
       bordered: true,
       circle: false,
-      type: 'default',
-      color: undefined,
+      isPrimary: true,
+      color: '#40a9ff',
     },
     buttonModel
   );

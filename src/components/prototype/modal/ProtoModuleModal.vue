@@ -21,7 +21,7 @@
         </n-menu>
       </n-layout-sider>
       <n-layout>
-        <n-carousel v-if="isSelected" :show-arrow="true" style="height: 700px">
+        <n-carousel v-if="isSelected" :show-arrow="true" style="height: 100% width: 100%;">
           <img v-for="img in previewImages" class="carousel-img" :src="img" />
         </n-carousel>
         <n-empty v-else style="height: 700px" description="你什么也找不到"> </n-empty>

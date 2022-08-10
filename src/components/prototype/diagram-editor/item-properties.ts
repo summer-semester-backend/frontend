@@ -63,6 +63,12 @@ export const textColor$: ObjectProperty = {
   type: PropertyType.COLOR,
   editorRightAlign: true,
 };
+export const buttonColor$: ObjectProperty = {
+  name: 'color',
+  label: '按钮颜色',
+  type: PropertyType.COLOR,
+  editorRightAlign: true,
+};
 export const shadow$: ObjectProperty = { name: 'shadow', label: '阴影', type: PropertyType.BOOLEAN };
 export const locked$: ObjectProperty = { name: 'locked', label: '锁定', type: PropertyType.BOOLEAN };
 
@@ -736,25 +742,11 @@ export const buttonModel: ObjectInspectorModel = {
           title: '属性',
           properties: [
             { name: 'value', label: '文字', type: PropertyType.TEXT, editorFullsize: true },
-            { name: 'disabled', label: '禁用', type: PropertyType.BOOLEAN, editorFullsize: true },
+            { name: 'isPrimary', label: '实心', type: PropertyType.BOOLEAN, editorFullsize: true },
             { name: 'bordered', label: '边框', type: PropertyType.BOOLEAN, editorFullsize: true },
-            { name: 'circle', label: '圆形', type: PropertyType.BOOLEAN, editorFullsize: true },
-            {
-              name: 'buttonType',
-              label: '按钮类型',
-              type: PropertyType.ICON_LIST,
-              editorFullsize: true,
-              editorOptions: {
-                items: [
-                  { name: 'default', text: 'default' },
-                  { name: 'tertiary', text: 'tertiary' },
-                  { name: 'primary', text: 'primary' },
-                  // { name: 'info', text: 'info' },
-                  // { name: 'warning', text: 'warning' },
-                  // { name: 'error', text: 'error' },
-                ],
-              },
-            },
+            { name: 'circle', label: '圆角', type: PropertyType.BOOLEAN, editorFullsize: true },
+            { name: 'useColor', label: '使用颜色', type: PropertyType.BOOLEAN, editorFullsize: true },
+            buttonColor$,
           ],
         },
         {

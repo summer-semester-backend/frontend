@@ -1,11 +1,11 @@
 <template>
   <div class="button">
     <n-button
-      :disabled="item.disabled"
       :bordered="item.bordered"
       :circle="item.circle"
-      :type="item.type"
-      :color="item.color"
+      :type="item.isPrimary ? 'primary' : 'default'"
+      :ghost="item.isPrimary ? false : true"
+      :color="item.useColor ? item.color : undefined"
       class="button-center"
       @click.stop="handleLinkClick"
     >
