@@ -1,6 +1,7 @@
 <template>
-  <n-layout has-sider>
-    <global-sidebar v-if="!isLoginPage && !isProtoPage && !isNoFoundPage && !isIndex" />
+  <global-content v-if="isIndex" />
+  <n-layout has-sider position="absolute" v-if="!isIndex">
+    <global-sidebar v-if="!isLoginPage && !isProtoPage && !isNoFoundPage" />
     <global-content />
   </n-layout>
 </template>
