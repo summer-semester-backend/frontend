@@ -13,18 +13,29 @@
         <n-scrollbar style="max-height: 200px">
           <n-menu :options="pageOptions" class="w-full" @update-value="handleUpdateValue" v-model:value="page"></n-menu>
           <n-button-group v-if="editable" class="w-full ml-2 my-1 h-10">
-            <n-button class="w-5/7 h-full" @click="emits('page-create', newPageName, currentResolution)">
+            <n-button class="w-5/7 h-full" @click="emits('page-create', newPageName, resolutionNumbers)">
               <template #icon>
                 <n-icon><Add /></n-icon>
               </template>
-              {{ currentResolution }}
+              {{ currentResolution[0] + 'x' + currentResolution[1] }}
             </n-button>
-            <n-button class="w-22/100 h-full">
-              <n-dropdown trigger="click" :options="resolutionOptions" @select="handleSelectResolution">
+            <n-dropdown trigger="click" :options="resolutionOptions" @select="handleSelectResolution">
+              <n-button class="w-22/100 h-full">
                 <n-icon><ChevronDownOutline /></n-icon>
-              </n-dropdown>
-            </n-button>
+              </n-button>
+            </n-dropdown>
           </n-button-group>
+          <div class="w-47 pl-2">
+            <n-input
+              style="width: 100%; height: 100%"
+              v-if="showCustomInput"
+              pair
+              separator="-"
+              :placeholder="['x', 'y']"
+              v-model:value="currentResolution"
+              :allow-input="onlyAllowNumber"
+            ></n-input>
+          </div>
         </n-scrollbar>
       </n-card>
     </div>
@@ -34,11 +45,18 @@
 <script setup lang="ts">
 import { Component, computed, ref, watch, h } from 'vue';
 import { MenuOption, NIcon } from 'naive-ui';
-import { Add, ChevronDownOutline, PhonePortraitOutline, TabletPortraitOutline, LaptopOutline } from '@vicons/ionicons5';
+import {
+  Add,
+  ChevronDownOutline,
+  PhonePortraitOutline,
+  TabletPortraitOutline,
+  LaptopOutline,
+  PencilOutline,
+} from '@vicons/ionicons5';
 import { PageItem } from '../diagram-editor/types';
 interface PageBoxEvents {
   (e: 'page-selected', pageItem: PageItem): void;
-  (e: 'page-create', pageName: string, pageResolution: string): void;
+  (e: 'page-create', pageName: string, pageResolution: number[]): void;
 }
 const props = defineProps<{ pages: Array<PageItem>; selectedPage: string; editable: boolean }>();
 const pageOptions = ref<Array<{ key: string; label: string }>>([]);
@@ -49,7 +67,11 @@ const renderIcon = (icon: Component) => {
     });
   };
 };
-const currentResolution = ref('1080x720');
+const currentResolution = ref<[string, string]>(['1080', '720']);
+const onlyAllowNumber = (value: string) => !value || /^\d+$/.test(value);
+const resolutionNumbers = computed(() => {
+  return [parseInt(currentResolution.value[0]), parseInt(currentResolution.value[1])];
+});
 const resolutionOptions = [
   {
     label: '电脑',
@@ -124,7 +146,13 @@ const resolutionOptions = [
       },
     ],
   },
+  {
+    label: '自定义',
+    key: 'custom',
+    icon: renderIcon(PencilOutline),
+  },
 ];
+const showCustomInput = ref(false);
 const pagesMap = new Map<string, PageItem>();
 const page = ref('');
 const newPageName = computed(() => '页面' + (pageOptions.value.length + 1));
@@ -137,7 +165,13 @@ const handleUpdateValue = (key: string, option: MenuOption) => {
   }
 };
 const handleSelectResolution = (key: string) => {
-  currentResolution.value = key;
+  if (key == 'custom') {
+    showCustomInput.value = true;
+  } else {
+    showCustomInput.value = false;
+    currentResolution.value[0] = key.split('x')[0];
+    currentResolution.value[1] = key.split('x')[1];
+  }
 };
 watch(
   () => props.pages,

@@ -9,7 +9,10 @@
     <div id="sun"></div>
     <div id="loginCard">
       <n-card :bordered="false" size="large" class="w-100 rounded-md shadow-md">
-        <n-gradient-text type="primary" class="m-auto" :size="28">项目管理平台</n-gradient-text>
+        <div id="loginTitle">
+          <n-image :src="logo" preview-disabled></n-image>
+          <div>云图</div>
+        </div>
         <main class="pt-24px">
           <div v-if="!showForgetPassword">
             <n-tabs
@@ -41,6 +44,7 @@ import { ref, h, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import Vue3DraggableResizable from 'vue3-draggable-resizable';
 import 'vue3-draggable-resizable/dist/Vue3DraggableResizable.css';
+import logo from '/resource/logo2.png';
 
 const router = useRouter();
 const tabValue = ref('signin');
@@ -120,5 +124,17 @@ onMounted(() => {
   position: absolute;
   height: 100%;
   right: 10%;
+}
+
+#loginTitle {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 9px 10px;
+  gap: 15px;
+  font-size: 24px;
+  font-weight: 700;
+  /* color: #128cef; */
 }
 </style>
