@@ -116,6 +116,7 @@ import { EditOutlined, CameraOutlined } from '@vicons/antd';
 import { getUserInfo, updateUserInfo, updateUserAva } from '@/api/user';
 import { useAuthStore } from '@/store/auth';
 import { useMessage } from 'naive-ui';
+import { complex ,isEmail} from '@/plugins/passVerify.js';
 // import type { FormInst, FormRules, FormItemRule, UploadFileInfo } from 'naive-ui';
 
 const { setAvatar } = useAuthStore();
@@ -165,8 +166,17 @@ const rules = ref({
   email: [
     {
       required: true,
-      message: '请输入邮箱',
+      // message: '请输入新密码',
       trigger: ['input', 'blur'],
+
+      validator(rule, value) {
+        if (!value) {
+          return new Error("请输入邮箱");
+        } else if (!(isEmail(value))) {
+          return new Error("输入正确邮箱格式");
+        }
+        return true;
+      },
     },
   ],
 });

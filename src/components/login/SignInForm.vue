@@ -1,5 +1,5 @@
 <template>
-  <n-form ref="formRef" :model="model" size="large" :show-label="false">
+  <n-form ref="formRef" :rules="rules" :model="model" size="large" :show-label="false">
     <n-form-item path="email">
       <n-input v-model:value="model.email" placeholder="请输入邮箱" />
     </n-form-item>
@@ -14,11 +14,13 @@
 </template>
 
 <script setup lang="ts">
+import { ref, computed, reactive, defineProps, onMounted, h } from 'vue';
 import { login } from '@/api/auth';
 import { useAuthStore } from '@/store/auth';
-import { reactive } from 'vue';
+// import { reactive } from 'vue';
 import { useRouter } from 'vue-router';
 import { hex_md5 } from '@/plugins/md5.js'
+import { complex ,isEmail} from '@/plugins/passVerify.js';
 const emits = defineEmits(['forget']);
 const { signIn } = useAuthStore();
 const router = useRouter();
@@ -27,6 +29,25 @@ const model = reactive({
   email: '',
   password: '',
 });
+const rules = ref({
+  email: [
+    {
+      required: true,
+      // message: '请输入新密码',
+      trigger: ['input', 'blur'],
+
+      validator(rule:any, value:any) {
+        if (!value) {
+          return new Error("请输入邮箱");
+        } else if (!(isEmail(value))) {
+          return new Error("输入正确邮箱格式");
+        }
+        return true;
+      },
+    },
+  ],
+});
+
 
 const handleLogin = () => {
   //login({ email: model.email, password: hex_md5(model.password) }).then((res) => {//加密
