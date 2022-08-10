@@ -130,6 +130,9 @@ export class SyncManager {
             func(message.targetID);
           });
           break;
+        case 'close_share':
+          this.websocket.close();
+          break;
       }
     };
   }
