@@ -59,7 +59,6 @@ const checkTextAlign = computed(() => {
 });
 </script>
 
-<style scoped>
-@import 'animate.css';
-@import 'aos/dist/aos.css';
-</style>
+<style scoped src="bootstrap/scss/bootstrap.scss" lang="scss"></style>
+
+<style scoped src="@/assets/scss/style.scss" lang="scss"></style>

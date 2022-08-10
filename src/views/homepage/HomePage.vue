@@ -118,6 +118,21 @@
 
 <script setup>
 import Typed from 'typed.js';
+import { ArrowRightOutlined } from '@vicons/antd';
+import { ref, onMounted } from 'vue';
+
+const options = {
+  // typeSpeed: 40,
+  strings: ['在线.', '一体化.', '协作平台.'],
+  loop: true,
+  typeSpeed: 80,
+  startDelay: 1000,
+  backSpeed: 50,
+};
+const welcomeMessage = ref(null);
+onMounted(() => {
+  const typed = new Typed(welcomeMessage.value, options);
+});
 </script>
 
 <style scoped>
