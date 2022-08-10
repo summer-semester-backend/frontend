@@ -795,7 +795,7 @@ function handleSync() {
   syncManager.registerAddItemFunc((element: DiagramElement, targetPageID: string) => {
     if (element.isPage) {
       var newPageName = (element as PageItem).pageName;
-      var resolution = (element as PageItem).w + 'x' + (element as PageItem).h;
+      var resolution = [(element as PageItem).w, (element as PageItem).h];
       addPage(newPageName, resolution);
       focusPage(currentPage.value as PageItem);
     } else {
@@ -1129,7 +1129,7 @@ function loadProto() {
         try {
           loadElements.value = JSON.parse(res.data.data) as DiagramElement[];
         } catch (e) {
-          addPage('首页', '1080x720');
+          addPage('首页', [1080, 720]);
         }
       })
       .finally(protoFunctionInit);
@@ -1141,7 +1141,7 @@ function loadProto() {
         try {
           loadElements.value = JSON.parse(res.data.data) as DiagramElement[];
         } catch (e) {
-          addPage('首页', '1080x720');
+          addPage('首页', [1080, 720]);
         }
       })
       .finally(protoFunctionInit);
@@ -1182,19 +1182,18 @@ function protoFunctionInit() {
   handleSync();
 }
 
-function handleCreatePage(newPageName: string, pageResolution: string) {
+function handleCreatePage(newPageName: string, pageResolution: number[]) {
   addPage(newPageName, pageResolution);
   focusPage(currentPage.value as PageItem);
   syncManager.sendMessage(OperationType.ADD_ITEM, { element: currentPage.value });
 }
 
-function addPage(newPageName: string, pageResolution: string): void {
+function addPage(newPageName: string, pageResolution: number[]): void {
   // Clicking the canvas with other tools => create a new item of related type
   const toolDef = getToolDefinition(EditorTool.PAGE);
   const properties = getItemBlueprint(toolDef.itemType!)[0];
-  const wh = pageResolution.split('x');
-  const w = parseInt(wh[0]);
-  const h = parseInt(wh[1]);
+  const w = pageResolution[0];
+  const h = pageResolution[1];
   let accWidth = 0;
   pages.value.forEach((page) => {
     accWidth += page.w + 200;
@@ -1644,6 +1643,7 @@ function inlineEdit(item: Item) {
   background-image: linear-gradient(90deg, rgba(140, 140, 140, 0.15) 10%, rgba(0, 0, 0, 0) 10%),
     linear-gradient(rgba(140, 140, 140, 0.15) 10%, rgba(0, 0, 0, 0) 10%);
   background-size: 10px 10px;
+  background-color: #f5f5f5;
 }
 
 .viewport {
