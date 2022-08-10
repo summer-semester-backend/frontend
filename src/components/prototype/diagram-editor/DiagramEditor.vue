@@ -331,10 +331,10 @@
                   </g>
                 </svg>
               </button>
-              <button class="toolbar-item" @click="saveAll" title="SavePrototype">
+              <button class="toolbar-item" @click="saveAll" title="保存原型">
                 <EditorIcon icon="save" />
               </button>
-              <button class="toolbar-item" @click="saveToImage" title="SaveImage">
+              <button class="toolbar-item" @click="saveToImage" title="保存图片">
                 <EditorIcon icon="perm_media" />
               </button>
             </div>
