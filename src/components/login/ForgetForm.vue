@@ -1,5 +1,5 @@
 <template>
-  <n-form ref="formRef" :model="model" size="large" :show-label="false">
+  <n-form ref="formRef" :rules="rules" :model="model" size="large" :show-label="false">
     <n-form-item path="email">
       <n-input v-model:value="model.email" placeholder="邮箱地址" />
     </n-form-item>
@@ -46,6 +46,7 @@ import { reactive, ref } from 'vue';
 import type { CountdownProps } from 'naive-ui';
 import { ArrowBack } from '@vicons/ionicons5';
 import { hex_md5 } from '@/plugins/md5.js'
+import { complex } from '@/plugins/passVerify.js';
 const emits = defineEmits(['finish-forget']);
 const valid = ref(true);
 const model = reactive({
@@ -53,6 +54,40 @@ const model = reactive({
   code: '',
   passwd: '',
   confirmpasswd: '',
+});
+const rules = ref({
+  passwd: [
+    {
+      required: true,
+      // message: '请输入新密码',
+      trigger: ['input', 'blur'],
+
+      validator(rule:any, value:any) {
+        if (!value) {
+          return new Error("请输入新密码");
+        } else if (!complex(value)) {
+          return new Error("密码大于八位，同时包含大小写");
+        }
+        return true;
+      },
+    },
+  ],
+  confirmpasswd: [
+    {
+      required: true,
+      // message: '请输入新密码',
+      trigger: ['input', 'blur'],
+
+      validator(rule:any, value:any) {
+        if (!value) {
+          return new Error("请确认密码");
+        } else if (!complex(value)) {
+          return new Error("密码大于八位，同时包含大小写");
+        }
+        return true;
+      },
+    },
+  ],
 });
 
 const handleRegisterCode = () => {

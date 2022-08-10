@@ -93,3 +93,15 @@ export function readModule(data: { fileID: number | null }) {
 export function projectToTeam(data: { fileID: number | null }) {
   return backend.post('/file/projectToTeam', data);
 }
+
+export function acquireFileLock(data: { fileID: number | null }) {
+  return backend.post('/file/acquireLock', data);
+}
+
+export function releaseFileLock(data: { fileID: number | null }) {
+  return backend.post('/file/releaseLock', data);
+}
+
+export function keepFileLock(data: { fileID: number | null }) {
+  return backend.post('/file/keepLock', data);
+}
