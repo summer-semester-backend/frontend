@@ -6,12 +6,10 @@ import Vue3DraggableResizable from 'vue3-draggable-resizable';
 import { createPinia } from 'pinia';
 import { setupPrototypeComponents } from './components/prototype/register';
 
-import 'bootstrap/scss/bootstrap.scss';
-import 'animate.css';
-import 'bootstrap';
+
+
 import AOS from 'aos';
-import 'aos/dist/aos.css';
-import './assets/scss/style.scss';
+
 import VueTypedJs from 'vue-typed-js';
 
 async function setupApp() {

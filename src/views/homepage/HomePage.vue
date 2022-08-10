@@ -117,6 +117,11 @@
 
 <script setup>
 import Typed from 'typed.js';
+import 'bootstrap/scss/bootstrap.scss';
+import 'animate.css';
+import 'bootstrap';
+import 'aos/dist/aos.css';
+import '../../assets/scss/style.scss';
 </script>
 
 <style scoped>
