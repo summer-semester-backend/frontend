@@ -11,7 +11,7 @@
           <div class="col-lg-12">
             <div class="inner">
               <div class="content text-center">
-                <h2 class="title" v-html="props.title" data-aos="fade-up" data-aos-delay="60" />
+                <h2 class="title" v-html="props.title" data-aos="fade-up" data-aos-delay="60" style="font-size:44px;font-weight:700;margin-bottom: 20px"/>
                 <h6 class="subtitle" v-html="props.subtitle" data-aos="fade-up" data-aos-delay="60" />
                 <div class="call-to-btn text-center mt--30" data-aos="fade-up" data-aos-delay="60">
                   <a class="btn-default btn-icon" href="#">
