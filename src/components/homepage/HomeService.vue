@@ -12,7 +12,7 @@
             <h4 class="title">
               <router-link to="/service-details" v-html="service.title" />
             </h4>
-            <p class="description" v-html="service.description" style="font-size:16px"/>
+            <p class="description" v-html="service.description" style="font-size: 16px" />
           </div>
           <div class="image">
             <img :src="service.image" alt="Service Images" />
@@ -64,6 +64,10 @@ const checkTextAlign = computed(() => {
 });
 </script>
 
+<style scoped>
+@import 'aos/dist/aos.css';
+@import 'animate.css';
+</style>
 <style scoped src="bootstrap/scss/bootstrap.scss" lang="scss"></style>
 
 <style scoped src="@/assets/scss/style.scss" lang="scss"></style>

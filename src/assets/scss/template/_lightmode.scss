@@ -6,7 +6,7 @@
 }
 
 .rn-back-top:hover i {
-  color: var(--color-primary) !important;
+  // color: var(--color-primary) !important;
 }
 
 // Light Style
@@ -41,7 +41,7 @@ body {
     .rn-call-to-action.style-8 .title,
     .rn-newsletter-default .newsletter-section-title .title,
     .rn-default-tab .tab-button .tabs__tab .nav-link {
-      color: #181818;
+      // color: #181818;
     }
 
     .rn-default-tab .tab-button .tabs__tab .nav-link.active,
@@ -275,7 +275,7 @@ body {
     }
 
     .rn-back-top i {
-      color: #333;
+      // color: #333;
     }
 
   }
@@ -335,7 +335,7 @@ body.active-light-mode .rn-back-top,
 body.active-light-mode .popup-mobile-menu .inner,
 body.active-light-mode .rn-call-to-action.style-8,
 body.active-light-mode .bg-overlay-solid::before {
-  background: #f5f8fa;
+  // background: #f5f8fa;
 }
 
 body.active-light-mode .rn-header.sticky {

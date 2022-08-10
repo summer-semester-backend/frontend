@@ -28,8 +28,13 @@
               >
                 在线一体化协作平台
               </p>
-              <router-link class="btn-default btn-medium round btn-icon" to="/login">
-                <div id="buttonTop" data-aos="fade-up" data-aos-delay="250">
+              <router-link
+                data-aos="fade-up"
+                data-aos-delay="250"
+                class="btn-default btn-medium round btn-icon"
+                to="/login"
+              >
+                <div id="buttonTop">
                   <div style="width: 80px; height: 65px">即刻开始</div>
                   <div style="height: 65px; display: flex; align-items: center">
                     <n-icon size="20" color="#ffffff">

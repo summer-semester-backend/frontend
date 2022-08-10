@@ -1,10 +1,19 @@
 <template>
   <div v-if="props.sectionTitleStyle === 1" class="section-title" :class="checkTextAlign">
-    <h4 class="subtitle">
-      <span class="theme-gradient" v-html="props.subtitle"/>
+    <h4 class="subtitle" style="background: transparent">
+      <span class="theme-gradient" v-html="props.subtitle" />
     </h4>
-    <h2 class="title" v-html="props.title" style="font-size:44px;font-weight:600;color:#181818;margin-bottom: 20px"/>
-    <p v-if="props.description" class="description b1" v-html="props.description" style="font-size:18px;color:#65676b"/>
+    <h2
+      class="title"
+      v-html="props.title"
+      style="font-size: 44px; font-weight: 600; color: #181818; margin-bottom: 20px"
+    />
+    <p
+      v-if="props.description"
+      class="description b1"
+      v-html="props.description"
+      style="font-size: 18px; color: #65676b"
+    />
   </div>
 
   <!-- <div v-else-if="sectionTitleStyle === 2" :class="`section-title-2 ${checkTextAlign}`">
