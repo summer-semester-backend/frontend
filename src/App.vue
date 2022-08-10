@@ -1,6 +1,8 @@
 <template>
-  <n-layout has-sider position="absolute">
-    <global-sidebar v-if="!notShow" :should-load="!notShow" />
+  <global-content v-if="isIndex" />
+
+  <n-layout has-sider position="absolute" v-if="!isIndex">
+    <global-sidebar v-if="!isLoginPage && !isProtoPage && !isNoFoundPage" />
     <global-content />
   </n-layout>
 </template>
@@ -15,6 +17,20 @@ const router = useRouter();
 const notShow = computed(() => {
   return route.name == 'login' || route.name == 'Prototype' || route.name == 'NoFound';
 });
+const isIndex = computed(() => {
+  return route.name == 'Index';
+});
+
+const isLoginPage = computed(() => {
+  return route.name == 'login';
+});
+const isProtoPage = computed(() => {
+  return route.name == 'Prototype';
+});
+const isNoFoundPage = computed(() => {
+  return route.name == 'NoFound';
+});
+
 backend.interceptors.response.use(
   (response) => {
     if (response.data.result == 10) {

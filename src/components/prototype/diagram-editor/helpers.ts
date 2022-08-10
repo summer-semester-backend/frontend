@@ -264,7 +264,7 @@ export function registerDefaultItemTypes() {
 
       component: type,
       border: {
-        width: 0,
+        width: 1,
         style: ConnectionStyle.SOLID,
         color: 'black',
       },
@@ -462,6 +462,11 @@ export function registerDefaultItemTypes() {
       w: 1080,
       h: 720,
       containedIDs: [],
+      border: {
+        width: 0,
+        style: ConnectionStyle.SOLID,
+        color: 'black',
+      },
     },
     pageModel
   );

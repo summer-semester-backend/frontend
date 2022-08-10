@@ -17,7 +17,8 @@ export default defineConfig((configEnv) => {
     css: {
       preprocessorOptions: {
         scss: {
-          additionalData: `@use "./src/styles/scss/global.scss" as *;`,
+          // additionalData: `@use "./src/styles/scss/global.scss" as *;`,
+          // additionalData: '@import "./src/assets/scss/style.scss";'
         },
         less: {
           javascriptEnabled: true,
