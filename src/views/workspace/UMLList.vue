@@ -28,6 +28,15 @@
           </template>
           新建
         </n-button>
+
+        <!-- <n-button strong secondary type="info" small size="small" @click="releaseLock">
+          <template #icon>
+            <n-icon size="20" class="icon">
+              <AddCircleOutline />
+            </n-icon>
+          </template>
+          release
+        </n-button> -->
       </n-space>
     </template>
   </ToolBar>
@@ -110,7 +119,7 @@ import { NButton, NIcon, NSpace, useDialog } from 'naive-ui';
 import { h, ref, computed, onMounted } from 'vue';
 import { Add, AddCircleOutline, Trash, ArrowRedo, Create, GridOutline, List, Copy } from '@vicons/ionicons5';
 import { UnorderedListOutlined, EditOutlined, FileImageFilled } from '@vicons/antd';
-import { readFile, createFile, editFile, deleteFile, copyFile } from '@/api/file';
+import { readFile, createFile, editFile, deleteFile, copyFile, releaseFileLock, acquireFileLock ,keepFileLock} from '@/api/file';
 import { formatDate } from '@/plugins/date';
 import { useRoute } from 'vue-router';
 import { ToolBar } from './components';
@@ -282,10 +291,23 @@ const files = ref<File[]>([]);
 const fileOnOpen = ref<File | null>(null);
 
 const emits = defineEmits(['refresh']);
-const handleClickOpen = (file: any) => {
+const handleClickOpen = async (file: any) => {
   fileOnOpen.value = file;
+  var re = 100;
+  re = await acquireLock();
+  if(re != 0)
+  {
+    // message.warning("文件正在编辑中，无法打开！");
+    return;
+  }
+  else
+  {
+    if(fileOnOpen.value != null)
+    fileOnOpen.value.fileImage = (await getFileInfo(fileOnOpen.value)) as string;
+    beginTimer();
+    openDeskWithFile(fileOnOpen.value!.fileImage);
+  }
   // console.log(fileOnOpen.value.fileImage);
-  openDeskWithFile(fileOnOpen.value!.fileImage);
 };
 const handleClickEdit = (file: any) => {
   fileOnOpen.value = file;
@@ -336,9 +358,10 @@ const getFileList = (id: number | null) => {
 
 const create = () => {
   if (fileNameRef.value == null || fileNameRef.value == '') {
-    message.warning('文件名不能为空!');
+    message.warning('文件名不能为空!',{max:2});
     return;
   }
+
   createFile({ teamID: null, fileName: fileNameRef.value, fileType: 12, fileImage: '', fatherID: projID.value })
     .then((res) => {
       if (res.data.result == 0) {
@@ -354,16 +377,18 @@ const create = () => {
       console.log(err);
     })
     .finally(() => {
+      // console.log("finally");
       getFileList(projID.value);
     });
 };
 
-const getFileInfo = (file: File) => {
-  readFile({ fileID: file.fileID, teamID: null })
+const getFileInfo = async (file: File) => {
+  var fileImage = fileOnOpen.value?.fileImage;
+  await readFile({ fileID: file.fileID, teamID: null })
     .then((res) => {
       if (res.data.result == 0) {
-        window.$message.success('获取成功');
-        // return res.data.fileImage;
+        // window.$message.success('获取成功');
+        fileImage = res.data.fileImage;
       } else if (res.data.result == 1) {
         window.$message.warning(res.data.message);
       } else if (res.data.result == 2) {
@@ -373,6 +398,7 @@ const getFileInfo = (file: File) => {
     .catch((err) => {
       console.log(err);
     });
+  return fileImage;
 };
 
 const edit = (file: FileEdit) => {
@@ -454,6 +480,79 @@ const copy = () => {
     });
 };
 
+var timer;
+
+const acquireLock = async () => {
+  var re = -1;
+  await acquireFileLock({fileID: fileOnOpen.value?.fileID as number})
+    .then((res) => {
+      if (res.data.result == 0) {
+        window.$message.success('成功获取锁');
+        // getFileList(projID.value);
+      } else if (res.data.result == 1) {
+        window.$message.warning(res.data.message);
+      } else if (res.data.result == 2) {
+        window.$message.error(res.data.message);
+      }
+      re = res.data.result;
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+    return re;
+}
+
+const releaseLock = () => {
+  releaseFileLock({fileID: fileOnOpen.value?.fileID as number})
+    .then((res) => {
+      if (res.data.result == 0) {
+        window.$message.success('成功释放锁');
+        stopTimer();
+        // getFileList(projID.value);0su 1
+      } else if (res.data.result == 1) {
+        window.$message.warning(res.data.message);
+      } else if (res.data.result == 2) {
+        window.$message.error(res.data.message);
+      }
+      return res.data.result;
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+    return -1;
+}
+
+const keepLock = () => {
+  console.log("keep");
+  keepFileLock({fileID: fileOnOpen.value?.fileID as number})
+    .then((res) => {
+      if (res.data.result == 0) {
+        // window.$message.success('维持锁');
+        // getFileList(projID.value);0su 1
+      } else if (res.data.result == 1) {
+        window.$message.warning(res.data.message);
+      } else if (res.data.result == 2) {
+        window.$message.error(res.data.message);
+      }
+      return res.data.result;
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+    return -1;
+}
+
+const beginTimer = () => {
+  stopTimer();
+  timer = setInterval(keepLock,4000);
+}
+
+const stopTimer = () => {
+  if(timer == null)
+  return;
+  clearInterval(timer);
+}
+
 onMounted(() => {
   projID.value = parseInt(route.params.ProjID.toString());
   getFileList(projID.value);
@@ -465,7 +564,11 @@ const openDrawio = drawioEmbed('http://43.138.71.3:8070/');
 
 //监听返回的图片数据
 window.addEventListener('drawioImageCreated', (evt: any) => {
+  if(!(evt instanceof Event))
+  return;
   const { imageType, imageContent } = evt;
+  if(imageType != 'svg')
+  return;
   if (imageType == 'svg') {
     let fileEdit: FileEdit = {
       fileID: fileOnOpen.value?.fileID as number,
@@ -475,12 +578,25 @@ window.addEventListener('drawioImageCreated', (evt: any) => {
       data: null,
     };
     if (fileEdit.fileID == null || fileEdit.fileName == null) return;
+    // console.log(fileOnOpen.value);
     edit(fileEdit);
+    releaseLock();
+    stopTimer();
     // console.log(imageContent);
     // svgDom.innerHTML = imageContent;
     // str = imageContent;
   }
 });
+
+
+window.addEventListener('drawioClosed', (evt: any) => {
+  if((evt instanceof Event))
+  {
+    releaseLock();
+    stopTimer();
+  }
+  }
+);
 
 // 监听是否预加载完成
 window.addEventListener('drawioLoaded', (evt) => {
