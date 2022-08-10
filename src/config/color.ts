@@ -10,6 +10,12 @@ export const colorConfig = {
     tabFontSizeMedium: '24px',
     tabFontWeightActive: '700',
   },
+  Carousel: {
+    dotColor: 'rgba(50, 50, 50, 0.3)',
+    dotColorActive: 'rgba(50, 50, 50, 1)',
+    dotColorFocus: 'rgba(50, 50, 50, 0.5)',
+    arrowColor: '#1D1D1DFF',
+  },
 };
 
 export const prototypeWorkspaceConfig = {

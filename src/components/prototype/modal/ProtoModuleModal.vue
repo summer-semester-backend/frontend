@@ -15,14 +15,16 @@
           key-field="fileID"
           label-field="fileName"
           :options="moduleOptions"
-          :on-update:selected-keys="handleSelect"
+          v-model:value="currentOption"
+          @update-value="handleSelect"
         >
         </n-menu>
       </n-layout-sider>
       <n-layout>
-        <n-scrollbar x-scrollable style="max-height: 70vh">
-          <div id="container"></div>
-        </n-scrollbar>
+        <n-carousel v-if="isSelected" :show-arrow="true" style="height: 700px">
+          <img v-for="img in previewImages" class="carousel-img" :src="img" />
+        </n-carousel>
+        <n-empty v-else style="height: 700px" description="你什么也找不到"> </n-empty>
       </n-layout>
     </n-layout>
   </n-modal>
@@ -33,14 +35,19 @@ import { h, onMounted, ref } from 'vue';
 import { NDivider, NInput, NIcon } from 'naive-ui';
 import { CreateOutline } from '@vicons/ionicons5';
 import { useRoute } from 'vue-router';
+import { computed } from '@vue/reactivity';
 const newFileName = ref('');
 const selectFileID = ref<number | null>(-1);
 const teamID = ref(-1);
+const previewImagesMap: Map<string, Array<string>> = new Map();
+const previewImages = ref<Array<string>>([]);
 const route = useRoute();
 const emits = defineEmits(['close', 'refresh']);
+const projID = ref(-1);
 const props = withDefaults(defineProps<{ isModuleModalShow: boolean }>(), {
   isModuleModalShow: false,
 });
+const currentOption = ref('');
 const moduleOptions = ref<Array<{ fileName: string; fileID: number }>>([]);
 const handleCreate = () => {
   window.$dialog.info({
@@ -74,7 +81,7 @@ const handleCreate = () => {
         copyFile({
           fileID: selectFileID.value,
           teamID: teamID.value,
-          fatherID: null,
+          fatherID: projID.value,
           newName: newFileName.value,
         }).then((res) => {
           if (res.data.result == 0) {
@@ -89,7 +96,15 @@ const handleCreate = () => {
   });
 };
 
-const handleSelect = (key: string, item: any) => {};
+const handleSelect = (key: string, item: any) => {
+  console.log('menu key', key);
+  previewImages.value = previewImagesMap.get(key) as Array<string>;
+  selectFileID.value = parseInt(key);
+};
+
+const isSelected = computed(() => {
+  return currentOption.value != '';
+});
 //获取通用模板
 const reload = () => {
   getProtoCommonModule().then((res) => {
@@ -98,16 +113,27 @@ const reload = () => {
         fileID: item.fileID,
         fileName: item.fileName,
       });
+      previewImagesMap.set(item.fileID, item.previewImages);
     });
   });
+  // .finally(() => {
+  //   currentOption.value = moduleOptions.value[0].fileName;
+  //   console.log(currentOption.value);
+  // });
 };
 //异步加载
 onMounted(() => {
-  if (route.params.teamID) {
-    teamID.value = parseInt(route.params.teamID.toString());
-  } else if (route.params.projID) {
+  if (route.params.ProjID) {
     teamID.value = -1;
+    projID.value = parseInt(route.params.ProjID as string);
   }
   reload();
 });
 </script>
+<style scoped>
+.carousel-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+</style>
