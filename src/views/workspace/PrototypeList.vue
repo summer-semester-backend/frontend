@@ -39,7 +39,7 @@
     :files="files"
     :paginationBlock="paginationBlock"
     :editButtonRef="editButtonRef"
-    :fileType="12"
+    :fileType="13"
     @handleClickOpen="handleClickOpen"
     @handleClickDelete="handleClickDelete"
     @handleClickEdit="handleClickEdit"

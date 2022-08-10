@@ -39,7 +39,7 @@ export function editFile(data: {
   fileName?: string | null;
   fileImage?: string | null;
   fatherID?: number | null;
-  data: string | null;
+  data?: string | null;
 }) {
   return backend.post('/file/write', data);
 }

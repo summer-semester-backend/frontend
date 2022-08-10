@@ -458,6 +458,7 @@ import { darkTheme } from 'naive-ui';
 import { prototypeWorkspaceConfig } from '@/config/color';
 import { resolve } from 'path';
 import router from '@/router';
+import { uploadImage } from '@/api/assets';
 export type Item = _Item & { hover?: boolean };
 // The component props and events
 // ------------------------------------------------------------------------------------------------------------------------
@@ -602,6 +603,7 @@ const handleIconSelected = (icon: string) => {
 
 var outputCanvas = document.createElement('canvas');
 var ctx2 = outputCanvas.getContext('2d');
+
 function drawCanvas() {
   let elems: Array<HTMLElement> = [];
   (currentPage.value as PageItem).containedIDs.forEach((dataID) => {
@@ -658,12 +660,22 @@ function drawCanvas() {
         index++;
         // console.log(index);
         if (index == len) {
-          let imgUrl = outputCanvas.toDataURL();
-          let a = document.createElement('a');
-          a.href = imgUrl;
-          // 利用浏览器下载器下载图片
-          a.setAttribute('download', pageAttrs.pagaName);
-          a.click();
+          outputCanvas.toBlob((blob) => {
+            let imageFile = new File([blob as Blob], pageAttrs.pagaName, { lastModified: Date.now() });
+            // 上传图片
+            uploadImage(imageFile).then((res) => {
+              var protoID = parseInt(route.params.protoID as string);
+              editFile({ fileID: protoID, fileImage: res.data.url });
+            });
+            var imgUrl = window.URL.createObjectURL(blob as Blob);
+            // 利用浏览器下载器下载图片
+            let a = document.createElement('a');
+            a.href = imgUrl;
+
+            a.setAttribute('download', pageAttrs.pagaName);
+            a.click();
+            a.remove();
+          });
         }
       }
     });
