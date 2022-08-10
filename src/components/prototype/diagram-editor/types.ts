@@ -22,7 +22,6 @@ export interface Frame extends Rect {
 
 export interface DiagramElement {
   id: string; // The unique element ID
-  fatherID?: string;
   title: string; // The element title / label
   z: number; // The element z-index
   isPage: boolean; // whether used as page
