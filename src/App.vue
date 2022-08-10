@@ -1,5 +1,5 @@
 <template>
-  <n-layout has-sider position="absolute">
+  <n-layout has-sider>
     <global-sidebar v-if="!isLoginPage && !isProtoPage && !isNoFoundPage && !isIndex" />
     <global-content />
   </n-layout>

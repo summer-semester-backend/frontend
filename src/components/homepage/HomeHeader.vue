@@ -3,30 +3,30 @@
     <header :class="[`rn-header header-default header-not-transparent header-sticky ${data.headerClass}`]">
       <div class="container position-relative">
         <div class="row align-items-center row--0">
-          <template>
-            <div class="col-lg-9 col-md-6 col-4 position-static">
-              <div class="header-left d-flex">
-                <HomeLogo />
-                <nav class="mainmenu-nav d-none d-lg-block">
-                  <!-- Nav -->
-                  <ul class="mainmenu">
-                    <li><router-link to="/business-consulting-2">主页</router-link></li>
-                    <li><router-link to="/about">关于</router-link></li>
-                    <li><router-link to="/contact">联系我们</router-link></li>
-                  </ul>
-                </nav>
-              </div>
+          <!-- <template> -->
+          <div class="col-lg-9 col-md-6 col-4 position-static">
+            <div class="header-left d-flex">
+              <HomeLogo />
+              <nav class="mainmenu-nav d-none d-lg-block">
+                <!-- Nav -->
+                <ul class="mainmenu">
+                  <li><router-link to="/business-consulting-2">主页</router-link></li>
+                  <li><router-link to="/about">关于</router-link></li>
+                  <li><router-link to="/contact">联系我们</router-link></li>
+                </ul>
+              </nav>
             </div>
-            <div class="col-lg-3 col-md-6 col-8">
-              <div class="header-right">
-                <!-- Start Header Btn -->
-                <div class="header-btn">
-                  <a :class="data.buyButtonClass" href="#"> 登录 / 注册 </a>
-                </div>
-                <!-- End Header Btn  -->
+          </div>
+          <div class="col-lg-3 col-md-6 col-8">
+            <div class="header-right">
+              <!-- Start Header Btn -->
+              <div class="header-btn">
+                <a :class="data.buyButtonClass" href="#"> 登录 / 注册 </a>
               </div>
+              <!-- End Header Btn  -->
             </div>
-          </template>
+          </div>
+          <!-- </template> -->
         </div>
       </div>
     </header>
@@ -74,7 +74,7 @@ const toggleStickyHeader = () => {
 };
 
 onBeforeMount(() => {
-  window.addEventListener('scroll', toggleStickyHeader);
+  window.addEventListener('scroll', toggleStickyHeader, true);
 });
 
 onMounted(() => {

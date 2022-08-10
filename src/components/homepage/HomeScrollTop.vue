@@ -1,6 +1,6 @@
 <template>
   <div class="rn-back-top" @click="scrollToTop" :class="[visible ? 'd-inline' : 'd-none']">
-    <HomeIcon name="chevron-up" size="27" />
+    <HomeIcon name="chevron-up" :size="27" />
   </div>
 </template>
 
@@ -17,8 +17,8 @@ const scrollToTop = () => {
 };
 
 const toggleVisible = () => {
-  const scrolled = document.documentElement.scrollTop.value;
-  console.log('1233');
+  const scrolled = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop;
+  console.log(scrolled);
   if (scrolled > 300) {
     visible.value = true;
   } else if (scrolled <= 300) {
@@ -27,7 +27,7 @@ const toggleVisible = () => {
 };
 onBeforeMount(() => {
   console.log('test');
-  window.addEventListener('scroll', toggleVisible);
+  window.addEventListener('scroll', toggleVisible, true);
 });
 onMounted(() => {
   console.log('test');
