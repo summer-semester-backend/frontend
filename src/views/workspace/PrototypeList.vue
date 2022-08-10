@@ -20,14 +20,16 @@
           </template>
           {{ buttonText }}
         </n-button>
-        <n-button strong secondary type="info" small size="small" @click="handleClickCreate">
-          <template #icon>
-            <n-icon size="20" class="icon">
-              <AddCircleOutline />
-            </n-icon>
-          </template>
-          新建
-        </n-button>
+        <n-dropdown :options="options" @select="handleSelect" trigger="click">
+          <n-button strong secondary type="info" small size="small">
+            <template #icon>
+              <n-icon size="20" class="icon">
+                <AddCircleOutline />
+              </n-icon>
+            </template>
+            新建
+          </n-button>
+        </n-dropdown>
       </n-space>
     </template>
   </ToolBar>
@@ -50,6 +52,11 @@
       <FileImageFilled color="#E26E0D" />
     </template>
   </BlockModalData>
+  <ProtoModuleModal
+    :is-module-modal-show="isModuleModalShow"
+    @close="isModuleModalShow = false"
+    @refresh="reload"
+  ></ProtoModuleModal>
 </template>
 
 <script setup lang="ts">
@@ -59,7 +66,7 @@ import { AddCircleOutline, Trash, ArrowRedo, CreateOutline, Create, GridOutline,
 import { UnorderedListOutlined, EditOutlined, FileImageFilled } from '@vicons/antd';
 import { copyFile, createFile, deleteFile, editFile } from '@/api/file';
 import { readFile } from '@/api/file';
-import { useRoute, useRouter } from 'vue-router';
+import { useRoute } from 'vue-router';
 import { ToolBar } from './components';
 interface File {
   fileID: number;
@@ -68,7 +75,27 @@ interface File {
   lastEditTime: string;
   fileImage: string;
 }
-const router = useRouter();
+const options = ref([
+  {
+    label: '空白原型',
+    key: 'empty',
+  },
+  {
+    label: '模板原型',
+    key: 'module',
+  },
+]);
+const handleSelect = (key: string) => {
+  switch (key) {
+    case 'empty':
+      handleClickCreate();
+      break;
+    case 'module':
+      isModuleModalShow.value = true;
+      break;
+  }
+};
+
 const route = useRoute();
 const projID = ref<number | null>(null);
 const pagination = ref({
@@ -99,6 +126,7 @@ const changeButtonState = () => {
 
 // 展示模式切换
 const showListRef = ref(false);
+const isModuleModalShow = ref(false);
 const setListModel = () => {
   showListRef.value = true;
 };
@@ -365,10 +393,12 @@ const getFileList = (id: number | null) => {
     });
   });
 };
-onMounted(() => {
+
+function reload() {
   projID.value = parseInt(route.params.ProjID.toString());
   getFileList(projID.value);
-});
+}
+onMounted(reload);
 </script>
 
 <style scoped></style>

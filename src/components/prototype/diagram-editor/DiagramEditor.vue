@@ -331,7 +331,7 @@
                   </g>
                 </svg>
               </button>
-              <button class="toolbar-item" @click="saveProto" title="SavePrototype">
+              <button class="toolbar-item" @click="saveAll" title="SavePrototype">
                 <EditorIcon icon="save" />
               </button>
               <button class="toolbar-item" @click="saveToImage" title="SaveImage">
@@ -397,7 +397,7 @@
 
 <script setup lang="ts">
 import { onKeyStroke, useKeyModifier } from '@vueuse/core';
-import { computed, getCurrentInstance, nextTick, onBeforeMount, onMounted, ref } from 'vue';
+import { computed, nextTick, onBeforeMount, onMounted, ref } from 'vue';
 import Guides from 'vue3-guides';
 import { VueInfiniteViewer } from 'vue3-infinite-viewer';
 import Moveable from 'vue3-moveable';
@@ -456,8 +456,6 @@ import { createSyncManager, syncManager, isSyncManagerInitialized, OperationType
 import { wsurl } from '@/api/utils/request';
 import { darkTheme } from 'naive-ui';
 import { prototypeWorkspaceConfig } from '@/config/color';
-import { resolve } from 'path';
-import router from '@/router';
 import { uploadImage } from '@/api/assets';
 export type Item = _Item & { hover?: boolean };
 // The component props and events
@@ -600,91 +598,6 @@ const handleIconSelected = (icon: string) => {
   currentTool.value = EditorTool.ICON;
   currentIcon.value = icon;
 };
-
-var outputCanvas = document.createElement('canvas');
-var ctx2 = outputCanvas.getContext('2d');
-
-function drawCanvas() {
-  let elems: Array<HTMLElement> = [];
-  (currentPage.value as PageItem).containedIDs.forEach((dataID) => {
-    var id = dataID.split("'")[1];
-    elems.push(document.getElementById(id) as HTMLElement);
-    console.log(id);
-  });
-  elems.sort((ele1, ele2) => {
-    return parseInt(ele2.style.zIndex) - parseInt(ele1.style.zIndex);
-  });
-  selectedPageItems.value.sort((ele1, ele2) => {
-    return ele1.z - ele2.z;
-  });
-  var len = elems.length;
-  console.log('len', len);
-  var pageAttrs = {
-    w: (currentPage.value as PageItem).w,
-    h: (currentPage.value as PageItem).h,
-    x: (currentPage.value as PageItem).x,
-    y: (currentPage.value as PageItem).y,
-    pagaName: (currentPage.value as PageItem).pageName,
-  };
-  outputCanvas.width = pageAttrs.w;
-  outputCanvas.height = pageAttrs.h;
-  var index = 0;
-  elems.forEach((elem: any, i: number) => {
-    var canvas = document.createElement('canvas');
-    var context = canvas.getContext('2d');
-    if (context != null) {
-      context.fillStyle = 'rgba(255, 255, 255, 0)';
-    }
-    var width = elem.offsetWidth; //获取dom 宽度
-    var height = elem.offsetHeight; //获取dom 高度
-    var x = selectedPageItems.value[i].x - pageAttrs.x;
-    var y = selectedPageItems.value[i].y - pageAttrs.y;
-    var yOffset = selectedPageItems.value[i].yOffset;
-    canvas.width = width;
-    canvas.height = height;
-    var opts = {
-      scale: 1, // 添加的scale 参数
-      canvas: canvas, //自定义 canvas
-      logging: true, //日志开关
-      width: width, //dom 原始宽度
-      height: height, //dom 原始高度
-      y: yOffset,
-      useCORS: true,
-      withCredentials: true,
-      allowTaint: true,
-      backgroundColor: null,
-    };
-    html2canvas(elem, opts).then((canvas) => {
-      if (ctx2 != null) {
-        ctx2.drawImage(canvas, x, y, canvas.width, canvas.height);
-        index++;
-        // console.log(index);
-        if (index == len) {
-          outputCanvas.toBlob((blob) => {
-            let imageFile = new File([blob as Blob], pageAttrs.pagaName, { lastModified: Date.now() });
-            // 上传图片
-            uploadImage(imageFile).then((res) => {
-              var protoID = parseInt(route.params.protoID as string);
-              editFile({ fileID: protoID, fileImage: res.data.url });
-            });
-            var imgUrl = window.URL.createObjectURL(blob as Blob);
-            // 利用浏览器下载器下载图片
-            let a = document.createElement('a');
-            a.href = imgUrl;
-
-            a.setAttribute('download', pageAttrs.pagaName);
-            a.click();
-            a.remove();
-          });
-        }
-      }
-    });
-  });
-}
-
-function saveToImage() {
-  drawCanvas();
-}
 
 function onDragOver(e: any) {
   if (!viewport.value) return;
@@ -1081,11 +994,128 @@ function bringToFront(): void {
 
 /** Save the scene into a json file */
 function saveProto(): void {
-  var protoData = JSON.stringify(loadElements.value as Item[]);
+  protoData = JSON.stringify(loadElements.value as Item[]);
   // localStorage.setItem('proto', protoData);
   var protoID = parseInt(route.params.protoID as string);
   editFile({ fileID: protoID, data: protoData }).then((res) => {
-    window.$message.info('已保存');
+    window.$message.info('已保存原型');
+  });
+}
+
+var outputCanvas = document.createElement('canvas');
+var ctx2 = outputCanvas.getContext('2d');
+let previewImages: string[] = [];
+let pageCount = 0;
+let protoData: string;
+async function drawCanvas(drawPage: PageItem, darwPageItems: Array<Item>, output: boolean) {
+  let elems: Array<HTMLElement> = [];
+  (drawPage as PageItem).containedIDs.forEach((dataID) => {
+    var id = dataID.split("'")[1];
+    elems.push(document.getElementById(id) as HTMLElement);
+  });
+  elems.sort((ele1, ele2) => {
+    return parseInt(ele2.style.zIndex) - parseInt(ele1.style.zIndex);
+  });
+  darwPageItems.sort((ele1, ele2) => {
+    return ele1.z - ele2.z;
+  });
+  var len = elems.length;
+  var pageAttrs = {
+    w: (drawPage as PageItem).w,
+    h: (drawPage as PageItem).h,
+    x: (drawPage as PageItem).x,
+    y: (drawPage as PageItem).y,
+    pagaName: (drawPage as PageItem).pageName,
+  };
+  outputCanvas.width = pageAttrs.w;
+  outputCanvas.height = pageAttrs.h;
+  var index = 0;
+  await elems.forEach((elem: any, i: number) => {
+    var canvas = document.createElement('canvas');
+    var context = canvas.getContext('2d');
+    if (context != null) {
+      context.fillStyle = 'rgba(255, 255, 255, 0)';
+    }
+    var width = elem.offsetWidth; //获取dom 宽度
+    var height = elem.offsetHeight; //获取dom 高度
+    var x = darwPageItems[i].x - pageAttrs.x;
+    var y = darwPageItems[i].y - pageAttrs.y;
+    var yOffset = darwPageItems[i].yOffset;
+    canvas.width = width;
+    canvas.height = height;
+    var opts = {
+      scale: 1, // 添加的scale 参数
+      canvas: canvas, //自定义 canvas
+      logging: true, //日志开关
+      width: width, //dom 原始宽度
+      height: height, //dom 原始高度
+      y: yOffset,
+      useCORS: true,
+      withCredentials: true,
+      allowTaint: true,
+      backgroundColor: null,
+    };
+    html2canvas(elem, opts).then((canvas) => {
+      if (ctx2 != null) {
+        ctx2.drawImage(canvas, x, y, canvas.width, canvas.height);
+        index++;
+        // console.log(index);
+        if (index == len) {
+          outputCanvas.toBlob((blob) => {
+            // 上传图片
+            let imageFile = new File([blob as Blob], pageAttrs.pagaName, { lastModified: Date.now() });
+            uploadImage(imageFile)
+              .then((res) => {
+                previewImages.push(res.data.url);
+              })
+              .finally(() => {
+                if (++pageCount == pages.value.length) {
+                  var protoID = parseInt(route.params.protoID as string);
+                  editFile({
+                    fileID: protoID,
+                    fileImage: previewImages[previewImages.length - 1],
+                    previewImages: previewImages,
+                    data: protoData,
+                  }).then((res) => {
+                    if (res.data.result == 0) {
+                      window.$message.info('已保存全部');
+                    }
+                  });
+                }
+              });
+            if (output) {
+              var imgUrl = window.URL.createObjectURL(blob as Blob);
+              // 利用浏览器下载器下载图片
+              let a = document.createElement('a');
+              a.href = imgUrl;
+
+              a.setAttribute('download', pageAttrs.pagaName);
+              a.click();
+              a.remove();
+            }
+          });
+        }
+      }
+    });
+  });
+}
+
+function saveToImage() {
+  if (currentPage.value == null) {
+    selectPage(pages.value[0]);
+  }
+  drawCanvas(currentPage.value as PageItem, selectedPageItems.value, true);
+}
+
+function saveAll() {
+  protoData = JSON.stringify(loadElements.value as Item[]);
+  pageCount = 0;
+  previewImages.length = 0;
+  pages.value.forEach((page) => {
+    var pageItems = loadElements.value.filter((elem) => {
+      return (page as PageItem).containedIDs.includes(`[data-item-id='${elem.id}']`);
+    }) as Item[];
+    drawCanvas(page, pageItems, false);
   });
 }
 
@@ -1216,6 +1246,7 @@ function deleteItem() {
     var fromID = (selectedItem.value as ItemConnection).from.item;
     var element = loadElements.value.find((elem) => elem.id == fromID);
     (element as Item).connection = undefined;
+    syncManager.sendMessage(OperationType.DELETE_ITEM, { targetID: (selectedItem.value as DiagramElement).id });
     historyManager.value.execute(new DeleteCommand(loadElements.value, selectedItem.value));
     emit('delete-connection', selectedItem.value);
     selectNone();
@@ -1337,7 +1368,7 @@ function connectionHandleClick(item: Item, point: ConnectionHandle) {
 
   ci.startItem = null;
   ci.endItem = null;
-
+  syncManager.sendMessage(OperationType.ADD_ITEM, { element: newConnection });
   historyManager.value.execute(new AddConnectionCommand(loadElements.value, newConnection));
   emit('add-connection', newConnection);
 }
@@ -1390,6 +1421,7 @@ function focusPage(page: Item) {
 }
 
 function handleLinkToClick(itemID: string) {
+  console.log('handleLinkToClick');
   if (!editable.value) {
     var element = loadElements.value.find((elem) => elem.id == itemID) as Item;
     focusPage(element);

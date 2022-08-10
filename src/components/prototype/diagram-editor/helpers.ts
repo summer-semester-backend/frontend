@@ -101,6 +101,7 @@ export function createPageItem(): PageItem {
 export function createItem(item?: DeepPartial<Item>): Item {
   return {
     id: getUniqueId(),
+    isPage: false,
     title: 'Item',
     component: 'Rectangle',
 
@@ -144,7 +145,7 @@ export function createItem(item?: DeepPartial<Item>): Item {
 export function createConnection(fromID: string, toID: string, c?: DeepPartial<ItemConnection>): ItemConnection {
   return {
     id: getUniqueId(),
-
+    isPage: false,
     component: 'Connection',
 
     from: {
