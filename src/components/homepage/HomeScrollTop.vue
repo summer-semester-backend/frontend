@@ -1,5 +1,5 @@
 <template>
-  <div class="rn-back-top" @click="scrollToTop" :class="[visible ? 'd-inline' : 'd-none']">
+  <div class="rn-back-top" @click="scrollToTop" :class="[visible ? 'd-inline' : 'd-none']" style="background: #f5f8fa">
     <HomeIcon name="chevron-up" :size="27" />
   </div>
 </template>
@@ -39,3 +39,6 @@ onBeforeUnmount(() => {
   window.removeEventListener('scroll', toggleVisible);
 });
 </script>
+<style scoped src="bootstrap/scss/bootstrap.scss" lang="scss"></style>
+
+<style scoped src="@/assets/scss/style.scss" lang="scss"></style>

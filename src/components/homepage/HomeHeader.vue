@@ -1,9 +1,8 @@
 <template>
-  <div :class="{ 'header-transparent-with-topbar': data.headerTransparency }">
-    <header :class="[`rn-header header-default header-not-transparent header-sticky ${data.headerClass}`]">
+  <div style="background: #f5f8fa">
+    <header :class="[`rn-header header-default header-not-transparent header-sticky`]" style="background: #f5f8fa">
       <div class="container position-relative">
         <div class="row align-items-center row--0">
-          <!-- <template> -->
           <div class="col-lg-9 col-md-6 col-4 position-static">
             <div class="header-left d-flex">
               <HomeLogo />
@@ -67,9 +66,9 @@ const data = defineProps({
 const toggleStickyHeader = () => {
   const scrolled = document.documentElement.scrollTop;
   if (scrolled > 100) {
-    AppFunctions.addClass('.header-default', 'sticky');
+    document.querySelector('.header-default').classList.add('sticky');
   } else if (scrolled <= 100) {
-    AppFunctions.removeClass('.header-default', 'sticky');
+    document.querySelector('.header-default').classList.remove('.header-default');
   }
 };
 

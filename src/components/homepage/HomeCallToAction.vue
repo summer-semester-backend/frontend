@@ -14,10 +14,20 @@
                 <h2 class="title" v-html="props.title" data-aos="fade-up" data-aos-delay="60" />
                 <h6 class="subtitle" v-html="props.subtitle" data-aos="fade-up" data-aos-delay="60" />
                 <div class="call-to-btn text-center mt--30" data-aos="fade-up" data-aos-delay="60">
-                  <a class="btn-default btn-icon" href="#">
+                  <!-- <a class="btn-default btn-icon" href="#">
                     {{ props.btnText }}
                     <HomeIcon name="arrow-right" class="size-20" />
-                  </a>
+                  </a> -->
+                  <router-link class="btn-default btn-icon" to="/login">
+                    <div id="buttonTop" data-aos="fade-up" data-aos-delay="250">
+                      <div style="width: 80px; height: 50px">即刻开始</div>
+                      <div style="height: 50px; display: flex; align-items: center">
+                        <n-icon size="20" color="#ffffff">
+                          <ArrowRightOutlined />
+                        </n-icon>
+                      </div>
+                    </div>
+                  </router-link>
                 </div>
               </div>
             </div>
@@ -31,6 +41,7 @@
 
 <script setup="js">
 import { computed } from 'vue';
+import { ArrowRightOutlined } from '@vicons/antd';
 
 const props = defineProps({
   backgroundImage: {
@@ -72,3 +83,19 @@ const setOverlay = computed(() => {
 <style scoped src="bootstrap/scss/bootstrap.scss" lang="scss"></style>
 
 <style scoped src="@/assets/scss/style.scss" lang="scss"></style>
+<style scoped>
+#buttonTop {
+  font-size: 16px;
+  font-weight: 400;
+  text-align: center;
+  color: white;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 50px;
+  margin: 0px;
+  padding: 0px;
+}
+</style>

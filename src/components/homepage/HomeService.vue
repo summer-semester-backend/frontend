@@ -1,7 +1,12 @@
 <template>
   <div class="row row--15 service-wrapper">
     <div class="col-lg-4 col-md-6 col-sm-12 col-12" v-for="(service, index) in serviceList" :key="index">
-      <div :class="`service ${props.serviceStyle} ${checkTextAlign}`" data-aos="fade-up" data-aos-delay="70">
+      <div
+        :class="`service ${props.serviceStyle} ${checkTextAlign}`"
+        data-aos="fade-up"
+        data-aos-delay="70"
+        style="background: #f5f8fa"
+      >
         <div class="inner">
           <div class="content">
             <h4 class="title">
