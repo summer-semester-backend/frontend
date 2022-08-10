@@ -7,7 +7,11 @@ import { createPinia } from 'pinia';
 import { setupPrototypeComponents } from './components/prototype/register';
 
 
-
+// import 'bootstrap/scss/bootstrap.scss';
+// import 'animate.css';
+// import 'bootstrap';
+// import 'aos/dist/aos.css';
+// import './assets/scss/style.scss';
 import AOS from 'aos';
 
 import VueTypedJs from 'vue-typed-js';

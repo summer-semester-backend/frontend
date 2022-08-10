@@ -39,3 +39,9 @@ const props = defineProps({
   },
 });
 </script>
+
+
+<style scoped>
+@import 'animate.css';
+@import 'aos/dist/aos.css';
+</style>

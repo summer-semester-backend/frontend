@@ -29,7 +29,7 @@
                 在线一体化协作平台
               </p>
               <div class="button-group" data-aos="fade-up" data-aos-delay="250">
-                <router-link class="btn-default btn-medium round btn-icon" to="/contact">
+                <router-link class="btn-default btn-medium round btn-icon" to="/login">
                   即刻开始
                   <HomeIcon name="arrow-right" size="20" icon-class="icon" />
                 </router-link>
@@ -117,15 +117,20 @@
 
 <script setup>
 import Typed from 'typed.js';
-import 'bootstrap/scss/bootstrap.scss';
-import 'animate.css';
-import 'bootstrap';
-import 'aos/dist/aos.css';
-import '../../assets/scss/style.scss';
+// import 'bootstrap/scss/bootstrap.scss';
+// import 'animate.css';
+// import 'bootstrap';
+// import 'aos/dist/aos.css';
+// import '../../assets/scss/style.scss';
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 #img1 {
   background-image: url('@/assets/images/test/3.png');
 }
+</style>
+
+<style scoped>
+@import 'animate.css';
+@import 'aos/dist/aos.css';
 </style>

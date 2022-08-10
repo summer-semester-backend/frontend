@@ -68,3 +68,8 @@ const setOverlay = computed(() => {
   if (props.styleType === 2) return 8;
 });
 </script>
+
+<style scoped>
+@import 'animate.css';
+@import 'aos/dist/aos.css';
+</style>

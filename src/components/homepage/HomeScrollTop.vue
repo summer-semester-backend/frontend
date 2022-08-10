@@ -39,3 +39,8 @@ onBeforeUnmount(() => {
   window.removeEventListener('scroll', toggleVisible);
 });
 </script>
+
+<style scoped>
+@import 'animate.css';
+@import 'aos/dist/aos.css';
+</style>

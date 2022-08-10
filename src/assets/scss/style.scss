@@ -82,91 +82,91 @@
 /**************************************
   Default Styles
 ***************************************/
-@import './default/_variables';
-@import './default/_mixins';
-@import './default/_reset';
-@import './default/_typography';
-@import './default/_extend';
-@import './default/_animations';
-@import './default/_shortcode';
-@import './default/_spacing';
-@import './default/_common';
-@import './default/_forms';
-@import './default/_sal';
-@import './default/_text-animation';
-@import './default/_icons';
+@import 'default/variables';
+@import 'default/mixins';
+@import 'default/reset';
+@import 'default/typography';
+@import 'default/extend';
+@import 'default/animations';
+@import 'default/shortcode';
+@import 'default/spacing';
+@import 'default/common';
+@import 'default/forms';
+@import 'default/sal';
+@import 'default/text-animation';
+@import 'default/icons';
 
 
 /**************************************
   Theme Styles
 ***************************************/
-@import './color/_themebg';
+@import 'color/themebg';
 
 
 /**************************************
   Header Styles
 ***************************************/
-@import './header/_headerdefault';
-@import './header/_nav';
-@import './header/_header-top';
-@import './header/_headerTopBar';
-@import './header/_mobilemenu';
+@import 'header/headerdefault';
+@import 'header/nav';
+@import 'header/header-top';
+@import 'header/headerTopBar';
+@import 'header/mobilemenu';
 
 
 /**************************************
   Elements
 ***************************************/
-@import './elements/_breadcrumb';
-@import './elements/_sectiontitle';
-@import './elements/_button';
-@import './elements/_service';
-@import './elements/_card';
-@import './elements/_counter';
-@import './elements/_progressbar';
-@import './elements/_accordion';
-@import './elements/_social-share';
-@import './elements/_team';
-@import './elements/_portfolio';
-@import './elements/_testimonial';
-@import './elements/_slickslide';
-@import './elements/_timeline';
-@import './elements/_call-to-action';
-@import './elements/_tab';
-@import './elements/_pricing';
-@import './elements/_split';
-@import './elements/_vedio';
-@import './elements/_gallery';
-@import './elements/_contact';
-@import './elements/_brand';
-@import './elements/_404';
-@import './elements/_advance-tab';
-@import './elements/_advancepricing';
-@import './elements/_contact-form';
-@import './elements/_switcher';
-@import './elements/_backto-top';
-@import './elements/_about';
-@import './elements/_newsletter';
+@import 'elements/breadcrumb';
+@import 'elements/sectiontitle';
+@import 'elements/button';
+@import 'elements/service';
+@import 'elements/card';
+@import 'elements/counter';
+@import 'elements/progressbar';
+@import 'elements/accordion';
+@import 'elements/social-share';
+@import 'elements/team';
+@import 'elements/portfolio';
+@import 'elements/testimonial';
+@import 'elements/slickslide';
+@import 'elements/timeline';
+@import 'elements/call-to-action';
+@import 'elements/tab';
+@import 'elements/pricing';
+@import 'elements/split';
+@import 'elements/vedio';
+@import 'elements/gallery';
+@import 'elements/contact';
+@import 'elements/brand';
+@import 'elements/404';
+@import 'elements/advance-tab';
+@import 'elements/advancepricing';
+@import 'elements/contact-form';
+@import 'elements/switcher';
+@import 'elements/backto-top';
+@import 'elements/about';
+@import 'elements/newsletter';
 
 
 /**************************************
   Blog
 ***************************************/
-@import './blog/_blog';
-@import './blog/_sidebar';
-@import './blog/_blog-details';
+@import 'blog/blog';
+@import 'blog/sidebar';
+@import 'blog/blog-details';
 
 
 /**************************************
   Footer Styles
 ***************************************/
-@import './footer/_footer';
-@import './footer/_copyright';
+@import 'footer/footer';
+@import 'footer/copyright';
 
 
 /**************************************
   Template
 ***************************************/
-@import './template/_banner';
-@import './template/_portfoliodetails';
-@import './template/_splash';
-@import './template/_lightmode';
+@import 'template/banner';
+@import 'template/portfoliodetails';
+@import 'template/splash';
+@import 'template/lightmode';

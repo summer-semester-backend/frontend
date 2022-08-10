@@ -24,3 +24,8 @@ const iconSvg = (icon) => {
   return feather.icons[icon].toSvg();
 };
 </script>
+
+<style scoped>
+@import 'animate.css';
+@import 'aos/dist/aos.css';
+</style>
