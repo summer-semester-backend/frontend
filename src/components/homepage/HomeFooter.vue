@@ -12,3 +12,7 @@
 </template>
 
 <script setup></script>
+
+<style scoped src="bootstrap/scss/bootstrap.scss" lang="scss"></style>
+
+<style scoped src="@/assets/scss/style.scss" lang="scss"></style>

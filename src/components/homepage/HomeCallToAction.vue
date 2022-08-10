@@ -68,3 +68,7 @@ const setOverlay = computed(() => {
   if (props.styleType === 2) return 8;
 });
 </script>
+
+<style scoped src="bootstrap/scss/bootstrap.scss" lang="scss"></style>
+
+<style scoped src="@/assets/scss/style.scss" lang="scss"></style>

@@ -125,7 +125,6 @@ import { ArrowRightOutlined } from '@vicons/antd';
 import { ref, onMounted } from 'vue';
 
 const options = {
-  strings: ['<i>First</i> sentence.', '&amp; a second sentence.'],
   // typeSpeed: 40,
   strings: ['在线.', '一体化.', '协作平台.'],
   loop: true,
