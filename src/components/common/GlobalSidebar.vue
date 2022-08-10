@@ -13,7 +13,7 @@
     </n-layout-header>
     <n-layout-footer class="mb-2" position="absolute">
       <n-space vertical>
-        <n-avatar round size="large" class="flex m-auto" :src="avatar"></n-avatar>
+        <n-avatar object-fit="cover" round size="large" class="flex m-auto" :src="avatar"></n-avatar>
         <n-button class="flex m-auto" :bordered="false" @click="handleLogout"> 登出</n-button>
       </n-space>
     </n-layout-footer>
@@ -27,12 +27,13 @@ import { useRouter } from 'vue-router';
 import { useAuthStore } from '@/store/auth';
 import { computed } from 'vue';
 
-const avatar = computed(() => {
-  const img = localStorage.getItem('avatar') as string;
+const { signOut, getAvatar } = useAuthStore();
+
+var avatar = computed(() => {
+  const img = getAvatar();
   return img;
 });
 const router = useRouter();
-const { signOut } = useAuthStore();
 
 const handleLogout = () => {
   router.push({ name: 'login' });
