@@ -41,6 +41,11 @@ const renderIcon = (icon: Component) => {
 };
 const options = ref([
   {
+    label: 'PDF',
+    key: 'pdf',
+    icon: renderIcon(FilePdfOutlined),
+  },
+  {
     label: 'Word',
     key: 'word',
     icon: renderIcon(FileWordOutlined),

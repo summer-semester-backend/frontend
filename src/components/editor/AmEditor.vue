@@ -107,7 +107,7 @@ const exportPdf = (title: string) => {
     filename: title,
     image: { type: 'jpeg', quality: 0.98 },
     enableLinks: true,
-    html2canvas: { dpi: 192, letterRendering: true, useCORS: true },
+    html2canvas: { dpi: 192, letterRendering: true },
     jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
   });
 };

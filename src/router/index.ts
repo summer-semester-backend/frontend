@@ -4,22 +4,31 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/',
     name: 'default',
-    redirect: 'login',
+    redirect: '/index',
   },
   {
     path: '/prototype/:protoID',
     name: 'Prototype',
     component: () => import('../views/prototype/ProtoWorkSpace.vue'),
+    meta: {
+      title: '云图',
+    },
   },
   {
     path: '/attendTeam/:code',
     name: 'AttendTeam',
     component: () => import('../views/team/AttendTeam.vue'),
+    meta: {
+      title: '云图',
+    },
   },
   {
     path: '/team',
     name: 'team',
     component: () => import('../views/team/Index.vue'),
+    meta: {
+      title: '云图',
+    },
     children: [
       {
         path: ':teamID',
@@ -59,6 +68,9 @@ const routes: RouteRecordRaw[] = [
     path: '/user',
     name: 'user',
     component: () => import('../views/user/UserOverview.vue'),
+    meta: {
+      title: '云图',
+    },
     children: [
       {
         path: 'personInfo',
@@ -86,6 +98,9 @@ const routes: RouteRecordRaw[] = [
     path: '/workspace/:ProjID',
     name: 'workspace',
     component: () => import('../views/workspace/WorkspaceOverview.vue'),
+    meta: {
+      title: '云图',
+    },
     children: [
       {
         path: 'doc/',
@@ -118,21 +133,33 @@ const routes: RouteRecordRaw[] = [
     path: '/edit/:id',
     name: 'editor',
     component: () => import('../views/document/DocumentEditor.vue'),
+    meta: {
+      title: '云图',
+    },
   },
   {
     path: '/login',
     name: 'login',
     component: () => import('../views/login/LoginPage.vue'),
+    meta: {
+      title: '云图',
+    },
   },
   {
     path: '/:catchAll(.*)',
     name: 'NoFound',
     component: () => import('../views/common/noFound.vue'),
+    meta: {
+      title: '云图-404',
+    },
   },
   {
     path: '/index',
     name: 'Index',
     component: () => import('../views/homepage/HomePage.vue'),
+    meta: {
+      title: '云图-首页',
+    },
   },
 ];
 

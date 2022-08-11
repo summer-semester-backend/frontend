@@ -8,6 +8,14 @@ import { setupPrototypeComponents } from './components/prototype/register';
 
 import AOS from 'aos';
 
+router.beforeEach((to, from, next) => {
+  /* 路由发生变化修改页面title */
+  if (to.meta.title) {
+    document.title = to.meta.title;
+  }
+  next();
+});
+
 async function setupApp() {
   // 引入静态资源
   setupAssets();
