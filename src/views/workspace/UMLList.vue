@@ -292,6 +292,14 @@ const fileOnOpen = ref<File | null>(null);
 
 const emits = defineEmits(['refresh']);
 const handleClickOpen = async (file: any) => {
+  var state = false;
+  state = await drawioState();
+  
+  if (state == false) {
+    message.loading('UML编辑器正在初始化……');
+    return;
+  }
+
   fileOnOpen.value = file;
   var re = 100;
   re = await acquireLock();
@@ -605,9 +613,21 @@ window.addEventListener('drawioLoaded', (evt) => {
   // state.value = "Ready!"
 });
 
-// 在需要时打开 drawio 开始编辑
-const openDesk = () => {
+const drawioState = () => {
   if (openDrawio == null || openDrawio.isLoaded() == false) {
+    // message.loading('UML编辑器正在初始化……');
+    return false;
+  }
+  else
+  return true;
+}
+
+// 在需要时打开 drawio 开始编辑
+const openDesk = async () => {
+  var state = false;
+  state = await drawioState();
+  
+  if (state == false) {
     message.loading('UML编辑器正在初始化……');
     return;
   }
@@ -617,8 +637,11 @@ const openDesk = () => {
 };
 
 // 携带参数的打开
-const openDeskWithFile = (svgStream: any) => {
-  if (openDrawio == null || openDrawio.isLoaded() == false) {
+const openDeskWithFile = async (svgStream: any) => {
+  var state = false;
+  state = await drawioState();
+  
+  if (state == false) {
     message.loading('UML编辑器正在初始化……');
     return;
   }
