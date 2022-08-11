@@ -4,7 +4,8 @@
     :data="tableData"
     :loading="isReloading"
     :pagination="pagination"
-    style="max-height: 400px; min-height: 300px"
+    :max-height="400"
+    style="min-height: 300px"
   >
   </n-data-table>
   <team-invite ref="teamInvite" />
