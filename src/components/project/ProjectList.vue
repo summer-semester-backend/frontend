@@ -64,7 +64,7 @@
                     <template #footer>
                       <n-ellipsis
                         :tooltip="false"
-                        style="background-color: #fff; font-size: 1rem; font-weight: 500; margin: 0 24px"
+                        style="background-color: #fff; font-size: 1rem; font-weight: 500; margin: 0 24px; width: 80%"
                       >
                         {{ item.fileName }}
                       </n-ellipsis>

@@ -19,10 +19,10 @@ import { login } from '@/api/auth';
 import { useAuthStore } from '@/store/auth';
 // import { reactive } from 'vue';
 import { useRouter } from 'vue-router';
-import { hex_md5 } from '@/plugins/md5.js'
-import { complex ,isEmail} from '@/plugins/passVerify.js';
+import { hex_md5 } from '@/plugins/md5.js';
+import { complex, isEmail } from '@/plugins/passVerify.js';
 const emits = defineEmits(['forget']);
-const { signIn } = useAuthStore();
+const { signIn, setAvatar } = useAuthStore();
 const router = useRouter();
 
 const model = reactive({
@@ -36,18 +36,17 @@ const rules = ref({
       // message: '请输入新密码',
       trigger: ['input', 'blur'],
 
-      validator(rule:any, value:any) {
+      validator(rule: any, value: any) {
         if (!value) {
-          return new Error("请输入邮箱");
-        } else if (!(isEmail(value))) {
-          return new Error("输入正确邮箱格式");
+          return new Error('请输入邮箱');
+        } else if (!isEmail(value)) {
+          return new Error('输入正确邮箱格式');
         }
         return true;
       },
     },
   ],
 });
-
 
 const handleLogin = () => {
   //login({ email: model.email, password: hex_md5(model.password) }).then((res) => {//加密
@@ -56,11 +55,13 @@ const handleLogin = () => {
       localStorage.setItem('token', res.data.token);
       localStorage.setItem('userID', res.data.userID);
       localStorage.setItem('avatar', res.data.avatar);
+      setAvatar(res.data.avatar);
       signIn(res.data.token);
       window.$message.info('登录成功');
       // console.log(localStorage.getItem('inviteLink'));
       if (localStorage.getItem('inviteLink')) {
         router.push({ name: 'AttendTeam', params: { code: localStorage.getItem('inviteLink') } });
+        localStorage.removeItem('inviteLink');
       } else {
         router.push({ name: 'ProjectDesktop' });
       }
