@@ -4,11 +4,11 @@
     <template #action>
       <n-grid>
         <n-gi :span="16"> </n-gi>
+        <n-gi :span="5">
+          <n-button type="info" @click="handleCopyHere">在根目录复制</n-button>
+        </n-gi>
         <n-gi :span="3">
           <n-button type="info" @click="handleCopy">复制</n-button>
-        </n-gi>
-        <n-gi :span="5">
-          <n-button type="info" @click="handleCopyHere">在此处复制</n-button>
         </n-gi>
       </n-grid>
     </template>
@@ -140,7 +140,7 @@ const handleCopy = () => {
 };
 
 const handleCopyHere = () => {
-  copyFile({ fatherID: nowTeamID.value, fileID: props.fileID, teamID: nowTeamID.value, newName: props.fileName }).then(
+  copyFile({ fatherID: nowFileID.value, fileID: props.fileID, teamID: nowTeamID.value, newName: props.fileName }).then(
     (res: any) => {
       if (res.data.result <= 1) {
         window.$message.success('复制成功');
