@@ -79,6 +79,12 @@ function zoomReset() {
   if (oldZoom !== newZoom) emit('zoom-changed', newZoom, true);
 }
 
+function zoomSet(zoomFactor: number) {
+  const oldZoom = props.zoomManager.getZoomFactor();
+  const newZoom = props.zoomManager.zoomSet(zoomFactor);
+  if (oldZoom !== zoomFactor) emit('zoom-changed', newZoom, false);
+}
+
 function zoomIn() {
   const oldZoom = props.zoomManager.getZoomFactor();
   const newZoom = props.zoomManager.zoomIn();
@@ -108,7 +114,7 @@ function closeLink() {
   });
   syncManager.sendMessage(OperationType.CLOSE_SHARE, { teamID: currentFileID });
 }
-defineExpose({ zoomReset });
+defineExpose({ zoomReset, zoomSet });
 </script>
 
 <style scoped>

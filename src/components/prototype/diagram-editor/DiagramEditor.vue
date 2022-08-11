@@ -1427,10 +1427,11 @@ function handleSelectPage(page: PageItem) {
 function focusPage(page: Item) {
   if (isPage(page)) {
     window.$message.info('聚焦' + (page as PageItem).pageName);
-    const left = page.x - 100;
-    const top = page.y - 100;
+    const left = page.x - 50;
+    const top = page.y - 50;
+    const zoomFactor = (window.innerHeight / page.h) * 100;
+    zoomToolbar.value?.zoomSet(zoomFactor);
     viewer.value?.scrollTo(left, top);
-    zoomToolbar.value?.zoomReset();
   }
   // console.log('page info', currentPage.value, currentPageTargets.value);
 }
