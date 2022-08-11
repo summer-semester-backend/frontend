@@ -58,10 +58,10 @@ const handleLogin = () => {
       setAvatar(res.data.avatar);
       signIn(res.data.token);
       window.$message.info('登录成功');
-      // console.log(localStorage.getItem('inviteLink'));
+      console.log(localStorage.getItem('inviteLink'));
       if (localStorage.getItem('inviteLink')) {
         router.push({ name: 'AttendTeam', params: { code: localStorage.getItem('inviteLink') } });
-        localStorage.removeItem('inviteLink');
+        window.localStorage.removeItem('inviteLink');
       } else {
         router.push({ name: 'ProjectDesktop' });
       }
