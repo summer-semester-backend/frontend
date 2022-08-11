@@ -3,8 +3,8 @@
     <template #header> 选择复制位置 </template>
     <template #action>
       <n-grid>
-        <n-gi :span="16"> </n-gi>
-        <n-gi :span="5">
+        <n-gi :span="15"> </n-gi>
+        <n-gi :span="6">
           <n-button type="info" @click="handleCopyHere">在根目录复制</n-button>
         </n-gi>
         <n-gi :span="3">

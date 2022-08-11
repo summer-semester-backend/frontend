@@ -17,6 +17,7 @@ onMounted(() => {
       if (res.data.result == 0) {
         router.push({ name: 'teamProject', params: { teamID: res.data.teamID } });
         message.success('加入团队成功');
+        window.localStorage.removeItem('inviteLink');
       }
     })
     .catch((err) => {

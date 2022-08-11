@@ -61,7 +61,6 @@ const handleLogin = () => {
       console.log(localStorage.getItem('inviteLink'));
       if (localStorage.getItem('inviteLink')) {
         router.push({ name: 'AttendTeam', params: { code: localStorage.getItem('inviteLink') } });
-        window.localStorage.removeItem('inviteLink');
       } else {
         router.push({ name: 'ProjectDesktop' });
       }
