@@ -18,24 +18,12 @@
           <div class="col-lg-3 col-md-6 col-8">
             <div class="header-right">
               <!-- Start Header Btn -->
-              <div class="header-btn" v-if="userID == null">
+              <div class="header-btn">
                 <!-- <a :class="data.buyButtonClass" href="#" style="color: white; width: 120px"> </a> -->
                 <router-link :class="data.buyButtonClass" to="/login" style="color: white; width: 120px">
                   登录 / 注册
                 </router-link>
               </div>
-              <n-space v-else align="center" inline>
-                <n-avatar
-                  @click="$router.push({ name: 'PersonInfo' })"
-                  class="shadow-box"
-                  circle
-                  :src="userInfo.avatar"
-                >
-                </n-avatar>
-                <n-ellipsis style="font-size: 24px; color: black; max-width: 180px; user-select: none">{{
-                  userInfo.username
-                }}</n-ellipsis>
-              </n-space>
               <!-- End Header Btn  -->
             </div>
           </div>
@@ -49,7 +37,6 @@
 <script setup="js">
 import AppFunctions from '../../helpers/AppFunctions';
 import { ref, onMounted, onBeforeUnmount, onBeforeMount } from 'vue';
-import { getUserInfo } from '@/api/user';
 const data = defineProps({
   logo: {
     type: String,
@@ -76,18 +63,6 @@ const data = defineProps({
     default: 'btn-default btn-small round',
   },
 });
-const userInfo = ref({
-  username: '',
-  avatar: '',
-});
-const userID = ref(null);
-
-const readUserInfo = (userID) => {
-  getUserInfo({ userID: userID }).then((res) => {
-    userInfo.value.username = res.data.data.username;
-    userInfo.value.avatar = res.data.data.avatar;
-  });
-};
 
 const toggleStickyHeader = () => {
   const scrolled = document.documentElement.scrollTop;
@@ -103,12 +78,6 @@ onBeforeMount(() => {
 });
 
 onMounted(() => {
-  if (localStorage.getItem('userID')) {
-    userID.value = parseInt(localStorage.getItem('userID'));
-    readUserInfo(userID.value);
-  } else {
-    userID.value = null;
-  }
   toggleStickyHeader();
   AppFunctions.toggleClass('body', 'active-light-mode');
 });
