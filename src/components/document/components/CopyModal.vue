@@ -3,9 +3,12 @@
     <template #header> 选择复制位置 </template>
     <template #action>
       <n-grid>
-        <n-gi :span="22"> </n-gi>
-        <n-gi>
+        <n-gi :span="16"> </n-gi>
+        <n-gi :span="3">
           <n-button type="info" @click="handleCopy">复制</n-button>
+        </n-gi>
+        <n-gi :span="5">
+          <n-button type="info" @click="handleCopyHere">在此处复制</n-button>
         </n-gi>
       </n-grid>
     </template>
@@ -51,6 +54,8 @@ const route = useRoute();
 const treeData = ref<File[]>([]);
 const type = ref('team');
 const targetID = ref<number>(-1);
+const nowTeamID = ref(-1);
+const nowFileID = ref(-1);
 //将后端请求的数据放入文件列表
 const pushFile = (res: any, dad: File[] | null) => {
   res.data.sonList.forEach((item: any) => {
@@ -134,13 +139,29 @@ const handleCopy = () => {
   });
 };
 
+const handleCopyHere = () => {
+  copyFile({ fatherID: nowTeamID.value, fileID: props.fileID, teamID: nowTeamID.value, newName: props.fileName }).then(
+    (res: any) => {
+      if (res.data.result <= 1) {
+        window.$message.success('复制成功');
+        emits('close');
+        emits('refresh');
+      }
+    }
+  );
+};
+
 onMounted(() => {
   if (route.params.teamID) {
+    nowTeamID.value = parseInt(route.params.teamID.toString());
+    nowFileID.value = -1;
     type.value = 'team';
-    getFileList(-1, parseFloat(route.params.teamID.toString()), treeData.value);
-  } else if (route.params.projID) {
+    getFileList(nowFileID.value, nowTeamID.value, treeData.value);
+  } else if (route.params.ProjID) {
+    nowTeamID.value = -1;
+    nowFileID.value = parseInt(route.params.ProjID.toString());
     type.value = 'proj';
-    getFileList(parseFloat(route.params.projID.toString()), -1, treeData.value);
+    getFileList(nowFileID.value, nowTeamID.value, treeData.value);
   }
 });
 </script>

@@ -539,7 +539,7 @@ const handleOpen = (row: any) => {
       name: 'DirList',
       params: {
         dirID: row.fileID,
-        projID: fileID.value,
+        ProjID: fileID.value,
       },
     });
   }
